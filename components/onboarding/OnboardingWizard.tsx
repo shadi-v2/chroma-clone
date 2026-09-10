@@ -47,8 +47,10 @@ export default function OnboardingWizard() {
     phone: user?.phone || "",
     dateOfBirth: user?.dateOfBirth ? user.dateOfBirth.split("T")[0] : "",
     avatar: user?.avatar || "",
-    selectedGenres: [] as string[],
+    avatarPublicId: user?.avatarPublicId || "",
+    selectedGenres: (user?.genres || []) as string[],
   });
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>(user?.avatar || "");
   const initializedUserIdRef = useRef<string | null>(null);
 
@@ -66,6 +68,8 @@ export default function OnboardingWizard() {
           phone: prev.phone || user.phone || "",
           dateOfBirth: prev.dateOfBirth || (user.dateOfBirth ? user.dateOfBirth.split("T")[0] : ""),
           avatar: prev.avatar || user.avatar || "",
+          avatarPublicId: prev.avatarPublicId || user.avatarPublicId || "",
+          selectedGenres: prev.selectedGenres.length > 0 ? prev.selectedGenres : (user.genres || []),
         }));
         if (user.avatar) {
           setAvatarPreview(user.avatar);
@@ -74,17 +78,12 @@ export default function OnboardingWizard() {
     }
   }, [user]);
 
-
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result as string;
-        setAvatarPreview(base64);
-        setFormData((prev) => ({ ...prev, avatar: base64 }));
-      };
-      reader.readAsDataURL(file);
+      setSelectedAvatarFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setAvatarPreview(previewUrl);
     }
   };
 
@@ -139,6 +138,22 @@ export default function OnboardingWizard() {
     setError("");
 
     try {
+      let avatarUrl = formData.avatar;
+      let avatarPublicId = formData.avatarPublicId;
+
+      if (selectedAvatarFile) {
+        try {
+          const uploadRes = await api.users.uploadAvatar(selectedAvatarFile);
+          if (uploadRes.url) {
+            avatarUrl = uploadRes.url;
+            avatarPublicId = uploadRes.publicId;
+          }
+        } catch (uploadErr) {
+          console.error("AVATAR UPLOAD FAILED:", uploadErr);
+          // Non-blocking: continue updating user profile
+        }
+      }
+
       const updated = await api.users.updateMe({
         firstName: formData.firstName.trim(),
         surname: formData.surname.trim(),
@@ -146,7 +161,9 @@ export default function OnboardingWizard() {
         school: formData.school.trim(),
         phone: formData.phone.trim(),
         dateOfBirth: formData.dateOfBirth,
-        avatar: formData.avatar || undefined,
+        avatar: avatarUrl || undefined,
+        avatarPublicId: avatarPublicId || undefined,
+        genres: formData.selectedGenres,
         onboardingCompleted: true,
       });
 

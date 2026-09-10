@@ -13,6 +13,7 @@ import type {
 } from "@/types/article";
 import type { Category } from "@/types/category";
 import { RichTextEditor } from "../rich-text-editor/Editor";
+import { useToast } from "@/contexts/ToastContext";
 
 interface ArticleEditorFormProps {
   categories: Category[];
@@ -47,6 +48,7 @@ export default function ArticleEditorForm({
   isEdit = false,
 }: ArticleEditorFormProps) {
   const router = useRouter();
+  const { success: toastSuccess, error: toastError } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
   const [error, setError] = useState("");
@@ -73,12 +75,11 @@ export default function ArticleEditorForm({
 
     if (file.size > 5 * 1024 * 1024) {
       setError("Image must be less than 5MB");
+      toastError("Image must be less than 5MB");
       return;
     }
 
     const previewUrl = URL.createObjectURL(file);
-
-    URL.revokeObjectURL(previewUrl);
 
     setFormData((prev) => ({
       ...prev,
@@ -102,7 +103,6 @@ export default function ArticleEditorForm({
       }
 
       const uploadData = new FormData();
-
       uploadData.append("thumbnail", file);
 
       const response = await fetch("/api/upload", {
@@ -113,7 +113,7 @@ export default function ArticleEditorForm({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message);
+        throw new Error(data.message || "Failed to upload image");
       }
 
       setFormData((prev) => ({
@@ -121,10 +121,12 @@ export default function ArticleEditorForm({
         thumbnail: data.url,
         thumbnailPublicId: data.publicId,
       }));
+      toastSuccess("Cover image uploaded!");
     } catch (error) {
       console.error(error);
-
-      setError(error instanceof Error ? error.message : "Upload failed");
+      const msg = error instanceof Error ? error.message : "Upload failed";
+      setError(msg);
+      toastError(msg);
     } finally {
       setImageUploading(false);
     }
@@ -151,6 +153,7 @@ export default function ArticleEditorForm({
         thumbnail: "",
         thumbnailPublicId: "",
       }));
+      toastSuccess("Cover image removed");
     } finally {
       setImageUploading(false);
     }
@@ -172,14 +175,17 @@ export default function ArticleEditorForm({
 
       if (isEdit && article?._id) {
         await api.articles.update(article._id, payload as UpdateArticlePayload);
+        toastSuccess("Masterpiece updated successfully!");
       } else {
-        console.log("SUBMIT PAYLOAD:", payload);
         await api.articles.create(payload as CreateArticlePayload);
+        toastSuccess("Masterpiece submitted for editorial review!");
       }
       router.replace("/dashboard");
     } catch (error) {
       console.error(error);
-      setError(error instanceof Error ? error.message : "Submission failed");
+      const msg = error instanceof Error ? error.message : "Submission failed";
+      setError(msg);
+      toastError(msg);
     } finally {
       setIsLoading(false);
     }

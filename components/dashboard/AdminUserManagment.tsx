@@ -498,7 +498,7 @@ const AdminUserManagement = ({ currentUser }: AdminUserManagementProps) => {
                 }`}
               >
                 <Snowflake className="w-3.5 h-3.5" />
-                <span>{"❄️ Frozen (<=18)"}</span>
+                <span>{"❄️ Frozen (>18)"}</span>
                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-900/10 text-sky-900">
                   {users.filter((u) => u.isFrozen).length}
                 </span>
@@ -721,7 +721,7 @@ const AdminUserManagement = ({ currentUser }: AdminUserManagementProps) => {
                         {u.isFrozen ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
                             <Snowflake className="w-3 h-3" />
-                            Frozen {u.age && u.age <= 18 ? "(<=18)" : ""}
+                            Frozen {u.age && u.age > 18 ? "(>18)" : ""}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -906,7 +906,7 @@ const AdminUserManagement = ({ currentUser }: AdminUserManagementProps) => {
                   {selectedUser.isFrozen ? (
                     <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200 inline-flex items-center gap-1">
                       <Snowflake className="w-3 h-3" />
-                      Frozen {selectedUser.age && selectedUser.age <= 18 ? "(<=18 yrs)" : ""}
+                      Frozen {selectedUser.age && selectedUser.age > 18 ? "(>18 yrs)" : ""}
                     </span>
                   ) : (
                     <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-flex items-center gap-1">

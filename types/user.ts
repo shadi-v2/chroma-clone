@@ -17,6 +17,7 @@ export interface PublicUser {
   isEmailVerified?: boolean;
   googleId?: string;
   onboardingCompleted?: boolean;
+  genres?: string[];
   age?: number;
   bookmarks?: string[];
   likedArticles?: string[];
@@ -32,6 +33,8 @@ export interface UpdateProfilePayload {
   phone?: string;
   dateOfBirth?: string;
   avatar?: string;
+  avatarPublicId?: string;
+  genres?: string[];
   isFrozen?: boolean;
   isEmailVerified?: boolean;
   onboardingCompleted?: boolean;

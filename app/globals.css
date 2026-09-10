@@ -37,8 +37,36 @@
   background-color: var(--color-cream-50);
 }
 
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
   @apply bg-cream-50 text-charcoal min-h-screen font-sans;
+}
+
+/* Luxury Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(30, 47, 117, 0.03);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(30, 47, 117, 0.2);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 47, 117, 0.4);
 }
 
 h1,
@@ -47,7 +75,7 @@ h3,
 h4,
 h5,
 h6 {
-  @apply font-serif;
+  @apply font-serif tracking-tight;
 }
 
 .counter {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -10,6 +10,7 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import type { PublicArticle } from "@/types/article";
@@ -23,35 +24,47 @@ const Hero: React.FC<HeroProps> = ({ articles }) => {
   const { user } = useAuth();
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [localArticles, setLocalArticles] = useState<PublicArticle[]>(articles);
-
-  useEffect(() => {
-    const loadLocalArticles = async () => {
-      await setLocalArticles(articles);
-    };
-
-    loadLocalArticles();
-  }, [articles]);
+  const [isPaused, setIsPaused] = useState(false);
+  const touchStartX = useRef<number | null>(null);
 
   const handleNext = useCallback(() => {
+    if (articles.length <= 1) return;
     setCurrentIndex((prev) => (prev + 1) % articles.length);
   }, [articles.length]);
 
   const handlePrev = useCallback(() => {
+    if (articles.length <= 1) return;
     setCurrentIndex((prev) => (prev - 1 + articles.length) % articles.length);
   }, [articles.length]);
 
+  // Autoplay with hover pause
   useEffect(() => {
-    if (articles.length <= 1) {
-      return;
-    }
-
-    const timer = setInterval(handleNext, 8000);
-
+    if (articles.length <= 1 || isPaused) return;
+    const timer = setInterval(handleNext, 7000);
     return () => clearInterval(timer);
-  }, [handleNext, articles.length]);
+  }, [handleNext, articles.length, isPaused]);
 
-  const article = localArticles[currentIndex];
+  // Touch Swipe Handlers for Mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
+    }
+    touchStartX.current = null;
+  };
+
+  const article = articles[currentIndex];
 
   if (!article) {
     return null;
@@ -60,32 +73,37 @@ const Hero: React.FC<HeroProps> = ({ articles }) => {
   const isLiked =
     !!user && article.likedBy?.some((id) => id.toString() === user._id);
 
-  const handleExplore = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleExplore = (e: React.MouseEvent) => {
     e.preventDefault();
-
     e.stopPropagation();
-
-    router.push(`/article/${article._id}`);
+    router.push(`/article/${article._id || article.id}`);
   };
 
   return (
-    <section className="relative w-full rounded-[2.5rem] overflow-hidden bg-brand-main text-brand-dark group shadow-xl">
+    <section
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="relative w-full rounded-3xl md:rounded-[3rem] overflow-hidden bg-emerald-950 text-white shadow-2xl border border-emerald-900/30 group select-none"
+    >
       <div
-        onClick={() => router.push(`/article/${article._id}`)}
+        onClick={() => router.push(`/article/${article._id || article.id}`)}
         className="relative cursor-pointer transition-all duration-700"
       >
-        <div className="absolute inset-0 bg-linear-to-t from-emerald-950/60 via-brand-main/30 to-transparent z-10" />
+        {/* Editorial Ambient Gradient Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/60 to-emerald-950/20 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/80 via-transparent to-emerald-950/30 z-10" />
 
-        {/* IMAGE CAROUSEL */}
-
-        <div className="relative w-full h-137.5 md:h-162.5 overflow-hidden">
-          {localArticles.map((art, index) => (
+        {/* IMAGE CAROUSEL WITH SMOOTH CROSSFADE */}
+        <div className="relative w-full h-[32rem] sm:h-[36rem] md:h-[40rem] overflow-hidden">
+          {articles.map((art, index) => (
             <div
-              key={art._id}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
+              key={art._id || art.id}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-out ${
                 index === currentIndex
-                  ? "opacity-80 group-hover:opacity-100"
-                  : "opacity-0"
+                  ? "opacity-60 group-hover:opacity-75 scale-100"
+                  : "opacity-0 scale-105 pointer-events-none"
               }`}
             >
               <Image
@@ -93,17 +111,17 @@ const Hero: React.FC<HeroProps> = ({ articles }) => {
                 alt={art.title}
                 fill
                 priority={index === 0}
-                className="object-cover"
+                className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
               />
             </div>
           ))}
         </div>
 
-        {/* CONTENT */}
-
-        <div className="absolute bottom-0 left-0 w-full p-8 md:p-16 z-20">
-          <div className="flex items-center gap-4 mb-6 flex-wrap">
-            <span className="px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[8px] font-bold tracking-[0.2em] uppercase border text-white border-white/20">
+        {/* CONTENT CANVAS */}
+        <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10 md:p-16 z-20">
+          <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/15 backdrop-blur-md rounded-full text-[9px] sm:text-[10px] font-bold tracking-[0.2em] uppercase border border-white/20 text-cream-50 shadow-sm">
+              <Sparkles className="w-3 h-3 text-amber-400" />
               Featured{" "}
               {typeof article.category === "string"
                 ? article.category
@@ -119,154 +137,130 @@ const Hero: React.FC<HeroProps> = ({ articles }) => {
               />
             )}
 
-            <div className="flex items-center gap-2 text-[8px] text-cream-50/60 uppercase tracking-[0.2em] font-medium">
-              <Clock className="w-3.5 h-3.5" />
-              {article.readTime} reading time
+            <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] text-cream-50/70 uppercase tracking-[0.2em] font-semibold">
+              <Clock className="w-3.5 h-3.5 text-cream-50/60" />
+              <span>{article.readTime} read</span>
             </div>
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-serif font-bold mb-6 max-w-4xl leading-none line-clamp-1 truncate tracking-tight text-white">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-4 sm:mb-6 max-w-4xl leading-tight sm:leading-none tracking-tight text-white drop-shadow-md">
             {article.title}
           </h1>
 
-          <p className="text-md md:text-lg text-white/90 mb-5 max-w-4xl line-clamp-1 truncate md:line-clamp-1 font-medium leading-relaxed drop-shadow-md">
-            {article.excerpt}
+          <p className="text-sm sm:text-base md:text-lg text-cream-50/80 mb-6 max-w-3xl line-clamp-2 font-light leading-relaxed drop-shadow-sm">
+            &quot;{article.excerpt}&quot;
           </p>
 
-          <div className="hidden md:block">
-            {/* FOOTER */}
+          {/* AUTHOR & ACTIONS BAR */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-white/15 pt-6 sm:pt-8 gap-4 sm:gap-6">
+            {/* Author details */}
+            <div className="flex items-center gap-4">
+              <div className="relative shrink-0">
+                {article.author.avatar ? (
+                  <Image
+                    src={article.author.avatar}
+                    alt={article.author.firstName}
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 rounded-full border-2 border-white/30 object-cover shadow-md"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full border-2 border-white/30 bg-emerald-800 flex items-center justify-center font-serif font-bold text-white shadow-md">
+                    {article.author.firstName?.[0]?.toUpperCase() || "?"}
+                  </div>
+                )}
+                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 border-2 border-emerald-950 rounded-full" />
+              </div>
 
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-t border-white/10 pt-8 md:gap-0 gap-6">
-              {/* AUTHOR */}
+              <div>
+                <span className="block text-[9px] text-cream-50/50 uppercase tracking-[0.2em] font-bold">
+                  Curated Writer
+                </span>
+                <span className="block font-medium text-base sm:text-lg font-serif text-white">
+                  {article.author.firstName} {article.author.surname}
+                </span>
+              </div>
+            </div>
 
-              <div className="flex items-center gap-5">
-                <div className="relative">
-                  {article.author.avatar ? (
-                    <Image
-                      src={article.author.avatar}
-                      alt={article.author.firstName}
-                      width={56}
-                      height={56}
-                      className="w-14 h-14 rounded-full border-2 border-white/20 object-cover"
-                    />
-                  ) : (
-                    <div className="w-14 h-14 rounded-full border-2 border-white/20 bg-emerald-800 flex items-center justify-center font-serif font-bold text-white">
-                      {article.author.firstName?.[0]?.toUpperCase() || "?"}
-                    </div>
-                  )}
-
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-2 border-emerald-950 rounded-full" />
-                </div>
-
-                <div>
-                  <span className="block text-[10px] text-cream-50/40 uppercase tracking-[0.2em] mb-1 font-bold">
-                    Curated By
+            {/* Metrics & Explore CTA */}
+            <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
+              <div className="flex items-center gap-5 text-cream-50/70">
+                <div className="flex items-center gap-1.5">
+                  <Heart
+                    className={`w-5 h-5 transition-colors ${
+                      isLiked
+                        ? "text-red-400 fill-red-400"
+                        : "text-cream-50/50"
+                    }`}
+                  />
+                  <span className="font-bold text-sm text-white">
+                    {article.likes}
                   </span>
+                </div>
 
-                  <div className="flex items-center gap-3">
-                    <span className="block font-medium text-xl font-serif text-white">
-                      {article.author.firstName} {article.author.surname}
-                    </span>
-                    {article.author?.dateOfBirth && (
-                      <AgeBadge
-                        dateOfBirth={article.author.dateOfBirth}
-                        age={article.author.age}
-                        showCategoryName
-                      />
-                    )}
-                  </div>
+                <div className="flex items-center gap-1.5 text-cream-50/70">
+                  <Eye className="w-5 h-5 text-cream-50/50" />
+                  <span className="font-bold text-sm text-white">
+                    {article.reads || 0}
+                  </span>
                 </div>
               </div>
 
-              {/* ACTIONS */}
-
-              <div className="flex items-center gap-6 w-full md:w-auto">
-                <div className="flex items-center gap-6 mr-4">
-                  {/* LIKE */}
-
-                  <div className="flex items-center gap-2">
-                    <Heart
-                      className={`w-6 h-6 transition-all duration-300 ${
-                        isLiked
-                          ? "text-red-500 fill-red-500"
-                          : "text-cream-50/40 group-hover/likes:text-red-500 group-hover/likes:fill-red-500"
-                      }`}
-                    />
-
-                    <span className="font-bold text-lg text-white">
-                      {article.likes}
-                    </span>
-                  </div>
-
-                  {/* VIEWS */}
-
-                  <div className="flex items-center gap-2 text-cream-50/40">
-                    <Eye className="w-6 h-6" />
-
-                    <span className="font-bold text-lg text-white">
-                      {article.reads || 0}
-                    </span>
-                  </div>
-                </div>
-
-                {/* BUTTON */}
-
-                <button
-                  onClick={handleExplore}
-                  className="flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-4 bg-brand-dark text-cream-50 rounded-full font-bold text-sm tracking-wide hover:bg-brand-accent transition-all hover:translate-x-2 active:scale-95 shadow-lg shadow-black/20"
-                >
-                  EXPLORE STORY
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
+              <button
+                onClick={handleExplore}
+                className="inline-flex items-center gap-2 px-6 sm:px-8 py-3.5 bg-white text-emerald-950 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-cream-100 hover:shadow-xl transition-all hover:translate-x-1 active:scale-95 shadow-md shrink-0 cursor-pointer"
+              >
+                <span>Read Story</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* CONTROLS */}
-
+      {/* ARROW CONTROLS */}
       {articles.length > 1 && (
         <div className="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-4 z-30 pointer-events-none">
           <button
             onClick={(e) => {
               e.stopPropagation();
-
               handlePrev();
             }}
-            className="p-4 bg-black/20 backdrop-blur-md outline-none rounded-full text-white hover:bg-black/40 transition-all pointer-events-auto"
+            className="p-3 sm:p-3.5 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full text-white transition-all pointer-events-auto cursor-pointer border border-white/10"
+            aria-label="Previous story"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
 
           <button
             onClick={(e) => {
               e.stopPropagation();
-
               handleNext();
             }}
-            className="p-4 bg-black/20 backdrop-blur-md outline-none rounded-full text-white hover:bg-black/40 transition-all pointer-events-auto"
+            className="p-3 sm:p-3.5 bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full text-white transition-all pointer-events-auto cursor-pointer border border-white/10"
+            aria-label="Next story"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       )}
 
-      {/* DOTS */}
-
+      {/* PROGRESS / PAGINATION PILLS */}
       {articles.length > 1 && (
-        <div className="absolute top-8 right-8 z-30 flex gap-2">
+        <div className="absolute top-6 right-6 sm:top-8 sm:right-8 z-30 flex gap-2">
           {articles.map((_, idx) => (
             <button
               key={idx}
               onClick={(e) => {
                 e.stopPropagation();
-
                 setCurrentIndex(idx);
               }}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                idx === currentIndex ? "w-8 bg-white" : "w-2 bg-white/20"
+              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                idx === currentIndex
+                  ? "w-8 bg-amber-400"
+                  : "w-2.5 bg-white/30 hover:bg-white/50"
               }`}
+              aria-label={`Slide ${idx + 1}`}
             />
           ))}
         </div>

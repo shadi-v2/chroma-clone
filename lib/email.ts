@@ -305,71 +305,30 @@ export async function sendInactivityReminderEmail(
   }
 }
 
+import { renderEmailWithWrapper, type EmailWrapperConfig } from "./emailWrapper";
+
 export async function sendOfficialEmail({
   to,
   subject,
   htmlContent,
   senderName = "Chroma Diaries Editorial",
   wrapInOfficialTemplate = true,
+  wrapperConfig,
 }: {
   to: string;
   subject: string;
   htmlContent: string;
   senderName?: string;
   wrapInOfficialTemplate?: boolean;
+  wrapperConfig?: Partial<EmailWrapperConfig>;
 }): Promise<{ success: boolean; error?: string }> {
   try {
     const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
 
-    const finalHtml = wrapInOfficialTemplate
-      ? `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${subject}</title>
-        </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fcfbf7; margin: 0; padding: 40px 20px;">
-          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 24px; border: 1px solid rgba(2, 44, 34, 0.08); padding: 40px; box-shadow: 0 10px 30px rgba(2, 44, 34, 0.05);">
-            <!-- Official Header -->
-            <div style="text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #022c22;">
-              <div style="display: inline-block; background-color: #022c22; color: #fcfbf7; font-family: Georgia, serif; font-weight: bold; font-size: 18px; padding: 8px 24px; border-radius: 8px; letter-spacing: 2px; margin-bottom: 8px;">
-                CHROMA DIARIES
-              </div>
-              <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #047857; font-weight: 600;">
-                Web Magazine • Official Dispatch Desk
-              </div>
-            </div>
-
-            <!-- Subject Title -->
-            <h2 style="font-family: Georgia, serif; color: #022c22; font-size: 22px; margin: 0 0 20px 0; font-weight: 700; line-height: 1.4;">
-              ${subject}
-            </h2>
-            
-            <!-- Email Body Content -->
-            <div style="color: #1f2937; font-size: 15px; line-height: 1.75; margin-bottom: 36px;">
-              ${htmlContent}
-            </div>
-
-            <!-- Official Footer -->
-            <div style="border-top: 1px solid rgba(2, 44, 34, 0.08); padding-top: 24px; margin-top: 32px; font-size: 12px; color: #6b7280; line-height: 1.6;">
-              <div style="font-weight: 600; color: #022c22; margin-bottom: 4px;">
-                Chroma Diaries Web Magazine
-              </div>
-              <div style="font-size: 11px; color: #9ca3af; margin-bottom: 12px;">
-                Mentored & Supported by Sabeelul Hidaya Islamic College
-              </div>
-              <div style="font-size: 11px;">
-                <a href="${siteUrl}" style="color: #047857; text-decoration: none; font-weight: 500;">Visit Website</a> • 
-                <a href="mailto:editorial@chromadiaries.in" style="color: #047857; text-decoration: none; font-weight: 500;">Contact Desk</a>
-              </div>
-            </div>
-          </div>
-        </body>
-        </html>
-      `
-      : htmlContent;
+    const finalHtml = renderEmailWithWrapper(subject, htmlContent, {
+      ...wrapperConfig,
+      enabled: wrapInOfficialTemplate !== false && (wrapperConfig?.enabled !== false),
+    });
 
     if (!resend) {
       console.log(`\n=======================================================`);

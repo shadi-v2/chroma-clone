@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     if (user.isFrozen) {
       return NextResponse.json(
         {
-          message: "This account has been frozen (restricted for accounts up to 18 years of age). Please contact administration.",
+          message: "This account has been frozen (restricted for accounts exceeding 18 years of age). Please contact administration.",
         },
         {
           status: 403,

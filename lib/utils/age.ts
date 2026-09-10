@@ -98,8 +98,11 @@ export function getAgeCategory(
 }
 
 /**
- * Determines whether an account is frozen based on age (<= 18) or explicit flag.
- * Site owners and administrative root accounts are never locked out.
+ * Determines whether an account is frozen.
+ * Chroma Diaries is a magazine for youth / writers up to 18 years of age.
+ * - Authors who are > 18 years old are restricted/frozen.
+ * - Authors who are <= 18 years old are FREE (unfrozen and active).
+ * - Site owners, Admins, and Editors are never locked out by age.
  */
 export function isUserFrozen(user: {
   isFrozen?: boolean | null;
@@ -111,9 +114,11 @@ export function isUserFrozen(user: {
 }): boolean {
   if (
     user.role === "Owner" ||
+    user.role === "Admin" ||
+    user.role === "Editor" ||
     user.email?.toLowerCase() === "shahinshadi1122@gmail.com"
   ) {
-    return false;
+    return Boolean(user.isFrozen === true || user.is_frozen === true);
   }
 
   if (user.isFrozen === true || user.is_frozen === true) {
@@ -122,7 +127,8 @@ export function isUserFrozen(user: {
 
   const dob = user.dateOfBirth || user.date_of_birth;
   const age = calculateAge(dob);
-  if (age !== null && age <= 18) {
+  // Only users older than 18 are frozen (restricted under-18 magazine policy)
+  if (age !== null && age > 18) {
     return true;
   }
 

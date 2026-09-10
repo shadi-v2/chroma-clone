@@ -121,6 +121,37 @@ export const api = {
       return data;
     },
 
+    uploadAvatar: async (file: File): Promise<{ success: boolean; url: string; publicId: string }> => {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      let token: string | null = null;
+      if (typeof window !== "undefined") {
+        token = localStorage.getItem("token");
+        if (!token) {
+          const match = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);
+          if (match && match[1] && match[1] !== "null" && match[1] !== "undefined") {
+            token = match[1];
+          }
+        }
+      }
+
+      const headers: Record<string, string> = {};
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`${BASE_URL}/users/avatar`, {
+        method: "POST",
+        body: formData,
+        headers,
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to upload avatar");
+      return data;
+    },
+
     updateMe: async (data: UpdateProfilePayload): Promise<PublicUser> => {
       const res = await apiFetch(`${BASE_URL}/users/me`, {
         method: "PATCH",

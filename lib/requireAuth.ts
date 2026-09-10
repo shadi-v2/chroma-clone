@@ -22,7 +22,7 @@ export async function requireAuth(req: Request) {
     return {
       error: NextResponse.json(
         {
-          message: "Your account has been frozen (restricted for users up to 18 years of age).",
+          message: "Your account has been frozen (restricted for accounts exceeding 18 years of age).",
         },
         {
           status: 403,

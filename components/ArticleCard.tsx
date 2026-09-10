@@ -21,7 +21,10 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
   const [isLiked, setIsLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
 
-  const handleLike = async () => {
+  const handleLike = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (!article || isLiking) {
       return;
     }

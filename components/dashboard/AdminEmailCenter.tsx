@@ -21,6 +21,13 @@ import {
 } from "lucide-react";
 import { api } from "@/services/api";
 import type { PublicUser } from "@/types/user";
+import VisualEmailBuilder from "@/components/dashboard/VisualEmailBuilder";
+import EmailWrapperDesigner from "@/components/dashboard/EmailWrapperDesigner";
+import {
+  renderEmailWithWrapper,
+  DEFAULT_WRAPPER_CONFIG,
+  type EmailWrapperConfig,
+} from "@/lib/emailWrapper";
 
 interface EmailTemplate {
   id: string;
@@ -53,8 +60,7 @@ export default function AdminEmailCenter() {
   const [subject, setSubject] = useState("");
   const [htmlContent, setHtmlContent] = useState("");
   const [senderName, setSenderName] = useState("Chroma Diaries Editorial");
-  const [wrapTemplate, setWrapTemplate] = useState(true);
-  const [editorMode, setEditorMode] = useState<"visual" | "html">("html");
+  const [wrapperConfig, setWrapperConfig] = useState<EmailWrapperConfig>(DEFAULT_WRAPPER_CONFIG);
   const [sending, setSending] = useState(false);
 
   // Template Data
@@ -192,7 +198,7 @@ export default function AdminEmailCenter() {
         setHtmlContent(content);
         // If full HTML document, automatically turn off redundant outer letterhead wrapper
         if (content.toLowerCase().includes("<html") || content.toLowerCase().includes("<!doctype")) {
-          setWrapTemplate(false);
+          setWrapperConfig((prev) => ({ ...prev, enabled: false }));
         }
         setFeedback({ type: "success", text: `Imported HTML template: ${file.name}` });
       }
@@ -240,7 +246,8 @@ export default function AdminEmailCenter() {
           subject: subject.trim(),
           htmlContent: htmlContent.trim(),
           senderName: senderName.trim(),
-          wrapTemplate,
+          wrapTemplate: wrapperConfig.enabled,
+          wrapperConfig,
         }),
       });
 
@@ -597,76 +604,28 @@ export default function AdminEmailCenter() {
                       title="Upload an .html file from your computer"
                     >
                       <Upload className="w-3.5 h-3.5" />
-                      <span>Import HTML</span>
+                      <span>Import HTML File</span>
                     </button>
-
-                    <div className="flex bg-emerald-950/5 p-0.5 rounded-lg text-xs font-bold">
-                      <button
-                        type="button"
-                        onClick={() => setEditorMode("html")}
-                        className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
-                          editorMode === "html" ? "bg-white text-emerald-950 shadow-xs" : "text-emerald-950/50"
-                        }`}
-                      >
-                        HTML
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditorMode("visual")}
-                        className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
-                          editorMode === "visual" ? "bg-white text-emerald-950 shadow-xs" : "text-emerald-950/50"
-                        }`}
-                      >
-                        Text
-                      </button>
-                    </div>
                   </div>
                 </div>
 
-                {editorMode === "html" ? (
-                  <textarea
-                    value={htmlContent}
-                    onChange={(e) => setHtmlContent(e.target.value)}
-                    placeholder="<p>Dear {{name}},</p>&#10;<p>We are pleased to inform you that...</p>"
-                    rows={10}
-                    required
-                    className="w-full font-mono text-xs px-4 py-3 rounded-xl border border-emerald-950/15 focus:outline-none focus:border-emerald-950 leading-relaxed bg-emerald-950/[0.02]"
-                  />
-                ) : (
-                  <textarea
-                    value={htmlContent}
-                    onChange={(e) => setHtmlContent(e.target.value)}
-                    placeholder="Write your email body here..."
-                    rows={10}
-                    required
-                    className="w-full font-sans text-sm px-4 py-3 rounded-xl border border-emerald-950/15 focus:outline-none focus:border-emerald-950 leading-relaxed"
-                  />
-                )}
+                <VisualEmailBuilder
+                  value={htmlContent}
+                  onChange={setHtmlContent}
+                  placeholder="Click here to type your email message visually. Use the toolbar above to style text, or click 'Insert Shape / Design' to add buttons, badges, and cards with single clicks..."
+                  minHeight="320px"
+                />
 
                 <div className="flex items-center justify-between mt-2 text-[11px] text-emerald-950/50">
                   <span>
-                    Supported dynamic variables: <code className="bg-emerald-950/5 px-1 rounded font-bold">{"{{name}}"}</code>, <code className="bg-emerald-950/5 px-1 rounded font-bold">{"{{title}}"}</code>
+                    Supported variables: <code className="bg-emerald-950/5 px-1 rounded font-bold">{"{{name}}"}</code>, <code className="bg-emerald-950/5 px-1 rounded font-bold">{"{{title}}"}</code>
                   </span>
                   <span>{htmlContent.length} chars</span>
                 </div>
               </div>
 
-              {/* LETTERHEAD WRAPPER TOGGLE */}
-              <div className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-950/5 border border-emerald-950/10">
-                <input
-                  type="checkbox"
-                  id="wrapTemplate"
-                  checked={wrapTemplate}
-                  onChange={(e) => setWrapTemplate(e.target.checked)}
-                  className="w-4 h-4 rounded text-emerald-900 accent-emerald-950 cursor-pointer"
-                />
-                <label htmlFor="wrapTemplate" className="text-xs font-semibold text-emerald-950 cursor-pointer">
-                  Wrap inside Official Chroma Diaries Emerald Letterhead
-                  <span className="block text-[11px] text-emerald-950/60 font-normal">
-                    Adds top magazine header, emerald branding badge, and verified academic partner footer.
-                  </span>
-                </label>
-              </div>
+              {/* LETTERHEAD & WRAPPER DESIGNER */}
+              <EmailWrapperDesigner config={wrapperConfig} onChange={setWrapperConfig} />
 
               {/* ACTION BUTTONS */}
               <div className="flex gap-4 pt-2">
@@ -708,64 +667,26 @@ export default function AdminEmailCenter() {
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center justify-between px-2">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-950/60">
-                <Eye className="w-4 h-4" />
-                <span>Live Letterhead Preview</span>
+                <Eye className="w-4 h-4 text-emerald-800" />
+                <span>Live Client Email Preview</span>
               </div>
-              <span className="text-[10px] text-emerald-950/40 uppercase font-bold">
-                {wrapTemplate ? "Official Letterhead" : "Raw HTML"}
+              <span className="text-[10px] text-emerald-950/60 uppercase font-bold bg-emerald-950/5 px-2.5 py-0.5 rounded-full border border-emerald-950/10">
+                {wrapperConfig.enabled ? wrapperConfig.theme : "Raw HTML Mode"}
               </span>
             </div>
 
             {/* PREVIEW FRAME */}
-            <div className="bg-[#fcfbf7] rounded-[2.5rem] border border-emerald-950/15 p-6 shadow-xl overflow-hidden min-h-[500px]">
-              <div className="bg-white rounded-2xl border border-emerald-950/10 p-6 shadow-sm min-h-[460px] flex flex-col justify-between text-left">
-                {wrapTemplate ? (
-                  <div>
-                    {/* Official Letterhead Header */}
-                    <div className="text-center pb-5 mb-5 border-b-2 border-[#022c22]">
-                      <div className="inline-block bg-[#022c22] text-[#fcfbf7] font-serif font-bold text-sm px-4 py-1.5 rounded-lg tracking-widest mb-1.5">
-                        CHROMA DIARIES
-                      </div>
-                      <div className="text-[9px] uppercase tracking-widest text-emerald-800 font-bold">
-                        Web Magazine • Official Dispatch
-                      </div>
-                    </div>
-
-                    {/* Subject Header */}
-                    <h3 className="font-serif font-bold text-emerald-950 text-base mb-4 leading-snug">
-                      {subject || "Subject line will appear here..."}
-                    </h3>
-
-                    {/* Body Content */}
-                    <div
-                      className="text-gray-800 text-xs leading-relaxed space-y-3 prose prose-xs max-w-none"
-                      dangerouslySetInnerHTML={{
-                        __html:
-                          htmlContent ||
-                          "<p class='text-gray-400 italic'>Message content will render here in real-time as you type or choose a template...</p>",
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className="text-gray-800 text-xs leading-relaxed"
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        htmlContent ||
-                        "<p class='text-gray-400 italic'>Raw HTML content will render here...</p>",
-                    }}
-                  />
+            <div className="rounded-[2.5rem] border border-emerald-950/15 p-3 shadow-xl overflow-hidden bg-white">
+              <iframe
+                title="Live Email Preview"
+                srcDoc={renderEmailWithWrapper(
+                  subject || "Subject line will appear here...",
+                  htmlContent ||
+                    "<p style='color: #9ca3af; font-style: italic;'>Your visual message, shapes, badges, and buttons will appear here in real-time...</p>",
+                  wrapperConfig,
                 )}
-
-                {wrapTemplate && (
-                  <div className="border-t border-emerald-950/10 pt-4 mt-8 text-[10px] text-gray-500 space-y-1">
-                    <div className="font-bold text-[#022c22]">Chroma Diaries Web Magazine</div>
-                    <div className="text-gray-400 text-[9px]">
-                      Supported & Mentored by Sabeelul Hidaya Islamic College
-                    </div>
-                  </div>
-                )}
-              </div>
+                className="w-full h-[620px] rounded-2xl border-none"
+              />
             </div>
           </div>
         </div>
@@ -996,7 +917,7 @@ export default function AdminEmailCenter() {
       {/* TEMPLATE CREATOR / EDITOR MODAL */}
       {showTemplateModal && (
         <div className="fixed inset-0 z-50 bg-emerald-950/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl border border-emerald-950/10 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-emerald-950/10 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700">
@@ -1064,7 +985,7 @@ export default function AdminEmailCenter() {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-bold uppercase tracking-wider text-emerald-950">
-                    Template HTML Content
+                    Visual Template Design & Content
                   </label>
                   <button
                     type="button"
@@ -1074,13 +995,12 @@ export default function AdminEmailCenter() {
                     Import .html file
                   </button>
                 </div>
-                <textarea
+
+                <VisualEmailBuilder
                   value={templateContent}
-                  onChange={(e) => setTemplateContent(e.target.value)}
-                  placeholder="<p>Dear {{name}},</p>&#10;<p>Your content here...</p>"
-                  rows={8}
-                  required
-                  className="w-full font-mono text-xs px-4 py-3 rounded-xl border border-emerald-950/15 focus:outline-none focus:border-emerald-950 leading-relaxed bg-emerald-950/[0.02]"
+                  onChange={setTemplateContent}
+                  placeholder="Design your reusable template visually. Click 'Insert Shape / Design' to place badges, buttons, ribbons, or quote boxes with zero HTML typing..."
+                  minHeight="280px"
                 />
               </div>
 

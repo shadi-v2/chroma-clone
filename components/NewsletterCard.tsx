@@ -110,10 +110,10 @@ export default function NewsletterCard({ className = "", variant = "card" }: New
           <span className="text-xs uppercase font-bold tracking-[0.2em] text-emerald-400">
             Chroma Diaries Dispatch
           </span>
-          <h3 className="text-2xl sm:text-3xl font-serif font-bold text-cream-50 leading-tight">
+          <h3 className="text-lg sm:text-xl font-serif font-bold text-cream-50 leading-tight">
             Stories, Essays & Literary Thoughts Delivered to Your Inbox
           </h3>
-          <p className="text-cream-50/70 text-sm leading-relaxed max-w-md mx-auto font-light">
+          <p className="text-cream-50/70 text-xs leading-relaxed max-w-md mx-auto font-light">
             Join our curated circle of readers. Receive weekly handpicked essays, author reflections, and creative highlights.
           </p>
         </div>
@@ -159,10 +159,6 @@ export default function NewsletterCard({ className = "", variant = "card" }: New
         {status === "error" && (
           <p className="text-xs text-amber-300 font-medium">{feedback}</p>
         )}
-
-        <div className="text-[11px] text-cream-50/40 uppercase tracking-widest pt-2">
-          Zero Spam • Unsubscribe Anytime in 1-Click
-        </div>
       </div>
     </div>
   );

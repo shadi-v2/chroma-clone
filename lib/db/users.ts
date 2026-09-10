@@ -20,6 +20,7 @@ export interface DbUser {
   is_email_verified?: boolean;
   google_id?: string | null;
   onboarding_completed?: boolean;
+  genres?: string[] | null;
   created_at: string | Date;
   updated_at: string | Date;
 }
@@ -52,6 +53,7 @@ export function formatUser(row: DbUser | null): FormattedUser | null {
     isEmailVerified: Boolean(row.is_email_verified),
     googleId: row.google_id || undefined,
     onboardingCompleted: Boolean(row.onboarding_completed),
+    genres: Array.isArray(row.genres) ? row.genres : [],
     age: age ?? undefined,
     avatar: row.avatar || "",
     avatarPublicId: row.avatar_public_id || "",
@@ -107,6 +109,7 @@ export async function createUser(data: {
   isEmailVerified?: boolean;
   googleId?: string;
   onboardingCompleted?: boolean;
+  genres?: string[];
 }): Promise<FormattedUser | null> {
   const hashedPassword = data.password ? await bcrypt.hash(data.password, 10) : "";
   const role = data.role || "Author";
@@ -114,9 +117,9 @@ export async function createUser(data: {
   const row = await queryOne<DbUser>(
     `INSERT INTO users (
       first_name, surname, email, password, role, school, bio, phone, 
-      date_of_birth, avatar, avatar_public_id, is_email_verified, google_id, onboarding_completed
+      date_of_birth, avatar, avatar_public_id, is_email_verified, google_id, onboarding_completed, genres
     )
-    VALUES ($1, $2, LOWER($3), $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+    VALUES ($1, $2, LOWER($3), $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
     RETURNING *`,
     [
       data.firstName,
@@ -133,6 +136,7 @@ export async function createUser(data: {
       Boolean(data.isEmailVerified),
       data.googleId || null,
       Boolean(data.onboardingCompleted),
+      data.genres || [],
     ],
   );
 
@@ -149,6 +153,7 @@ export async function updateUser(id: string, data: Partial<{
   avatarPublicId: string;
   role: UserRole;
   dateOfBirth?: string | Date | null;
+  genres?: string[];
   isFrozen?: boolean;
   isEmailVerified?: boolean;
   googleId?: string;
@@ -194,6 +199,10 @@ export async function updateUser(id: string, data: Partial<{
   if (data.dateOfBirth !== undefined) {
     fields.push(`date_of_birth = $${index++}`);
     values.push(data.dateOfBirth ? new Date(data.dateOfBirth) : null);
+  }
+  if (data.genres !== undefined) {
+    fields.push(`genres = $${index++}`);
+    values.push(Array.isArray(data.genres) ? data.genres : []);
   }
   if (data.isFrozen !== undefined) {
     fields.push(`is_frozen = $${index++}`);

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import Image from "next/image";
 import {
   LayoutDashboard,
   Shield,
@@ -17,6 +18,12 @@ import {
   Bell,
   Mail,
   Send,
+  Menu,
+  X,
+  Globe,
+  ChevronRight,
+  LogOut,
+  Sparkles,
 } from "lucide-react";
 import type { DashboardTab, AdminStats } from "@/types/dashboard";
 import type { PublicArticle } from "@/types/article";
@@ -24,47 +31,58 @@ import type { UserRole } from "@/types/user";
 import { isAdminRole, isEditorialRole } from "@/lib/roles";
 import SearchBar from "./SearchBar";
 import ModerationActions from "./ModerationActions";
-import Image from "next/image";
+import { useAuth } from "@/contexts/AuthContext";
 
 const getStatusChipClass = (status: PublicArticle["status"]) => {
-  if (status === "Published") {
-    return "bg-emerald-100 text-emerald-700";
-  }
-
-  if (status === "Paused") {
-    return "bg-blue-100 text-blue-700";
-  }
-
-  if (status === "Editing") {
-    return "bg-purple-100 text-purple-700";
-  }
-
-  if (status === "Edited") {
-    return "bg-pink-100 text-pink-700";
-  }
-
+  if (status === "Published") return "bg-emerald-100 text-emerald-700";
+  if (status === "Paused") return "bg-blue-100 text-blue-700";
+  if (status === "Editing") return "bg-purple-100 text-purple-700";
+  if (status === "Edited") return "bg-pink-100 text-pink-700";
   return "bg-amber-100 text-amber-700";
 };
+
+const TabLoadingFallback = () => (
+  <div className="space-y-6 p-6 sm:p-8 bg-white rounded-[2.5rem] border border-emerald-950/5 animate-pulse">
+    <div className="flex items-center justify-between">
+      <div className="h-6 w-48 bg-emerald-950/10 rounded-xl" />
+      <div className="h-9 w-28 bg-emerald-950/5 rounded-full" />
+    </div>
+    <div className="h-4 w-72 bg-emerald-950/5 rounded-lg" />
+    <div className="space-y-4 pt-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="h-16 w-full bg-emerald-950/[0.04] rounded-2xl" />
+      ))}
+    </div>
+  </div>
+);
+
 const AdminArticleManagement = dynamic(
   () => import("@/components/dashboard/AdminArticleManagment"),
+  { loading: () => <TabLoadingFallback /> },
 );
 const AdminCategoryManagement = dynamic(
   () => import("@/components/dashboard/AdminCategoryManagment"),
+  { loading: () => <TabLoadingFallback /> },
 );
 const AdminUserManagement = dynamic(
   () => import("@/components/dashboard/AdminUserManagment"),
+  { loading: () => <TabLoadingFallback /> },
 );
 const AdminArticleRecover = dynamic(
   () => import("@/components/dashboard/AdminArticleRecover"),
+  { loading: () => <TabLoadingFallback /> },
 );
 const AdminNotificationManager = dynamic(
   () => import("@/components/dashboard/AdminNotificationManager"),
+  { loading: () => <TabLoadingFallback /> },
 );
 const AdminNewsletterManager = dynamic(
   () => import("@/components/dashboard/AdminNewsletterManager"),
+  { loading: () => <TabLoadingFallback /> },
 );
 const AdminEmailCenter = dynamic(
   () => import("@/components/dashboard/AdminEmailCenter"),
+  { loading: () => <TabLoadingFallback /> },
 );
 
 interface DashboardTabsProps {
@@ -73,8 +91,9 @@ interface DashboardTabsProps {
     firstName: string;
     surname: string;
     role: UserRole;
+    avatar?: string;
+    email?: string;
   };
-
   userArticles: PublicArticle[];
   pendingReviews: PublicArticle[];
   adminStats: AdminStats;
@@ -88,61 +107,9 @@ export default function DashboardTabs({
 }: DashboardTabsProps) {
   const [activeTab, setActiveTab] = useState<DashboardTab>("my-studio");
   const [searchTerm, setSearchTerm] = useState("");
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const { logout } = useAuth();
 
-  const dashboardTabs = [
-    {
-      id: "my-studio" as DashboardTab,
-      label: "My Studio",
-      icon: LayoutDashboard,
-    },
-    ...(isAdminRole(user.role)
-      ? [
-          {
-            id: "user-management" as DashboardTab,
-            label: "User Management",
-            icon: Users,
-          },
-          {
-            id: "all-articles" as DashboardTab,
-            label: "Article Control",
-            icon: Shield,
-          },
-          {
-            id: "category-management" as DashboardTab,
-            label: "Category Management",
-            icon: Tag,
-          },
-          {
-            id: "deleted-articles" as DashboardTab,
-            label: "Recover Articles",
-            icon: Trash2,
-          },
-          {
-            id: "notifications" as DashboardTab,
-            label: "Notifications",
-            icon: Bell,
-          },
-          {
-            id: "newsletter" as DashboardTab,
-            label: "Newsletter",
-            icon: Mail,
-          },
-          {
-            id: "email-center" as DashboardTab,
-            label: "Email Desk",
-            icon: Send,
-          },
-        ]
-      : user.role === "Editor"
-        ? [
-            {
-              id: "all-articles" as DashboardTab,
-              label: "Article Control",
-              icon: Shield,
-            },
-          ]
-        : []),
-  ];
   const published = userArticles.filter(
     (article) => article.status === "Published" || article.status === "Paused",
   );
@@ -161,344 +128,595 @@ export default function DashboardTabs({
     0,
   );
 
+  // Grouped Navigation Items
+  const navSections = [
+    {
+      title: "Workspace",
+      items: [
+        {
+          id: "my-studio" as DashboardTab,
+          label: "My Studio",
+          icon: LayoutDashboard,
+          badge: pending.length > 0 ? `${pending.length} Pending` : undefined,
+        },
+      ],
+    },
+    ...(isEditorialRole(user.role)
+      ? [
+          {
+            title: "Editorial & Content",
+            items: [
+              {
+                id: "all-articles" as DashboardTab,
+                label: "Article Control",
+                icon: Shield,
+                badge:
+                  pendingReviews.length > 0
+                    ? `${pendingReviews.length} Queue`
+                    : undefined,
+              },
+              ...(isAdminRole(user.role)
+                ? [
+                    {
+                      id: "category-management" as DashboardTab,
+                      label: "Categories & Tags",
+                      icon: Tag,
+                    },
+                    {
+                      id: "deleted-articles" as DashboardTab,
+                      label: "Recover Deleted",
+                      icon: Trash2,
+                    },
+                  ]
+                : []),
+            ],
+          },
+        ]
+      : []),
+    ...(isAdminRole(user.role)
+      ? [
+          {
+            title: "Operations & Community",
+            items: [
+              {
+                id: "user-management" as DashboardTab,
+                label: "User Management",
+                icon: Users,
+              },
+              {
+                id: "notifications" as DashboardTab,
+                label: "Notification Desk",
+                icon: Bell,
+              },
+            ],
+          },
+          {
+            title: "Outreach & Dispatch",
+            items: [
+              {
+                id: "newsletter" as DashboardTab,
+                label: "Newsletter Circulation",
+                icon: Mail,
+              },
+              {
+                id: "email-center" as DashboardTab,
+                label: "Official Email Desk",
+                icon: Send,
+              },
+            ],
+          },
+        ]
+      : []),
+  ];
+
+  const getActiveTabTitle = () => {
+    switch (activeTab) {
+      case "my-studio":
+        return "Author Studio & Submissions";
+      case "all-articles":
+        return "Global Article Control & Moderation";
+      case "category-management":
+        return "Category & Tag Architecture";
+      case "deleted-articles":
+        return "Article Recovery & Trash";
+      case "user-management":
+        return "User & Role Management";
+      case "notifications":
+        return "System Notification Center";
+      case "newsletter":
+        return "Newsletter & Subscriber Management";
+      case "email-center":
+        return "Official Email Dispatch Desk";
+      default:
+        return "Control Panel";
+    }
+  };
+
+  const handleTabClick = (tabId: DashboardTab) => {
+    setActiveTab(tabId);
+    setMobileSidebarOpen(false);
+  };
+
   return (
-    <div className="font-sans">
-      <main className="container mx-auto px-12 py-12 md:py-20">
-        {/* HEADER */}
+    <div className="min-h-screen bg-[#fcfbf7] font-sans flex text-emerald-950">
+      {/* MOBILE SIDEBAR BACKDROP */}
+      {mobileSidebarOpen && (
+        <div
+          onClick={() => setMobileSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-emerald-950/60 backdrop-blur-xs lg:hidden"
+        />
+      )}
 
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-1.5 h-6 bg-emerald-950 rounded-full" />
+      {/* LEFT SIDEBAR */}
+      <aside
+        className={`fixed top-0 bottom-0 left-0 z-50 w-72 bg-emerald-950 text-cream-50 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col h-full overflow-hidden">
+          {/* SIDEBAR BRAND HEADER */}
+          <div className="p-6 pb-4 border-b border-white/10 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-cream-50 font-serif font-bold text-base shadow-sm group-hover:bg-white group-hover:text-emerald-950 transition-all">
+                CD
+              </div>
+              <div>
+                <h2 className="font-serif font-bold text-sm tracking-wide text-white">
+                  CHROMA DIARIES
+                </h2>
+                <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-emerald-400">
+                  {user.role} Console
+                </span>
+              </div>
+            </Link>
 
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-950/40">
-                Author Portal
-              </span>
-            </div>
-
-            <h1 className="text-5xl font-serif font-bold text-emerald-950 mb-4">
-              {user.firstName} {user.surname}
-              &apos;s Studio
-            </h1>
-
-            <p className="text-emerald-950/60 font-medium max-w-md leading-relaxed text-lg italic">
-              &quot;Every secret of a writer&apos;s soul, every experience of
-              his life, every quality of his mind, is written large in his
-              works.&quot;
-            </p>
+            <button
+              onClick={() => setMobileSidebarOpen(false)}
+              className="p-1.5 rounded-lg text-white/50 hover:text-white lg:hidden cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
-          <div className="flex gap-3 md:gap-4">
+          {/* USER CARD */}
+          <div className="p-4 mx-4 my-4 rounded-2xl bg-white/5 border border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/15 overflow-hidden relative shrink-0">
+                {user.avatar ? (
+                  <Image
+                    src={user.avatar}
+                    alt={user.firstName}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center font-bold text-xs text-white">
+                    {user.firstName?.[0]?.toUpperCase() || "U"}
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-serif font-bold text-xs text-white truncate">
+                  {user.firstName} {user.surname}
+                </div>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span className="text-[10px] text-emerald-300/80 uppercase tracking-widest font-semibold">
+                    {user.role}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* NAVIGATION LINKS */}
+          <div className="flex-1 overflow-y-auto px-4 py-2 space-y-6 scrollbar-thin scrollbar-thumb-white/10">
+            {navSections.map((section, idx) => (
+              <div key={idx} className="space-y-1.5">
+                <div className="px-3 text-[9px] uppercase tracking-[0.25em] font-bold text-white/40">
+                  {section.title}
+                </div>
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const isActive = activeTab === item.id;
+                    const Icon = item.icon;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => handleTabClick(item.id)}
+                        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs tracking-wide transition-all cursor-pointer group ${
+                          isActive
+                            ? "bg-white text-emerald-950 font-bold shadow-md shadow-black/20"
+                            : "text-cream-50/70 hover:bg-white/10 hover:text-white"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Icon
+                            className={`w-4 h-4 transition-transform group-hover:scale-110 ${
+                              isActive ? "text-emerald-900" : "text-emerald-400"
+                            }`}
+                          />
+                          <span>{item.label}</span>
+                        </div>
+                        {item.badge ? (
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                              isActive
+                                ? "bg-emerald-950 text-cream-50"
+                                : "bg-emerald-500/20 text-emerald-300"
+                            }`}
+                          >
+                            {item.badge}
+                          </span>
+                        ) : (
+                          <ChevronRight
+                            className={`w-3.5 h-3.5 transition-transform ${
+                              isActive
+                                ? "text-emerald-950 translate-x-0.5"
+                                : "text-white/20 opacity-0 group-hover:opacity-100"
+                            }`}
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* SIDEBAR FOOTER */}
+          <div className="p-4 border-t border-white/10 space-y-2">
+            <Link
+              href="/submit-piece"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 font-bold text-xs uppercase tracking-wider transition-all"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Submit Writing</span>
+            </Link>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <Link
+                href="/"
+                className="flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-cream-50/70 hover:text-white text-[10px] font-bold uppercase tracking-wider transition-colors"
+                title="Return to home page"
+              >
+                <Globe className="w-3 h-3" />
+                <span>Magazine</span>
+              </Link>
+              <button
+                onClick={() => logout()}
+                className="flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white/5 hover:bg-red-500/20 text-cream-50/70 hover:text-red-300 text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                title="Sign out"
+              >
+                <LogOut className="w-3 h-3" />
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* RIGHT SIDEBAR INSET */}
+      <div className="flex-1 lg:pl-72 flex flex-col min-w-0 min-h-screen">
+        {/* INSET TOP NAVIGATION BAR */}
+        <header className="sticky top-0 z-30 bg-[#fcfbf7]/90 backdrop-blur-md border-b border-emerald-950/10 px-6 sm:px-10 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            {/* Mobile Hamburger */}
+            <button
+              onClick={() => setMobileSidebarOpen(true)}
+              className="p-2 rounded-xl bg-emerald-950/5 hover:bg-emerald-950/10 text-emerald-950 lg:hidden cursor-pointer"
+              title="Open Navigation"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            {/* Breadcrumb & Section Title */}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-[0.2em] text-emerald-950/40">
+                <span>Admin Console</span>
+                <span>/</span>
+                <span className="text-emerald-800">{activeTab}</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-serif font-bold text-emerald-950 truncate">
+                {getActiveTabTitle()}
+              </h1>
+            </div>
+          </div>
+
+          {/* Quick Header Actions */}
+          <div className="flex items-center gap-3">
             <Link
               href={`/profile/${user._id}`}
-              className="flex-1 md:flex-none flex items-center justify-center gap-3 px-4 md:px-10 py-5 bg-emerald-950/10 text-emerald-950 rounded-full font-bold text-[10px] md:text-xs tracking-[0.15em] md:tracking-[0.2em] hover:bg-emerald-950/15 transition-all shadow-xl shadow-emerald-950/10 active:scale-95"
+              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-950/5 hover:bg-emerald-950/10 text-emerald-950 text-xs font-bold uppercase tracking-wider transition-colors"
             >
-              <User className="w-4 h-4 md:w-5 md:h-5" />
-              VIEW PROFILE
+              <User className="w-3.5 h-3.5" />
+              <span>Profile</span>
             </Link>
 
             <Link
               href="/submit-piece"
-              className="flex-1 md:flex-none flex items-center justify-center gap-3 px-4 md:px-10 py-5 bg-emerald-950 text-cream-50 rounded-full font-bold text-[10px] md:text-xs tracking-[0.15em] md:tracking-[0.2em] hover:bg-emerald-900 transition-all shadow-2xl shadow-emerald-950/40 active:scale-95 group"
+              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-emerald-950 text-cream-50 hover:bg-emerald-900 text-xs font-bold uppercase tracking-wider transition-all shadow-md shadow-emerald-950/15"
             >
-              <Plus className="w-4 h-4 md:w-5 md:h-5 group-hover:rotate-90 transition-transform duration-500" />
-              SUBMIT WRITING
+              <Plus className="w-3.5 h-3.5" />
+              <span>Write</span>
             </Link>
           </div>
-        </div>
+        </header>
 
-        {/* TABS */}
-
-        {isEditorialRole(user.role) && (
-          <div className="mb-16 overflow-x-auto scrollbar-hide py-2">
-            <div className="flex gap-3 min-w-max pb-2">
-              {dashboardTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`shrink-0 flex items-center ml-2 gap-3 px-6 md:px-8 py-4 rounded-full font-bold text-xs tracking-widest transition-all ${
-                    activeTab === tab.id
-                      ? "bg-emerald-950 text-cream-50 scale-105"
-                      : "bg-emerald-950/5 text-emerald-950/40 hover:bg-emerald-950/10"
-                  }`}
-                >
-                  <tab.icon className="w-4 h-4" />
-
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* STATS */}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
-          {(isAdminRole(user.role)
-            ? [
-                {
-                  label: "Total Creators",
-                  value: adminStats.totalUsers,
-                  icon: Users,
-                  color: "text-purple-500",
-                  bg: "bg-purple-500/5",
-                },
-                {
-                  label: "Global Submissions",
-                  value: adminStats.totalArticles,
-                  icon: CheckCircle2,
-                  color: "text-emerald-500",
-                  bg: "bg-emerald-500/5",
-                },
-
-                {
-                  label: "Pending Reviews",
-                  value: adminStats.pendingArticles,
-                  icon: Clock,
-                  color: "text-amber-500",
-                  bg: "bg-amber-500/5",
-                },
-
-                {
-                  label: "Published Works",
-                  value: adminStats.publishedArticles,
-                  icon: LayoutDashboard,
-                  color: "text-emerald-950",
-                  bg: "bg-emerald-950/5",
-                },
-              ]
-            : [
-                {
-                  label: "Published Works",
-                  value: published.length,
-                  icon: CheckCircle2,
-                  color: "text-emerald-500",
-                  bg: "bg-emerald-500/5",
-                },
-
-                {
-                  label: "Pending Review",
-                  value: pending.length,
-                  icon: Clock,
-                  color: "text-amber-500",
-                  bg: "bg-amber-500/5",
-                },
-
-                {
-                  label: "Total Admirers",
-                  value: totalLikes,
-                  icon: Heart,
-                  color: "text-red-500",
-                  bg: "bg-red-500/5",
-                },
-
-                {
-                  label: "Total Reads",
-                  value: totalReads,
-                  icon: LayoutDashboard,
-                  color: "text-emerald-950",
-                  bg: "bg-emerald-950/5",
-                },
-              ]
-          ).map((stat, idx) => (
-            <div
-              key={idx}
-              className="bg-white p-10 rounded-[2.5rem] border border-emerald-950/5 shadow-2xl shadow-emerald-950/5 group hover:-translate-y-2 transition-all duration-500"
-            >
-              <div
-                className={`w-14 h-14 ${stat.bg} rounded-2xl flex items-center justify-center mb-10 group-hover:scale-110 transition-transform duration-500`}
-              >
-                <stat.icon className={`w-7 h-7 ${stat.color}`} />
+        {/* INSET MAIN CONTENT CONTAINER */}
+        <main className="flex-1 p-6 sm:p-10 w-full w-full mx-auto">
+          {/* TAB 1: MY STUDIO */}
+          {activeTab === "my-studio" && (
+            <div className="space-y-12 animate-fade-in">
+              {/* STUDIO HERO BANNER */}
+              <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-emerald-950 via-[#033b2e] to-emerald-900 text-cream-50 p-8 sm:p-10 shadow-2xl border border-emerald-800/40">
+                <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full -mr-20 -mt-20 blur-2xl pointer-events-none" />
+                <div className="relative z-10 max-w-2xl space-y-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-[10px] uppercase font-bold tracking-widest border border-white/10">
+                    <Sparkles className="w-3 h-3" />
+                    <span>Creative Sanctuary</span>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white">
+                    Welcome to your studio, {user.firstName}.
+                  </h2>
+                  <p className="text-cream-50/70 text-sm leading-relaxed italic">
+                    &quot;Every secret of a writer&apos;s soul, every experience of his life, every quality of his mind, is written large in his works.&quot;
+                  </p>
+                </div>
               </div>
 
-              <div className="text-4xl font-serif font-bold text-emerald-950 mb-2">
-                {stat.value}
+              {/* STATS CARDS */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {(isAdminRole(user.role)
+                  ? [
+                      {
+                        label: "Total Creators",
+                        value: adminStats.totalUsers,
+                        icon: Users,
+                        color: "text-purple-600",
+                        bg: "bg-purple-50",
+                      },
+                      {
+                        label: "Global Submissions",
+                        value: adminStats.totalArticles,
+                        icon: CheckCircle2,
+                        color: "text-emerald-600",
+                        bg: "bg-emerald-50",
+                      },
+                      {
+                        label: "Pending Reviews",
+                        value: adminStats.pendingArticles,
+                        icon: Clock,
+                        color: "text-amber-600",
+                        bg: "bg-amber-50",
+                      },
+                      {
+                        label: "Published Works",
+                        value: adminStats.publishedArticles,
+                        icon: LayoutDashboard,
+                        color: "text-emerald-950",
+                        bg: "bg-emerald-950/5",
+                      },
+                    ]
+                  : [
+                      {
+                        label: "Published Works",
+                        value: published.length,
+                        icon: CheckCircle2,
+                        color: "text-emerald-600",
+                        bg: "bg-emerald-50",
+                      },
+                      {
+                        label: "Pending Review",
+                        value: pending.length,
+                        icon: Clock,
+                        color: "text-amber-600",
+                        bg: "bg-amber-50",
+                      },
+                      {
+                        label: "Total Admirers",
+                        value: totalLikes,
+                        icon: Heart,
+                        color: "text-rose-600",
+                        bg: "bg-rose-50",
+                      },
+                      {
+                        label: "Total Reads",
+                        value: totalReads,
+                        icon: LayoutDashboard,
+                        color: "text-emerald-950",
+                        bg: "bg-emerald-950/5",
+                      },
+                    ]
+                ).map((stat, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white p-6 rounded-3xl border border-emerald-950/5 shadow-xl shadow-emerald-950/5 group hover:-translate-y-1 transition-all"
+                  >
+                    <div
+                      className={`w-12 h-12 ${stat.bg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}
+                    >
+                      <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                    </div>
+                    <div className="text-3xl font-serif font-bold text-emerald-950 mb-1">
+                      {stat.value}
+                    </div>
+                    <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-emerald-950/40">
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-emerald-950/30">
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* MY STUDIO */}
-
-        {activeTab === "my-studio" && (
-          <>
-            {/* MODERATION */}
-            {pendingReviews.length > 0 && (
-              <div className="mb-20">
-                <div className="flex items-center gap-4 mb-10">
-                  <div className="px-5 py-2 bg-amber-500/10 text-amber-600 rounded-full text-[10px] font-bold uppercase tracking-widest border border-amber-500/10">
-                    Moderation Queue
+              {/* MODERATION QUEUE (IF PENDING) */}
+              {pendingReviews.length > 0 && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <span className="px-3 py-1 bg-amber-500/10 text-amber-700 rounded-full text-[10px] font-bold uppercase tracking-widest border border-amber-500/20">
+                      Moderation Queue
+                    </span>
+                    <h3 className="text-2xl font-serif font-bold text-emerald-950">
+                      Pending Approval
+                    </h3>
                   </div>
 
-                  <h2 className="text-3xl font-serif font-bold text-emerald-950">
-                    Pending Approval
-                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {pendingReviews.map((article) => (
+                      <ModerationActions key={article._id} article={article} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* RECENT SUBMISSIONS TABLE */}
+              <div className="bg-white rounded-[2.5rem] border border-emerald-950/5 shadow-2xl shadow-emerald-950/5 overflow-hidden">
+                <div className="p-8 border-b border-emerald-950/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-2xl font-serif font-bold text-emerald-950">
+                      Your Submissions
+                    </h3>
+                    <p className="text-xs text-emerald-950/60 mt-1">
+                      Track the review stage, readership, and status of your written pieces.
+                    </p>
+                  </div>
+                  <div className="w-full md:w-72">
+                    <SearchBar
+                      searchTerm={searchTerm}
+                      setSearchTerm={setSearchTerm}
+                    />
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {pendingReviews.map((article) => (
-                    <ModerationActions key={article._id} article={article} />
-                  ))}
-                </div>
-              </div>
-            )}
-            {/* SUBMISSIONS SECTION */}
-
-            <div className="bg-white rounded-[3rem] border border-emerald-950/5 shadow-2xl shadow-emerald-950/5 overflow-hidden mt-10">
-              {/* HEADER */}
-              <div className="p-10 md:p-12 border-b border-emerald-950/5 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                <h2 className="text-3xl font-serif font-bold text-emerald-950">
-                  Recent Submissions
-                </h2>
-                <div className="flex flex-wrap gap-4">
-                  <SearchBar
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
-                  />
-                </div>
-              </div>
-
-              {/* TABLE */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="bg-emerald-950/2 text-emerald-950/30 text-[10px] uppercase tracking-[0.2em] font-bold">
-                      <th className="w-[40%] px-12 py-8">Magnum Opus</th>
-                      <th className="w-[18%] px-12 py-8 text-center">Realm</th>
-                      <th className="w-[18%] px-12 py-8 text-center">
-                        Review Stage
-                      </th>
-                      <th className="w-[12%] px-12 py-8 text-center">
-                        Day of Creation
-                      </th>
-                      <th className="w-[12%] px-12 py-8 text-center">
-                        Audience
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody className="divide-y divide-emerald-950/5">
-                    {userArticles
-                      .filter(
-                        (article) =>
-                          article.title
-                            .toLowerCase()
-                            .includes(searchTerm.toLowerCase()) ||
-                          article.category?.name
-                            ?.toLowerCase()
-                            .includes(searchTerm.toLowerCase()),
-                      )
-                      .map((article) => (
-                        <tr
-                          key={article._id}
-                          className="group hover:bg-emerald-700/5 transition-colors cursor-pointer"
-                        >
-                          <td className="px-12 py-10">
-                            <div className="flex items-center gap-4">
-                              <div className="w-16 h-16 rounded-2xl bg-emerald-950/5 overflow-hidden relative shadow-sm group-hover:shadow-md transition-all">
-                                <Image
-                                  src={article.thumbnail as string}
-                                  alt={article.title as string}
-                                  className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                  fill
-                                  sizes="64px"
-                                />
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="bg-emerald-950/2 text-emerald-950/40 text-[10px] uppercase tracking-[0.2em] font-bold">
+                        <th className="w-[40%] px-8 py-5">Article Title</th>
+                        <th className="w-[20%] px-8 py-5 text-center">Category</th>
+                        <th className="w-[15%] px-8 py-5 text-center">Status</th>
+                        <th className="w-[15%] px-8 py-5 text-center">Created Date</th>
+                        <th className="w-[10%] px-8 py-5 text-center">Likes</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-emerald-950/5">
+                      {userArticles
+                        .filter(
+                          (article) =>
+                            article.title
+                              .toLowerCase()
+                              .includes(searchTerm.toLowerCase()) ||
+                            article.category?.name
+                              ?.toLowerCase()
+                              .includes(searchTerm.toLowerCase()),
+                        )
+                        .map((article) => (
+                          <tr
+                            key={article._id}
+                            className="group hover:bg-emerald-950/2 transition-colors cursor-pointer"
+                          >
+                            <td className="px-8 py-6">
+                              <div className="flex items-center gap-4">
+                                <div className="w-14 h-14 rounded-2xl bg-emerald-950/5 overflow-hidden relative shrink-0 shadow-xs">
+                                  <Image
+                                    src={article.thumbnail as string}
+                                    alt={article.title as string}
+                                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                    fill
+                                    sizes="56px"
+                                  />
+                                </div>
+                                <Link
+                                  href={`/article/${article._id}`}
+                                  className="group-hover:text-emerald-700 transition-colors"
+                                >
+                                  <span className="font-serif font-bold text-base text-emerald-950 group-hover:text-emerald-700 line-clamp-1 transition-colors">
+                                    {article.title}
+                                  </span>
+                                </Link>
                               </div>
-
-                              <Link
-                                href={`/article/${article._id}`}
-                                className="group-hover:text-emerald-700 transition-colors"
-                              >
-                                <span className="font-serif font-bold text-xl text-emerald-950 group-hover:text-emerald-700 max-w-100px truncate transition-colors">
-                                  {article.title}
-                                </span>
-                              </Link>
-                            </div>
-                          </td>
-
-                          <td className="px-12 py-10">
-                            <div className="flex items-center justify-center">
-                              <span className="px-4 py-1.5 bg-emerald-950/5 rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-950 border border-emerald-950/5">
+                            </td>
+                            <td className="px-8 py-6 text-center">
+                              <span className="px-3 py-1 bg-emerald-950/5 rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-950">
                                 {article.category?.name}
                               </span>
-                            </div>
-                          </td>
-
-                          <td className="px-12 py-10">
-                            <div className="flex items-center justify-center gap-3">
+                            </td>
+                            <td className="px-8 py-6 text-center">
                               <span
-                                className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest ${getStatusChipClass(article.status)}`}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest ${getStatusChipClass(
+                                  article.status,
+                                )}`}
                               >
                                 {article.status}
                               </span>
-                            </div>
-                          </td>
-
-                          <td className="px-12 py-10 text-sm text-emerald-950/40 font-bold tracking-tight">
-                            <div className="flex items-center justify-center gap-2">
+                            </td>
+                            <td className="px-8 py-6 text-center text-xs text-emerald-950/50">
                               {article.createdAt
-                                ? new Date(
-                                    article.createdAt,
-                                  ).toLocaleDateString()
+                                ? new Date(article.createdAt).toLocaleDateString()
                                 : "Unknown"}
-                            </div>
-                          </td>
-
-                          <td className="px-12 py-10">
-                            <div className="flex items-center justify-center gap-2 font-bold text-emerald-950">
-                              <span className="text-xl font-serif">
-                                {article.likes}
-                              </span>
-
-                              <span className="text-[10px] uppercase tracking-widest text-emerald-950/30">
-                                Admirers
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* FOOTER */}
-
-              <div className="p-10 md:p-12 bg-emerald-950/2 flex justify-between items-center border-t border-emerald-950/5">
-                <p className="text-[10px] uppercase tracking-widest font-bold text-emerald-950/30">
-                  Showing all records
-                </p>
-
-                <div className="flex gap-2">
-                  <button className="w-10 h-10 rounded-xl bg-white border border-emerald-950/5 flex items-center justify-center text-emerald-950 font-bold shadow-sm">
-                    1
-                  </button>
-
-                  <button className="w-10 h-10 rounded-xl hover:bg-white transition-all flex items-center justify-center text-emerald-950/20 font-bold hover:shadow-sm">
-                    2
-                  </button>
+                            </td>
+                            <td className="px-8 py-6 text-center font-serif font-bold text-emerald-950">
+                              {article.likes}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
-          </>
-        )}
+          )}
 
-        {/* ADMIN */}
-        {activeTab === "user-management" && (
-          <AdminUserManagement currentUser={user} />
-        )}
-        {activeTab === "category-management" && <AdminCategoryManagement />}
-        {activeTab === "all-articles" && (
-          <AdminArticleManagement currentUser={user} />
-        )}
-        {activeTab === "deleted-articles" && <AdminArticleRecover />}
-        {activeTab === "notifications" && <AdminNotificationManager />}
-        {activeTab === "newsletter" && <AdminNewsletterManager />}
-        {activeTab === "email-center" && <AdminEmailCenter />}
-      </main>
+          {/* TAB 2: USER MANAGEMENT */}
+          {activeTab === "user-management" && (
+            <div className="animate-fade-in">
+              <AdminUserManagement currentUser={user} />
+            </div>
+          )}
+
+          {/* TAB 3: CATEGORY MANAGEMENT */}
+          {activeTab === "category-management" && (
+            <div className="animate-fade-in">
+              <AdminCategoryManagement />
+            </div>
+          )}
+
+          {/* TAB 4: ARTICLE CONTROL */}
+          {activeTab === "all-articles" && (
+            <div className="animate-fade-in">
+              <AdminArticleManagement currentUser={user} />
+            </div>
+          )}
+
+          {/* TAB 5: DELETED ARTICLES RECOVERY */}
+          {activeTab === "deleted-articles" && (
+            <div className="animate-fade-in">
+              <AdminArticleRecover />
+            </div>
+          )}
+
+          {/* TAB 6: NOTIFICATIONS */}
+          {activeTab === "notifications" && (
+            <div className="animate-fade-in">
+              <AdminNotificationManager />
+            </div>
+          )}
+
+          {/* TAB 7: NEWSLETTER DESK */}
+          {activeTab === "newsletter" && (
+            <div className="animate-fade-in">
+              <AdminNewsletterManager />
+            </div>
+          )}
+
+          {/* TAB 8: EMAIL DISPATCH DESK */}
+          {activeTab === "email-center" && (
+            <div className="animate-fade-in">
+              <AdminEmailCenter />
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
