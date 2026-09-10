@@ -1,28 +1,27 @@
-import type { Document, Types } from "mongoose";
-
 import { createNotification } from "@/lib/createNotification";
 
 type ArticleAuthor = {
-  _id?: string | Types.ObjectId;
+  _id?: string;
+  id?: string;
   firstName?: string;
   surname?: string;
 };
 
-type ArticleAuthorLike = string | Types.ObjectId | ArticleAuthor;
+type ArticleAuthorLike = string | ArticleAuthor;
 
 type ArticleAudienceSource = {
   title: string;
   author?: ArticleAuthorLike;
   enrolledBy?: ArticleAuthorLike[];
-} & Document;
+};
 
-const toId = (value: ArticleAuthorLike | undefined | null) => {
+const toId = (value: ArticleAuthorLike | undefined | null): string => {
   if (!value) {
     return "";
   }
 
   if (isPopulatedArticleAuthor(value)) {
-    return value._id ? value._id.toString() : "";
+    return value.id ? value.id.toString() : value._id ? value._id.toString() : "";
   }
 
   return value.toString();
@@ -57,7 +56,7 @@ export const getArticleAuthorName = (article: ArticleAudienceSource) => {
 
 export const getArticleRecipients = (
   article: ArticleAudienceSource,
-  excludeIds: Array<string | Types.ObjectId> = [],
+  excludeIds: Array<string> = [],
 ) => {
   const excluded = new Set(excludeIds.map(toId).filter(Boolean));
   const fallbackRecipients = article.author ? [article.author] : [];
@@ -83,7 +82,7 @@ interface NotifyArticleAudienceProps {
     | "System"
     | "Warning";
   isGlobal?: boolean;
-  excludeRecipients?: Array<string | Types.ObjectId>;
+  excludeRecipients?: Array<string>;
 }
 
 export async function notifyArticleAudience({

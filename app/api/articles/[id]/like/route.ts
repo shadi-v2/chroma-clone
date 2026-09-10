@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/requireAuth";
-
-import "@/models/User";
-import { notifyArticleAudience } from "@/lib/articleNotifications";
-
-import Article from "@/models/Article";
+import { findArticleById, toggleLikeArticle } from "@/lib/db/articles";
 
 export async function POST(
   req: Request,
@@ -20,14 +15,13 @@ export async function POST(
     await connectDB();
 
     const { id } = await context.params;
-
     const auth = await requireAuth(req);
 
     if (auth.error) {
       return auth.error;
     }
 
-    const article = await Article.findById(id);
+    const article = await findArticleById(id);
 
     if (!article) {
       return NextResponse.json(
@@ -40,49 +34,11 @@ export async function POST(
       );
     }
 
-    // FIX OLD DOCUMENTS
-    if (!article.likedBy) {
-      article.likedBy = [];
-    }
-
-    const alreadyLiked = article.likedBy.some(
-      (userId: string) => userId.toString() === auth.user.id,
-    );
-
-    // UNLIKE
-    if (alreadyLiked) {
-      article.likes = Math.max(article.likes - 1, 0);
-
-      article.likedBy = article.likedBy.filter(
-        (userId: string) => userId.toString() !== auth.user.id,
-      );
-
-      await article.save();
-
-      return NextResponse.json({
-        liked: false,
-        likes: article.likes,
-      });
-    }
-
-    // LIKE
-    article.likes += 1;
-
-    article.likedBy.push(auth.user.id);
-
-    await article.save();
-
-    await notifyArticleAudience({
-      article,
-      title: "New Like",
-      message: `A new like was added to "${article.title}".`,
-      createdBy: auth.user.id,
-      excludeRecipients: [auth.user.id],
-    });
+    const result = await toggleLikeArticle(id, auth.user.id);
 
     return NextResponse.json({
-      liked: true,
-      likes: article.likes,
+      liked: result.liked,
+      likes: result.likes,
     });
   } catch (error) {
     console.error("LIKE ERROR:", error);

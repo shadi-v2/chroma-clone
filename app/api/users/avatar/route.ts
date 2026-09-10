@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
 import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
-
-import User from "@/models/User";
+import { findUserById, updateUser } from "@/lib/db/users";
 
 export async function POST(req: Request) {
   try {
@@ -46,7 +45,7 @@ export async function POST(req: Request) {
       publicId: result.public_id,
     });
   } catch (error) {
-    console.error(error);
+    console.error("AVATAR UPLOAD ERROR:", error);
 
     return NextResponse.json(
       {
@@ -66,7 +65,6 @@ export async function PATCH(req: Request) {
 
     const currentUser = await getCurrentUser();
 
-    console.log("CURRENT USER:", currentUser);
     if (!currentUser) {
       return NextResponse.json(
         {
@@ -80,7 +78,7 @@ export async function PATCH(req: Request) {
 
     const { avatar, avatarPublicId } = await req.json();
 
-    const user = await User.findById(currentUser._id);
+    const user = await findUserById(currentUser.id || currentUser._id);
 
     if (!user) {
       return NextResponse.json(
@@ -102,16 +100,16 @@ export async function PATCH(req: Request) {
       }
     }
 
-    user.avatar = avatar;
-    user.avatarPublicId = avatarPublicId;
-
-    await user.save();
+    await updateUser(currentUser.id || currentUser._id, {
+      avatar,
+      avatarPublicId,
+    });
 
     return NextResponse.json({
       success: true,
     });
   } catch (error) {
-    console.error(error);
+    console.error("AVATAR UPDATE ERROR:", error);
 
     return NextResponse.json(
       {

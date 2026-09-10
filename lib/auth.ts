@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { connectDB } from "@/lib/db";
-import User from "@/models/User";
+import { findUserById } from "@/lib/db/users";
 
 interface JwtPayload {
   id: string;
@@ -15,13 +15,19 @@ export async function getUserFromToken(req: Request) {
   const authHeader = req.headers.get("authorization");
 
   if (authHeader?.startsWith("Bearer ")) {
-    token = authHeader.split(" ")[1];
+    const raw = authHeader.split(" ")[1];
+    if (raw && raw !== "null" && raw !== "undefined") {
+      token = raw;
+    }
   }
 
   if (!token) {
     try {
       const cookieStore = await cookies();
-      token = cookieStore.get("token")?.value;
+      const cookieToken = cookieStore.get("token")?.value;
+      if (cookieToken && cookieToken !== "null" && cookieToken !== "undefined") {
+        token = cookieToken;
+      }
     } catch {
       // Ignore
     }
@@ -31,6 +37,7 @@ export async function getUserFromToken(req: Request) {
     return null;
   }
 
+
   try {
     const decoded = jwt.verify(
       token,
@@ -39,20 +46,20 @@ export async function getUserFromToken(req: Request) {
 
     await connectDB();
 
-    const user = await User.findById(decoded.id).select("email role").lean<{
-      _id: unknown;
-      email?: string;
-      role: string;
-    } | null>();
+    const user = await findUserById(decoded.id);
 
     if (!user) {
       return null;
     }
 
     return {
-      id: decoded.id,
+      id: user.id || decoded.id,
+      _id: user.id || decoded.id,
       email: user.email || decoded.email || "",
       role: user.role,
+      isFrozen: user.isFrozen,
+      dateOfBirth: user.dateOfBirth,
+      age: user.age,
     };
   } catch {
     return null;

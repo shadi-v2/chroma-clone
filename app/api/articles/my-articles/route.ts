@@ -1,18 +1,7 @@
-import { NextResponse }
-from "next/server";
-
-import { connectDB }
-from "@/lib/db";
-
-import { requireAuth }
-from "@/lib/requireAuth";
-
-import Article
-from "@/models/Article";
-
-import "@/models/User";
-import "@/models/Category";
-import { PopulatedArticle } from "@/types/article";
+import { NextResponse } from "next/server";
+import { connectDB } from "@/lib/db";
+import { requireAuth } from "@/lib/requireAuth";
+import { getUserAllArticles } from "@/lib/db/articles";
 
 export async function GET(req: Request) {
   try {
@@ -24,19 +13,9 @@ export async function GET(req: Request) {
       return auth.error;
     }
 
-    const articles = await Article.find({
-      author: auth.user.id,
-      deletedAt: {
-        $exists: false,
-      },
-    })
-      .populate("category", "name")
-      .sort({
-        createdAt: -1,
-      })
-      .lean<PopulatedArticle[]>();
+    const articles = await getUserAllArticles(auth.user.id);
 
-    const processedArticles = articles.map((article: PopulatedArticle) => ({
+    const processedArticles = articles.map((article) => ({
       ...article,
       category:
         typeof article.category === "object" && article.category !== null
@@ -46,7 +25,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ articles: processedArticles });
   } catch (error) {
-    console.error(error);
+    console.error("MY ARTICLES ERROR:", error);
 
     return NextResponse.json(
       {

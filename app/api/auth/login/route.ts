@@ -1,18 +1,16 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { connectDB } from "@/lib/db";
-import User from "@/models/User";
+import { findUserByEmail, comparePassword } from "@/lib/db/users";
 
 export async function POST(req: Request) {
   try {
     await connectDB();
     const body = await req.json();
     const { email, password } = body;
-    const user = await User.findOne({
-      email,
-    });
+    const user = await findUserByEmail(email);
 
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user || !user.password || !password || !(await comparePassword(password, user.password))) {
       return NextResponse.json(
         {
           message: "Invalid email or password",
@@ -23,9 +21,20 @@ export async function POST(req: Request) {
       );
     }
 
+    if (user.isFrozen) {
+      return NextResponse.json(
+        {
+          message: "This account has been frozen (restricted for accounts up to 18 years of age). Please contact administration.",
+        },
+        {
+          status: 403,
+        },
+      );
+    }
+
     const token = jwt.sign(
       {
-        id: user._id,
+        id: user.id || user._id,
         role: user.role,
       },
       process.env.JWT_SECRET || "secret",
@@ -34,19 +43,20 @@ export async function POST(req: Request) {
       },
     );
 
-    // CREATE RESPONSE
     const response = NextResponse.json({
       token,
       user: {
-        id: user._id,
+        id: user.id || user._id,
+        _id: user.id || user._id,
         firstName: user.firstName,
         surname: user.surname,
         email: user.email,
         role: user.role,
+        isFrozen: user.isFrozen,
+        age: user.age,
       },
     });
 
-    // SET COOKIE
     response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -54,10 +64,10 @@ export async function POST(req: Request) {
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });
+
     return response;
   } catch (error) {
-    console.error(error);
-
+    console.error("LOGIN ERROR:", error);
     return NextResponse.json(
       {
         message: "Login failed",

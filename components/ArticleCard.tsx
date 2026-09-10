@@ -3,11 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Clock, Heart, ArrowUpRight, Eye } from "lucide-react";
 import { api } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type { PublicArticle } from "@/types/article";
+import AgeBadge from "@/components/AgeBadge";
 
 interface ArticleCardProps {
   article: PublicArticle;
@@ -16,8 +16,7 @@ interface ArticleCardProps {
 const ArticleCard: React.FC<ArticleCardProps> = ({
   article: initialArticle,
 }) => {
-  const { user } = useAuth();
-  const router = useRouter();
+  const { user, openAuthModal } = useAuth();
   const [article, setArticle] = useState(initialArticle);
   const [isLiked, setIsLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
@@ -28,7 +27,10 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
     }
 
     if (!user) {
-      router.push("/auth");
+      openAuthModal({
+        title: "Sign in to Like",
+        message: "Please log in or create an account to like articles and support creators.",
+      });
       return;
     }
 
@@ -85,12 +87,19 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
             className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
 
-          <div className="absolute top-4 left-4 flex gap-2">
+          <div className="absolute top-4 left-4 flex items-center gap-2 flex-wrap">
             <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-950 border border-emerald-950/10">
               {typeof article.category === "string"
                 ? article.category
                 : article.category?.name}
             </span>
+            {article.author?.dateOfBirth && (
+              <AgeBadge
+                dateOfBirth={article.author.dateOfBirth}
+                age={article.author.age}
+                className="bg-white/95 backdrop-blur-sm"
+              />
+            )}
           </div>
 
           <div className="absolute inset-0 bg-emerald-950/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
@@ -132,24 +141,35 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
           <div className="mt-auto pt-6 border-t border-emerald-950/5 flex items-center justify-between">
             {/* AUTHOR */}
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               {article.author?.avatar ? (
                 <Image
                   src={article.author.avatar}
                   alt={article.author.firstName}
                   width={32}
                   height={32}
-                  className="w-8 h-8 rounded-full border border-emerald-950/10 object-cover"
+                  className="w-8 h-8 rounded-full border border-emerald-950/10 object-cover shrink-0"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-emerald-950/5 flex items-center justify-center text-xs font-serif font-bold text-emerald-950">
+                <div className="w-8 h-8 rounded-full bg-emerald-950/5 flex items-center justify-center text-xs font-serif font-bold text-emerald-950 shrink-0">
                   {article.author.firstName?.[0]?.toUpperCase() || "?"}
                 </div>
               )}
 
-              <span className="text-xs font-medium text-emerald-950/80">
-                {article.author.firstName} {article.author.surname}
-              </span>
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs font-medium text-emerald-950/80 truncate">
+                  {article.author.firstName} {article.author.surname}
+                </span>
+                {article.author?.dateOfBirth && (
+                  <div className="mt-0.5">
+                    <AgeBadge
+                      dateOfBirth={article.author.dateOfBirth}
+                      age={article.author.age}
+                      showCategoryName
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* ACTIONS */}

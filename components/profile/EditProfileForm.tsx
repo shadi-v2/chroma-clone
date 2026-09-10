@@ -35,7 +35,11 @@ export default function EditProfileForm({ user, adminMode }: Props) {
     dateOfBirth: user.dateOfBirth
       ? new Date(user.dateOfBirth).toISOString().split("T")[0]
       : "",
+    newPassword: "",
+    confirmNewPassword: "",
   });
+
+  const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -48,6 +52,8 @@ export default function EditProfileForm({ user, adminMode }: Props) {
       dateOfBirth: user.dateOfBirth
         ? new Date(user.dateOfBirth).toISOString().split("T")[0]
         : "",
+      newPassword: "",
+      confirmNewPassword: "",
     });
   }, [user]);
 
@@ -64,27 +70,54 @@ export default function EditProfileForm({ user, adminMode }: Props) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setPasswordError("");
+
+    if (form.newPassword || form.confirmNewPassword) {
+      if (form.newPassword.length < 6) {
+        setPasswordError("Password must be at least 6 characters long.");
+        return;
+      }
+      if (form.newPassword !== form.confirmNewPassword) {
+        setPasswordError("Passwords do not match.");
+        return;
+      }
+    }
 
     try {
       setLoading(true);
+
+      const payload: Record<string, unknown> = {
+        firstName: form.firstName,
+        surname: form.surname,
+        phone: form.phone,
+        school: form.school,
+        bio: form.bio,
+        dateOfBirth: form.dateOfBirth,
+      };
+
+      if (form.newPassword) {
+        payload.password = form.newPassword;
+      }
 
       const res = await fetch(endpoint, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        throw new Error("Failed to update profile");
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to update profile");
       }
 
       router.push(`/profile/${user._id}`);
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
-      alert("Failed to update profile");
+      const msg = error instanceof Error ? error.message : "Failed to update profile";
+      alert(msg);
     } finally {
       setLoading(false);
     }
@@ -187,24 +220,56 @@ export default function EditProfileForm({ user, adminMode }: Props) {
         />
       </div>
 
-      <div className="mt-6">
-        <label className="block mb-2 text-sm font-medium text-emerald-950">
-          Bio
-        </label>
-        <textarea
-          name="bio"
-          rows={5}
-          value={form.bio}
-          onChange={handleChange}
-          className={`${inputClasses} resize-none`}
-        />
+      <div className="mt-8 pt-8 border-t border-emerald-950/5">
+        <h3 className="text-lg font-serif font-bold text-emerald-950 mb-1">
+          Security & Password
+        </h3>
+        <p className="text-xs text-emerald-950/50 mb-4">
+          Leave blank if you do not want to change your password.
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <label className="block mb-2 text-sm font-medium text-emerald-950">
+              New Password
+            </label>
+            <input
+              type="password"
+              name="newPassword"
+              value={form.newPassword || ""}
+              onChange={handleChange}
+              placeholder="Enter new password (min. 6 chars)..."
+              className={inputClasses}
+            />
+          </div>
+
+          <div>
+            <label className="block mb-2 text-sm font-medium text-emerald-950">
+              Confirm New Password
+            </label>
+            <input
+              type="password"
+              name="confirmNewPassword"
+              value={form.confirmNewPassword || ""}
+              onChange={handleChange}
+              placeholder="Confirm new password..."
+              className={inputClasses}
+            />
+          </div>
+        </div>
+
+        {passwordError && (
+          <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-600 font-medium">
+            {passwordError}
+          </div>
+        )}
       </div>
 
       <div className="mt-10 flex justify-end">
         <button
           type="submit"
           disabled={loading}
-          className="px-8 py-4 rounded-xl bg-emerald-950 text-white font-medium hover:bg-emerald-900 transition-all disabled:opacity-50"
+          className="px-8 py-4 rounded-xl bg-emerald-950 text-white font-medium hover:bg-emerald-900 transition-all disabled:opacity-50 cursor-pointer"
         >
           {loading ? "Saving..." : "Save Changes"}
         </button>

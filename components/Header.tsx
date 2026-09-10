@@ -3,8 +3,7 @@ import Image from "next/image";
 
 import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
-
-import Notification from "@/models/Notification";
+import { findNotificationsForUser } from "@/lib/db/notifications";
 import UserSection from "./UserSection";
 import { ChevronDown } from "lucide-react";
 
@@ -24,11 +23,7 @@ export default async function Header() {
   let notifications: Notification[] = [];
 
   if (user) {
-    notifications = await Notification.find({
-      $or: [{ isGlobal: true }, { recipients: user._id }],
-    })
-      .sort({ createdAt: -1 })
-      .lean();
+    notifications = await findNotificationsForUser(user.id || user._id);
   }
 
   const navItems = [

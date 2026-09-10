@@ -1,15 +1,8 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
 import { requireRole } from "@/lib/requireRole";
-import { createNotification } from "@/lib/createNotification";
-import {
-  getArticleAuthorName,
-  notifyArticleAudience,
-} from "@/lib/articleNotifications";
 import type { ArticleStatus } from "@/types/article";
-
-import Article from "@/models/Article";
+import { findArticleById, updateArticle } from "@/lib/db/articles";
 
 const allowedStatuses: ArticleStatus[] = [
   "Draft",
@@ -32,8 +25,6 @@ export async function PATCH(
     await connectDB();
 
     const { id } = await context.params;
-
-    console.log("STATUS ARTICLE ID:", id);
 
     const auth = await requireRole(req, ["Admin", "Editor"]);
 
@@ -59,7 +50,7 @@ export async function PATCH(
       );
     }
 
-    const originalArticle = await Article.findById(id);
+    const originalArticle = await findArticleById(id);
 
     if (!originalArticle) {
       return NextResponse.json(
@@ -72,27 +63,15 @@ export async function PATCH(
       );
     }
 
-    const updateData: Record<string, unknown> = {};
-    if (status !== undefined) {
-      updateData.status = status;
-    }
-    if (assignedEditor !== undefined) {
-      updateData.assignedEditor = assignedEditor ? assignedEditor : null;
-      if (assignedEditor && status === undefined) {
-        updateData.status = "Editing";
-      }
+    let newStatus = status;
+    if (assignedEditor && status === undefined) {
+      newStatus = "Editing";
     }
 
-    const article = await Article.findByIdAndUpdate(
-      id,
-      updateData,
-      {
-        returnDocument: "after",
-      },
-    )
-      .populate("author", "firstName surname email avatar")
-      .populate("category", "_id name slug")
-      .populate("assignedEditor", "firstName surname email avatar role");
+    const article = await updateArticle(id, {
+      status: newStatus,
+      assignedEditorId: assignedEditor !== undefined ? (assignedEditor || null) : undefined,
+    });
 
     if (!article) {
       return NextResponse.json(
@@ -105,72 +84,9 @@ export async function PATCH(
       );
     }
 
-    if (status && status !== originalArticle.status) {
-      if (status === "Published") {
-        const authorName = getArticleAuthorName(article);
-
-        await createNotification({
-          title: "Article Published",
-          message: `"${article.title}" by ${authorName} is now live.`,
-          createdBy: auth.user.id,
-          recipients: article.enrolledBy?.length
-            ? article.enrolledBy.map((id : string) => id.toString())
-            : [article.author._id.toString()],
-          isGlobal: true,
-          type: "Article",
-        });
-      } else if (status === "Draft") {
-        await notifyArticleAudience({
-          title: "Article Needs Revision",
-          article,
-          message: `"${article.title}" was moved back to Draft.`,
-          createdBy: auth.user.id,
-          excludeRecipients: [auth.user.id],
-        });
-      } else {
-        await notifyArticleAudience({
-          article,
-          title: "Article Status Updated",
-          message: `"${article.title}" changed to ${status}.`,
-          createdBy: auth.user.id,
-          excludeRecipients: [auth.user.id],
-        });
-      }
-    }
-
-    if (
-      assignedEditor !== undefined &&
-      String(assignedEditor || "") !== String(originalArticle.assignedEditor || "")
-    ) {
-      if (assignedEditor) {
-        await createNotification({
-          title: "Article Assigned",
-          message: `You have been assigned to review "${article.title}".`,
-          createdBy: auth.user.id,
-          recipients: [assignedEditor],
-          type: "Article",
-        });
-      }
-    }
-
-    if (
-      assignedEditor !== undefined &&
-      status !== undefined &&
-      status === originalArticle.status &&
-      String(assignedEditor || "") !== String(originalArticle.assignedEditor || "")
-    ) {
-      await notifyArticleAudience({
-        article,
-        title: "Article Assignment Updated",
-        message: `"${article.title}" was assigned to a new editor.`,
-        createdBy: auth.user.id,
-        excludeRecipients: [auth.user.id],
-      });
-    }
-
     return NextResponse.json(article);
   } catch (error) {
-    console.error(error);
+    console.error("STATUS UPDATE ERROR:", error);
 
     return NextResponse.json(
       {

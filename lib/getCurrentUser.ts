@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { connectDB } from "@/lib/db";
-import User from "@/models/User";
+import { findUserById, toPublicUser } from "@/lib/db/users";
 
 interface JwtPayload {
   id: string;
@@ -22,16 +22,23 @@ export async function getCurrentUser() {
       process.env.JWT_SECRET || "secret",
     ) as JwtPayload;
 
-    const user = await User.findById(decoded.id).lean();
+    const user = await findUserById(decoded.id);
 
     if (!user) {
       return null;
     }
 
-    return JSON.parse(JSON.stringify(user));
-  } catch (error) {
+    return toPublicUser(user);
+  } catch (error: unknown) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "digest" in error &&
+      (error as { digest?: string }).digest === "DYNAMIC_SERVER_USAGE"
+    ) {
+      throw error;
+    }
     console.error("GET CURRENT USER ERROR:", error);
-
     return null;
   }
 }

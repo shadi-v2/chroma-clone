@@ -1,26 +1,19 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
-
 import { requireRole } from "@/lib/requireRole";
-
-import Tag from "@/models/Tag";
+import { listTags, createTag, findTagByName } from "@/lib/db/categories";
 
 export async function GET() {
   try {
     await connectDB();
 
-    const tags = await Tag.find()
-      .sort({
-        createdAt: -1,
-      })
-      .lean();
+    const tags = await listTags();
 
     return NextResponse.json({
       tags,
     });
   } catch (error) {
-    console.error(error);
+    console.error("TAGS GET ERROR:", error);
 
     return NextResponse.json(
       {
@@ -58,9 +51,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const exists = await Tag.findOne({
-      name,
-    });
+    const exists = await findTagByName(name);
 
     if (exists) {
       return NextResponse.json(
@@ -73,15 +64,13 @@ export async function POST(req: Request) {
       );
     }
 
-    const tag = await Tag.create({
-      name,
-    });
+    const tag = await createTag(name);
 
     return NextResponse.json(tag, {
       status: 201,
     });
   } catch (error) {
-    console.error(error);
+    console.error("TAGS POST ERROR:", error);
 
     return NextResponse.json(
       {

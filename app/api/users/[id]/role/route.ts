@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
-
-import User from "@/models/User";
 import { connectDB } from "@/lib/db";
 import { getUserFromToken } from "@/lib/auth";
-import { createNotification } from "@/lib/createNotification";
 import { isAdminRole, isAssignableRole } from "@/lib/roles";
+import { findUserById, updateUser, toPublicUser } from "@/lib/db/users";
 
 export async function PATCH(
   req: Request,
@@ -25,18 +22,13 @@ export async function PATCH(
     }
 
     const body = await req.json();
-
     const { id } = await context.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return NextResponse.json({ message: "Invalid user id" }, { status: 400 });
-    }
 
     if (!isAssignableRole(body.role)) {
       return NextResponse.json({ message: "Invalid role" }, { status: 400 });
     }
 
-    const user = await User.findById(id).select("role");
+    const user = await findUserById(id);
 
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -52,35 +44,17 @@ export async function PATCH(
       );
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      {
-        role: body.role,
-      },
-      {
-        returnDocument: "after",
-        runValidators: true,
-      },
-    ).select("-password");
+    const updatedUser = await updateUser(id, {
+      role: body.role,
+    });
 
     if (!updatedUser) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    try {
-      await createNotification({
-        title: "Role Updated",
-        message: `Your role has been changed to ${body.role}.`,
-        createdBy: admin.id,
-        recipients: [id],
-        type: "Role",
-      });
-    } catch (error) {
-      console.error("Failed to create role update notification", error);
-    }
-
-    return NextResponse.json(updatedUser);
-  } catch {
+    return NextResponse.json(toPublicUser(updatedUser));
+  } catch (error) {
+    console.error("ROLE UPDATE ERROR:", error);
     return NextResponse.json({ message: "Server Error" }, { status: 500 });
   }
 }

@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/requireAuth";
-
-import Article from "@/models/Article";
+import { findArticleById, toggleEnrollArticle } from "@/lib/db/articles";
 
 export async function POST(
   req: Request,
@@ -23,8 +21,7 @@ export async function POST(
     }
 
     const { id } = await context.params;
-
-    const article = await Article.findById(id);
+    const article = await findArticleById(id);
 
     if (!article) {
       return NextResponse.json(
@@ -37,37 +34,13 @@ export async function POST(
       );
     }
 
-    if (!article.enrolledBy) {
-      article.enrolledBy = [];
-    }
-
-    const isEnrolled = article.enrolledBy.some(
-      (userId: string) => userId.toString() === auth.user.id,
-    );
-
-    if (isEnrolled) {
-      await Article.findByIdAndUpdate(id, {
-        $pull: {
-          enrolledBy: auth.user.id,
-        },
-      });
-
-      return NextResponse.json({
-        enrolled: false,
-      });
-    }
-
-    await Article.findByIdAndUpdate(id, {
-      $addToSet: {
-        enrolledBy: auth.user.id,
-      },
-    });
+    const result = await toggleEnrollArticle(id, auth.user.id);
 
     return NextResponse.json({
-      enrolled: true,
+      enrolled: result.enrolled,
     });
   } catch (error) {
-    console.error(error);
+    console.error("ENROLL ERROR:", error);
 
     return NextResponse.json(
       {

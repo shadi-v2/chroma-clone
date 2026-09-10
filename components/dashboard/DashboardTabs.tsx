@@ -15,6 +15,8 @@ import {
   User,
   Trash2,
   Bell,
+  Mail,
+  Send,
 } from "lucide-react";
 import type { DashboardTab, AdminStats } from "@/types/dashboard";
 import type { PublicArticle } from "@/types/article";
@@ -57,6 +59,12 @@ const AdminArticleRecover = dynamic(
 );
 const AdminNotificationManager = dynamic(
   () => import("@/components/dashboard/AdminNotificationManager"),
+);
+const AdminNewsletterManager = dynamic(
+  () => import("@/components/dashboard/AdminNewsletterManager"),
+);
+const AdminEmailCenter = dynamic(
+  () => import("@/components/dashboard/AdminEmailCenter"),
 );
 
 interface DashboardTabsProps {
@@ -113,6 +121,16 @@ export default function DashboardTabs({
             id: "notifications" as DashboardTab,
             label: "Notifications",
             icon: Bell,
+          },
+          {
+            id: "newsletter" as DashboardTab,
+            label: "Newsletter",
+            icon: Mail,
+          },
+          {
+            id: "email-center" as DashboardTab,
+            label: "Email Desk",
+            icon: Send,
           },
         ]
       : user.role === "Editor"
@@ -478,6 +496,8 @@ export default function DashboardTabs({
         )}
         {activeTab === "deleted-articles" && <AdminArticleRecover />}
         {activeTab === "notifications" && <AdminNotificationManager />}
+        {activeTab === "newsletter" && <AdminNewsletterManager />}
+        {activeTab === "email-center" && <AdminEmailCenter />}
       </main>
     </div>
   );

@@ -1,0 +1,8 @@
+{"_id":{"$oid":"6a16edcd2209aef14cfd8ed4"},"name":"Story","slug":"story","createdAt":{"$date":"2026-05-27T13:12:45.112Z"},"updatedAt":{"$date":"2026-05-27T13:12:45.112Z"},"__v":0}
+{"_id":{"$oid":"6a16edd22209aef14cfd8ed5"},"name":"Article","slug":"article","createdAt":{"$date":"2026-05-27T13:12:50.696Z"},"updatedAt":{"$date":"2026-05-27T13:12:50.696Z"},"__v":0}
+{"_id":{"$oid":"6a16ee4e2209aef14cfd8ed8"},"name":"Travelogues","slug":"travelogues","createdAt":{"$date":"2026-05-27T13:14:54.148Z"},"updatedAt":{"$date":"2026-05-27T13:14:54.148Z"},"__v":0}
+{"_id":{"$oid":"6a16ee582209aef14cfd8ed9"},"name":"Letters","slug":"letters","createdAt":{"$date":"2026-05-27T13:15:04.622Z"},"updatedAt":{"$date":"2026-06-01T04:24:52.556Z"},"__v":0}
+{"_id":{"$oid":"6a16ee662209aef14cfd8eda"},"name":"Essays","slug":"essays","createdAt":{"$date":"2026-05-27T13:15:18.242Z"},"updatedAt":{"$date":"2026-05-27T13:15:18.242Z"},"__v":0}
+{"_id":{"$oid":"6a16ee722209aef14cfd8edb"},"name":"Feature","slug":"feature","createdAt":{"$date":"2026-05-27T13:15:30.475Z"},"updatedAt":{"$date":"2026-05-27T13:15:30.475Z"},"__v":0}
+{"_id":{"$oid":"6a16ee7b2209aef14cfd8edc"},"name":"Poetry","slug":"poetry","createdAt":{"$date":"2026-05-27T13:15:39.877Z"},"updatedAt":{"$date":"2026-05-27T13:15:39.877Z"},"__v":0}
+{"_id":{"$oid":"6a191dbc3013b6ea95369a77"},"name":"Philosophy","slug":"philosophy","createdAt":{"$date":"2026-05-29T05:01:48.831Z"},"updatedAt":{"$date":"2026-05-29T05:01:48.831Z"},"__v":0}

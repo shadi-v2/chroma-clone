@@ -1,11 +1,7 @@
 import { redirect } from "next/navigation";
-import { connectDB } from "@/lib/db";
-
-import "@/models/User";
-import "@/models/Category";
-
-import Article from "@/models/Article";
-import User from "@/models/User";
+import { connectDB, queryOne } from "@/lib/db";
+import { getUserAllArticles, findArticles } from "@/lib/db/articles";
+import { countUsers } from "@/lib/db/users";
 import DashboardTabs from "@/components/dashboard/DashboardTabs";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 import { isAdminRole } from "@/lib/roles";
@@ -18,67 +14,46 @@ export default async function DashboardPage() {
     redirect("/auth");
   }
 
-  console.time("dashboard-query");
+  const userId = user.id || user._id;
 
   // PARALLEL FETCHING
   const [
     userArticles,
-    pendingReviews,
+    pendingReviewsResult,
     totalUsers,
-    totalArticles,
-    pendingArticles,
-    publishedArticles,
+    totalArticlesResult,
+    pendingArticlesResult,
+    publishedArticlesResult,
   ] = await Promise.all([
-    Article.find({
-      author: user._id,
-      deletedAt: {
-        $exists: false,
-      },
-    })
-      .select("title thumbnail status likes reads createdAt category")
-      .populate("category", "name slug")
-      .sort({
-        createdAt: -1,
-      })
-      .lean(),
+    getUserAllArticles(userId),
     isAdminRole(user.role)
-      ? Article.find({
-          status: { $in: ["Pending", "Editing", "Edited"] },
+      ? findArticles({
+          status: "Pending",
+          limit: 100,
         })
-          .select("title thumbnail status author category createdAt")
-          .populate("author", "firstName surname avatar")
-          .populate("category", "name slug")
-          .lean()
-      : [],
-
-    isAdminRole(user.role) ? User.countDocuments() : 0,
-    isAdminRole(user.role) ? Article.countDocuments() : 0,
+      : Promise.resolve({ articles: [] }),
+    isAdminRole(user.role) ? countUsers() : Promise.resolve(0),
     isAdminRole(user.role)
-      ? Article.countDocuments({
-          status: { $in: ["Pending", "Editing", "Edited"] },
-        })
-      : 0,
+      ? queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM articles WHERE deleted_at IS NULL`)
+      : Promise.resolve({ count: 0 }),
     isAdminRole(user.role)
-      ? Article.countDocuments({
-          status: { $in: ["Published", "Paused"] },
-        })
-      : 0,
+      ? queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM articles WHERE status IN ('Pending', 'Editing', 'Edited') AND deleted_at IS NULL`)
+      : Promise.resolve({ count: 0 }),
+    isAdminRole(user.role)
+      ? queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM articles WHERE status IN ('Published', 'Paused') AND deleted_at IS NULL`)
+      : Promise.resolve({ count: 0 }),
   ]);
-
-  console.timeEnd("dashboard-query");
 
   const serializedUser = JSON.parse(JSON.stringify(user));
   const serializedArticles = JSON.parse(JSON.stringify(userArticles));
-  const serializedPending = JSON.parse(JSON.stringify(pendingReviews));
+  const serializedPending = JSON.parse(JSON.stringify(pendingReviewsResult.articles));
 
   const stats = {
     totalUsers,
-    totalArticles,
-    pendingArticles,
-    publishedArticles,
+    totalArticles: Number(totalArticlesResult?.count || 0),
+    pendingArticles: Number(pendingArticlesResult?.count || 0),
+    publishedArticles: Number(publishedArticlesResult?.count || 0),
   };
-
-  console.log("Articles:", JSON.stringify(userArticles).length / 1024, "KB");
 
   return (
     <DashboardTabs

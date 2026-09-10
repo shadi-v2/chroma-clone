@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { TrendingUp, Plus, ChevronRight } from "lucide-react";
 
 import type { PublicArticle } from "@/types/article";
+import AgeBadge from "@/components/AgeBadge";
+import NewsletterCard from "@/components/NewsletterCard";
 
 interface SidebarProps {
   trendingArticles: PublicArticle[];
@@ -25,6 +27,9 @@ const Sidebar: React.FC<SidebarProps> = ({ trendingArticles }) => {
 
   return (
     <aside className="space-y-12">
+      {/* NEWSLETTER CARD */}
+      <NewsletterCard />
+
       {/* TRENDING */}
 
       <section className="bg-white p-10 rounded-[2.5rem] border border-emerald-950/5 shadow-2xl shadow-emerald-950/5 relative overflow-hidden flex flex-col">
@@ -54,10 +59,17 @@ const Sidebar: React.FC<SidebarProps> = ({ trendingArticles }) => {
                   {article.title}
                 </h3>
 
-                <div className="flex items-center gap-2 text-[10px] text-emerald-950/40 uppercase tracking-widest font-bold">
+                <div className="flex items-center gap-2 text-[10px] text-emerald-950/40 uppercase tracking-widest font-bold flex-wrap">
                   <span>
                     {article.author.firstName} {article.author.surname}
                   </span>
+
+                  {article.author?.dateOfBirth && (
+                    <AgeBadge
+                      dateOfBirth={article.author.dateOfBirth}
+                      age={article.author.age}
+                    />
+                  )}
 
                   <span className="text-[8px]">•</span>
 

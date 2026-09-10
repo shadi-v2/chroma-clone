@@ -1,26 +1,24 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
-
 import { requireRole } from "@/lib/requireRole";
-
-import Category from "@/models/Category";
+import {
+  listCategories,
+  createCategory,
+  findCategoryByName,
+  findCategoryBySlug,
+} from "@/lib/db/categories";
 
 export async function GET() {
   try {
     await connectDB();
 
-    const categories = await Category.find()
-      .sort({
-        createdAt: -1,
-      })
-      .lean();
+    const categories = await listCategories();
 
     return NextResponse.json({
       categories,
     });
   } catch (error) {
-    console.error(error);
+    console.error("CATEGORIES GET ERROR:", error);
 
     return NextResponse.json(
       {
@@ -46,7 +44,6 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const { name } = body;
-
     let { slug } = body;
 
     if (!name) {
@@ -67,11 +64,10 @@ export async function POST(req: Request) {
         .replace(/[^\w-]+/g, "");
     }
 
-    const exists = await Category.findOne({
-      $or: [{ name }, { slug }],
-    });
+    const existingName = await findCategoryByName(name);
+    const existingSlug = await findCategoryBySlug(slug);
 
-    if (exists) {
+    if (existingName || existingSlug) {
       return NextResponse.json(
         {
           message: "Category already exists",
@@ -82,7 +78,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const category = await Category.create({
+    const category = await createCategory({
       name,
       slug,
     });
@@ -91,7 +87,7 @@ export async function POST(req: Request) {
       status: 201,
     });
   } catch (error) {
-    console.error(error);
+    console.error("CATEGORIES POST ERROR:", error);
 
     return NextResponse.json(
       {

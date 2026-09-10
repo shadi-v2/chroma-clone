@@ -4,19 +4,16 @@ import Link from "next/link";
 import { Clock, MessageCircle } from "lucide-react";
 import { notFound } from "next/navigation";
 import { connectDB } from "@/lib/db";
-
-import "@/models/User";
-import "@/models/Category";
-import "@/models/Comment";
-
-import Article from "@/models/Article";
-import Comment from "@/models/Comment";
+import { findArticleById, getRelatedArticles } from "@/lib/db/articles";
+import { findCommentsByArticleId } from "@/lib/db/comments";
 
 import ArticleActions from "@/components/article/ArticleActions";
 import CommentForm from "@/components/article/CommentForm";
 
 import type { ArticleComment, PublicArticle } from "@/types/article";
 import { RenderContent } from "@/components/rich-text-editor/RenderDescription";
+import AgeBadge from "@/components/AgeBadge";
+import MagazineArticle from "@/components/MagazineArticle";
 
 interface ArticlePageProps {
   params: Promise<{
@@ -29,45 +26,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   const { id } = await params;
 
-  const article = await Article.findById(id)
-    .populate("author", "firstName surname avatar school")
-    .populate("category", "name slug")
-    .lean();
+  const article = await findArticleById(id);
 
-  console.log(article.likedBy);
-
-  if (!article) {
+  if (!article || article.deletedAt) {
     notFound();
   }
 
-  const comments = await Comment.find({
-    article: id,
-  })
-    .populate("author", "firstName surname avatar")
-    .sort({
-      createdAt: -1,
-    })
-    .lean();
+  const categoryId = typeof article.category === "object" ? article.category?.id || article.category?._id || "" : article.category;
 
-  const relatedArticles = await Article.find({
-    _id: {
-      $ne: article._id,
-    },
-
-    category:
-      typeof article.category === "object"
-        ? article.category._id
-        : article.category,
-
-    status: "Published",
-
-    deletedAt: {
-      $exists: false,
-    },
-  })
-    .populate("author", "firstName surname avatar school")
-    .limit(3)
-    .lean();
+  const [comments, relatedArticles] = await Promise.all([
+    findCommentsByArticleId(id),
+    getRelatedArticles(id, categoryId, 3),
+  ]);
 
   const serializedArticle: PublicArticle = JSON.parse(JSON.stringify(article));
 
@@ -88,6 +58,13 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <span className="px-5 py-2 bg-emerald-950 text-cream-50 rounded-full text-[10px] font-bold uppercase tracking-[0.2em]">
                 {serializedArticle.category?.name}
               </span>
+
+              {serializedArticle.author?.dateOfBirth && (
+                <AgeBadge
+                  dateOfBirth={serializedArticle.author.dateOfBirth}
+                  age={serializedArticle.author.age}
+                />
+              )}
 
               <div className="flex items-center gap-2 text-emerald-950/40 text-[10px] font-bold uppercase tracking-widest">
                 <Clock className="w-3.5 h-3.5" />
@@ -130,10 +107,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   </p>
 
                   <Link
-                    href={`/profile/${serializedArticle.author._id}`}
+                    href={`/profile/${serializedArticle.author._id || serializedArticle.author.id}`}
                     className="flex items-center gap-3 group hover:bg-emerald-950/5 rounded-lg p-2 transition-colors"
                   >
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-emerald-950/5 relative">
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-emerald-950/5 relative shrink-0">
                       {serializedArticle.author.avatar ? (
                         <Image
                           src={serializedArticle.author.avatar}
@@ -142,19 +119,28 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                           className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center">
+                        <div className="w-full h-full flex items-center justify-center font-bold">
                           {serializedArticle.author.firstName[0]?.toUpperCase() || "?"}
                         </div>
                       )}
                     </div>
 
-                    <div>
-                      <p className="font-medium text-emerald-950">
+                    <div className="min-w-0">
+                      <p className="font-medium text-emerald-950 truncate">
                         {serializedArticle.author.firstName}{" "}
                         {serializedArticle.author.surname}
                       </p>
 
-                      <p className="text-sm text-emerald-950/40 truncate max-w-35">
+                      {serializedArticle.author?.dateOfBirth && (
+                        <div className="mt-1">
+                          <AgeBadge
+                            dateOfBirth={serializedArticle.author.dateOfBirth}
+                            age={serializedArticle.author.age}
+                          />
+                        </div>
+                      )}
+
+                      <p className="text-xs text-emerald-950/40 truncate mt-0.5">
                         {serializedArticle.author.school}
                       </p>
                     </div>
@@ -189,15 +175,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </aside>
 
             <article>
-              <div className="prose prose-lg max-w-none prose-headings:font-serif prose-p:text-emerald-950/90 prose-headings:text-emerald-950/95 prose-p:leading-loose">
-              <RenderContent json={JSON.parse(serializedArticle.content)} />
-                {/* {serializedArticle.content
-                  .split(/\n+/)
-                  .filter((p) => p.trim())
-                  .map((paragraph, idx) => (
-                    <p key={idx}>{paragraph}</p>
-                  ))} */}
-              </div>
+              <MagazineArticle>
+                <div className="prose prose-lg max-w-none prose-headings:font-serif prose-p:text-emerald-950/90 prose-headings:text-emerald-950/95 prose-p:leading-loose">
+                  <RenderContent json={JSON.parse(serializedArticle.content)} />
+                </div>
+              </MagazineArticle>
 
               <ArticleActions article={serializedArticle} />
             </article>
@@ -208,7 +190,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               Comments
             </h3>
 
-            <CommentForm articleId={serializedArticle._id} />
+            <CommentForm articleId={serializedArticle._id || serializedArticle.id || ""} />
 
             <div className="space-y-8">
               {serializedComments.map((comment) => (
@@ -258,8 +240,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {serializedRelated.map((rel) => (
                   <Link
-                    key={rel._id}
-                    href={`/article/${rel._id}`}
+                    key={rel._id || rel.id}
+                    href={`/article/${rel._id || rel.id}`}
                     className="group"
                   >
                     <div className="relative aspect-4/3 rounded-3xl overflow-hidden mb-4">

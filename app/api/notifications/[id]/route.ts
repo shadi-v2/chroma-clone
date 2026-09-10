@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 import { isAdminRole } from "@/lib/roles";
-
-import Notification from "@/models/Notification";
+import { deleteNotification } from "@/lib/db/notifications";
 
 export async function DELETE(
   req: Request,
@@ -25,13 +23,13 @@ export async function DELETE(
 
     const { id } = await context.params;
 
-    await Notification.findByIdAndDelete(id);
+    await deleteNotification(id);
 
     return NextResponse.json({
       success: true,
     });
   } catch (error) {
-    console.error(error);
+    console.error("NOTIFICATION DELETE ERROR:", error);
 
     return NextResponse.json(
       { message: "Failed to delete notification" },

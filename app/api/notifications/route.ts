@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 import { isAdminRole } from "@/lib/roles";
-
-import Notification from "@/models/Notification";
+import {
+  findNotificationsForUser,
+  createDbNotification,
+} from "@/lib/db/notifications";
 
 export async function GET() {
   try {
@@ -16,15 +17,11 @@ export async function GET() {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const notifications = await Notification.find({
-      $or: [{ isGlobal: true }, { recipients: user._id }],
-    })
-      .sort({ createdAt: -1 })
-      .lean();
+    const notifications = await findNotificationsForUser(user.id || user._id);
 
     return NextResponse.json(notifications);
   } catch (error) {
-    console.error(error);
+    console.error("NOTIFICATIONS GET ERROR:", error);
 
     return NextResponse.json(
       { message: "Failed to fetch notifications" },
@@ -45,20 +42,20 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    const notification = await Notification.create({
+    const notification = await createDbNotification({
       title: body.title,
       message: body.message,
       type: body.type || "General",
       recipients: body.recipients || [],
       isGlobal: body.isGlobal ?? true,
-      createdBy: user._id,
+      createdBy: user.id || user._id,
     });
 
     return NextResponse.json(notification, {
       status: 201,
     });
   } catch (error) {
-    console.error(error);
+    console.error("NOTIFICATIONS POST ERROR:", error);
 
     return NextResponse.json(
       { message: "Failed to create notification" },

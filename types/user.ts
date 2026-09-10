@@ -2,6 +2,7 @@ export type UserRole = "Owner" | "Admin" | "Editor" | "Author";
 
 export interface PublicUser {
   _id: string;
+  id?: string;
   firstName: string;
   surname: string;
   email: string;
@@ -9,8 +10,14 @@ export interface PublicUser {
   school: string;
   bio?: string;
   avatar?: string;
+  avatarPublicId?: string;
   phone?: string;
   dateOfBirth?: string;
+  isFrozen?: boolean;
+  isEmailVerified?: boolean;
+  googleId?: string;
+  onboardingCompleted?: boolean;
+  age?: number;
   bookmarks?: string[];
   likedArticles?: string[];
   createdAt?: string;
@@ -22,9 +29,15 @@ export interface UpdateProfilePayload {
   surname?: string;
   school?: string;
   bio?: string;
+  phone?: string;
+  dateOfBirth?: string;
   avatar?: string;
+  isFrozen?: boolean;
+  isEmailVerified?: boolean;
+  onboardingCompleted?: boolean;
 }
 
 export interface UpdateRolePayload {
   role: UserRole;
 }
+

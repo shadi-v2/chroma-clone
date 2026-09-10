@@ -3,13 +3,8 @@ import Image from "next/image";
 import { Mail, GraduationCap, Calendar, Edit3 } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import Link from "next/link";
-
-import "@/models/User";
-import "@/models/Article";
-import "@/models/Category";
-
-import User from "@/models/User";
-import Article from "@/models/Article";
+import { findUserById, toPublicUser } from "@/lib/db/users";
+import { getUserPublishedArticles } from "@/lib/db/articles";
 import ProfileTabs from "@/components/profile/ProfileTabs";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 import ProfileAvatarUpload from "@/components/ProfileAvatarUpload";
@@ -26,29 +21,18 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const { id } = await params;
   const currentUser = await getCurrentUser();
 
-  const isOwnProfile = currentUser?._id?.toString() === id;
-  const [profile, articles] = await Promise.all([
-    User.findById(id).lean(),
-
-    Article.find({
-      author: id,
-
-      status: "Published",
-    })
-      .populate("author", "firstName surname avatar")
-      .populate("category", "name slug")
-      .sort({
-        createdAt: -1,
-      })
-      .lean(),
+  const isOwnProfile = String(currentUser?._id || currentUser?.id) === String(id);
+  const [userDoc, articles] = await Promise.all([
+    findUserById(id),
+    getUserPublishedArticles(id),
   ]);
 
-  if (!profile) {
+  if (!userDoc) {
     redirect("/");
   }
 
+  const profile = toPublicUser(userDoc);
   const serializedProfile = JSON.parse(JSON.stringify(profile));
-
   const serializedArticles = JSON.parse(JSON.stringify(articles));
 
   return (
@@ -93,8 +77,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   {isOwnProfile && (
                     <Link
                       href="/profile/edit"
-                      className="self-center md:self-auto md:shrink-0 group inline-flex items-center gap-2 px-4 py-2 rounded-2xl border border-emerald-950/10 bg-white/70 backdrop-blur-sm text-emerald-950 hover:bg-emerald-950 hover:text-white transition-all duration-300 shadow-sm hover:shadow-xl
-      "
+                      className="self-center md:self-auto md:shrink-0 group inline-flex items-center gap-2 px-4 py-2 rounded-2xl border border-emerald-950/10 bg-white/70 backdrop-blur-sm text-emerald-950 hover:bg-emerald-950 hover:text-white transition-all duration-300 shadow-sm hover:shadow-xl"
                     >
                       <Edit3 className="w-4 h-4" />
                       <span className="text-sm font-medium">Edit Profile</span>

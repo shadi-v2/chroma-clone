@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-
 import { connectDB } from "@/lib/db";
-import User from "@/models/User";
+import { findUserByEmail, createUser } from "@/lib/db/users";
 
 export async function POST(req: Request) {
   try {
@@ -21,14 +20,13 @@ export async function POST(req: Request) {
       phone,
     } = body;
 
-    const userExists = await User.findOne({
-      email,
-    });
+    const cleanEmail = (email || "").trim().toLowerCase();
+    const userExists = await findUserByEmail(cleanEmail);
 
     if (userExists) {
       return NextResponse.json(
         {
-          message: "User already exists",
+          message: "User already exists with this email address",
         },
         {
           status: 400,
@@ -36,21 +34,31 @@ export async function POST(req: Request) {
       );
     }
 
-    const user = await User.create({
+    const user = await createUser({
       firstName,
       surname,
-      email,
+      email: cleanEmail,
       password,
       role: "Author",
-      school,
-      bio,
-      dateOfBirth,
-      phone,
+      school: school || "",
+      bio: bio || null,
+      dateOfBirth: dateOfBirth || null,
+      phone: phone || null,
+      isEmailVerified: true,
+      onboardingCompleted: false,
     });
+
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Failed to create user account" },
+        { status: 500 },
+      );
+    }
 
     const token = jwt.sign(
       {
-        id: user._id,
+        id: user.id || user._id,
         role: user.role,
       },
       process.env.JWT_SECRET || "secret",
@@ -63,7 +71,8 @@ export async function POST(req: Request) {
       {
         token,
         user: {
-          id: user._id,
+          id: user.id || user._id,
+          _id: user.id || user._id,
           firstName: user.firstName,
           surname: user.surname,
           email: user.email,
@@ -85,7 +94,7 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error) {
-    console.error(error);
+    console.error("REGISTER ERROR:", error);
 
     return NextResponse.json(
       {

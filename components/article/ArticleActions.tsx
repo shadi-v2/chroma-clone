@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Bell, Eye, Heart, Share2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { api } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type { PublicArticle } from "@/types/article";
@@ -12,8 +11,7 @@ interface ArticleActionsProps {
 }
 
 const ArticleActions = ({ article }: ArticleActionsProps) => {
-  const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading, openAuthModal } = useAuth();
   const [likes, setLikes] = useState(article.likes || 0);
   const [reads, setReads] = useState(article.reads || 0);
   const serverLiked =
@@ -30,7 +28,22 @@ const ArticleActions = ({ article }: ArticleActionsProps) => {
   const [isLiking, setIsLiking] = useState(false);
   const [isTogglingEnrollment, setIsTogglingEnrollment] = useState(false);
 
+  // Trigger login prompt when viewing an article without being signed in
   useEffect(() => {
+    if (!loading && !user) {
+      const timer = setTimeout(() => {
+        openAuthModal({
+          title: "Sign in to Continue Reading",
+          message:
+            "Please log in or create an account to like this article, post comments, subscribe to updates, and support the author.",
+        });
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, user, article._id, openAuthModal]);
+
+  useEffect(() => {
+    if (!user) return;
     let cancelled = false;
 
     const incrementViews = async () => {
@@ -50,17 +63,17 @@ const ArticleActions = ({ article }: ArticleActionsProps) => {
     return () => {
       cancelled = true;
     };
-  }, [article._id]);
-
-  console.log("USER ID:", user?._id);
-  console.log("LIKED BY:", article.likedBy);
+  }, [article._id, user]);
 
   const handleLike = async () => {
     if (isLiking) {
       return;
     }
     if (!user) {
-      router.push("/auth");
+      openAuthModal({
+        title: "Sign in to Like",
+        message: "Log in or create an account to like articles and support your favorite writers.",
+      });
       return;
     }
 
@@ -89,7 +102,10 @@ const ArticleActions = ({ article }: ArticleActionsProps) => {
     }
 
     if (!user) {
-      router.push("/auth");
+      openAuthModal({
+        title: "Sign in to Enroll",
+        message: "Log in or create an account to enroll and receive updates when this article is edited or updated.",
+      });
       return;
     }
 

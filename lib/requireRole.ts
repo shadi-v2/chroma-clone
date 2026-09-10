@@ -19,6 +19,19 @@ export async function requireRole(req: Request, roles: string[]) {
     };
   }
 
+  if (user.isFrozen) {
+    return {
+      error: NextResponse.json(
+        {
+          message: "Account is frozen (restricted for users up to 18 years of age).",
+        },
+        {
+          status: 403,
+        },
+      ),
+    };
+  }
+
   if (!roles.includes(user.role) && !(roles.includes("Admin") && isAdminRole(user.role))) {
     return {
       error: NextResponse.json(

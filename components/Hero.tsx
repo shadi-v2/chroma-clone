@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import type { PublicArticle } from "@/types/article";
+import AgeBadge from "@/components/AgeBadge";
 
 interface HeroProps {
   articles: PublicArticle[];
@@ -101,13 +102,22 @@ const Hero: React.FC<HeroProps> = ({ articles }) => {
         {/* CONTENT */}
 
         <div className="absolute bottom-0 left-0 w-full p-8 md:p-16 z-20">
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-6 flex-wrap">
             <span className="px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-[8px] font-bold tracking-[0.2em] uppercase border text-white border-white/20">
               Featured{" "}
               {typeof article.category === "string"
                 ? article.category
                 : article.category?.name}
             </span>
+
+            {article.author?.dateOfBirth && (
+              <AgeBadge
+                dateOfBirth={article.author.dateOfBirth}
+                age={article.author.age}
+                className="bg-white/20 text-white border-white/30 backdrop-blur-md"
+                showCategoryName
+              />
+            )}
 
             <div className="flex items-center gap-2 text-[8px] text-cream-50/60 uppercase tracking-[0.2em] font-medium">
               <Clock className="w-3.5 h-3.5" />
@@ -153,9 +163,18 @@ const Hero: React.FC<HeroProps> = ({ articles }) => {
                     Curated By
                   </span>
 
-                  <span className="block font-medium text-xl font-serif text-white">
-                    {article.author.firstName} {article.author.surname}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="block font-medium text-xl font-serif text-white">
+                      {article.author.firstName} {article.author.surname}
+                    </span>
+                    {article.author?.dateOfBirth && (
+                      <AgeBadge
+                        dateOfBirth={article.author.dateOfBirth}
+                        age={article.author.age}
+                        showCategoryName
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
 

@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
-
-import { connectDB } from "@/lib/db";
-
+import { connectDB, queryOne } from "@/lib/db";
 import { requireRole } from "@/lib/requireRole";
-
-import User from "@/models/User";
-import Article from "@/models/Article";
-import Comment from "@/models/Comment";
 
 export async function GET(req: Request) {
   try {
@@ -19,68 +13,34 @@ export async function GET(req: Request) {
     }
 
     const [
-      totalUsers,
-      totalArticles,
-      totalComments,
-      publishedArticles,
-      pendingArticles,
-      draftArticles,
-      totalReads,
+      usersResult,
+      articlesResult,
+      commentsResult,
+      publishedResult,
+      pendingResult,
+      draftResult,
+      readsResult,
     ] = await Promise.all([
-      User.countDocuments(),
-
-      Article.countDocuments({
-        deletedAt: {
-          $exists: false,
-        },
-      }),
-
-      Comment.countDocuments(),
-
-      Article.countDocuments({
-        status: { $in: ["Published", "Paused"] },
-        deletedAt: {
-          $exists: false,
-        },
-      }),
-
-      Article.countDocuments({
-        status: { $in: ["Pending", "Editing", "Edited"] },
-        deletedAt: {
-          $exists: false,
-        },
-      }),
-
-      Article.countDocuments({
-        status: "Draft",
-        deletedAt: {
-          $exists: false,
-        },
-      }),
-
-      Article.aggregate([
-        {
-          $group: {
-            _id: null,
-            total: {
-              $sum: "$reads",
-            },
-          },
-        },
-      ]),
+      queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM users`),
+      queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM articles WHERE deleted_at IS NULL`),
+      queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM comments`),
+      queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM articles WHERE status IN ('Published', 'Paused') AND deleted_at IS NULL`),
+      queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM articles WHERE status IN ('Pending', 'Editing', 'Edited') AND deleted_at IS NULL`),
+      queryOne<{ count: string | number }>(`SELECT COUNT(*) as count FROM articles WHERE status = 'Draft' AND deleted_at IS NULL`),
+      queryOne<{ sum: string | number }>(`SELECT COALESCE(SUM(reads), 0) as sum FROM articles`),
     ]);
 
     return NextResponse.json({
-      totalUsers,
-      totalArticles,
-      totalComments,
-      publishedArticles,
-      pendingArticles,
-      draftArticles,
-      totalReads: totalReads[0]?.total || 0,
+      totalUsers: Number(usersResult?.count || 0),
+      totalArticles: Number(articlesResult?.count || 0),
+      totalComments: Number(commentsResult?.count || 0),
+      publishedArticles: Number(publishedResult?.count || 0),
+      pendingArticles: Number(pendingResult?.count || 0),
+      draftArticles: Number(draftResult?.count || 0),
+      totalReads: Number(readsResult?.sum || 0),
     });
   } catch (error) {
-    console.error(error);
+    console.error("ADMIN STATS ERROR:", error);
 
     return NextResponse.json(
       {

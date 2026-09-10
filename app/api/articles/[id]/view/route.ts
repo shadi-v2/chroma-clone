@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
-
-import Article from "@/models/Article";
+import { incrementArticleViews } from "@/lib/db/articles";
+import { getUserFromToken } from "@/lib/auth";
 
 export async function POST(
-  _req: Request,
+  req: Request,
   context: {
     params: Promise<{
       id: string;
@@ -16,36 +15,21 @@ export async function POST(
     await connectDB();
 
     const { id } = await context.params;
+    const user = await getUserFromToken(req);
 
-    const article = await Article.findByIdAndUpdate(
-      id,
-      {
-        $inc: {
-          reads: 1,
-        },
-      },
-      {
-        new: true,
-        projection: {
-          reads: 1,
-        },
-      },
-    );
-
-    if (!article) {
+    if (!user) {
       return NextResponse.json(
         {
-          message: "Article not found",
+          message: "Views only counted for authenticated users",
+          incremented: false,
         },
-        {
-          status: 404,
-        },
+        { status: 200 },
       );
     }
 
-    return NextResponse.json({
-      reads: article.reads,
-    });
+    const result = await incrementArticleViews(id, user.id);
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error("VIEW ERROR:", error);
 

@@ -1,5 +1,4 @@
-import Notification from "@/models/Notification";
-import type { NotificationType } from "@/models/Notification";
+import { createDbNotification, type NotificationType } from "@/lib/db/notifications";
 
 interface CreateNotificationProps {
   title: string;
@@ -18,13 +17,12 @@ export async function createNotification({
   isGlobal = false,
   type = "General",
 }: CreateNotificationProps) {
-  return Notification.create({
+  return createDbNotification({
     title,
     message,
     createdBy,
     recipients,
     isGlobal,
     type,
-    readBy: [],
   });
 }

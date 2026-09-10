@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
-import User from "@/models/User";
 import { isAdminRole } from "@/lib/roles";
+import { deleteUser, updateUser, toPublicUser } from "@/lib/db/users";
 
 export async function DELETE(
   req: Request,
@@ -21,7 +21,7 @@ export async function DELETE(
 
     const { id } = await context.params;
 
-    if (currentUser._id.toString() === id) {
+    if (String(currentUser.id || currentUser._id) === String(id)) {
       return NextResponse.json(
         {
           message: "You cannot delete your own account",
@@ -32,13 +32,13 @@ export async function DELETE(
       );
     }
 
-    await User.findByIdAndDelete(id);
+    await deleteUser(id);
 
     return NextResponse.json({
       success: true,
     });
   } catch (error) {
-    console.error(error);
+    console.error("DELETE USER ERROR:", error);
 
     return NextResponse.json(
       {
@@ -71,15 +71,13 @@ export async function PATCH(
     }
 
     const { id } = await context.params;
-
     const body = await req.json();
 
-    const user = await User.findByIdAndUpdate(id, body, {
-      returnDocument: "after",
-    }).select("-password");
+    const user = await updateUser(id, body);
 
-    return NextResponse.json(user);
-  } catch {
+    return NextResponse.json(toPublicUser(user));
+  } catch (error) {
+    console.error("PATCH USER ERROR:", error);
     return NextResponse.json({ message: "Server Error" }, { status: 500 });
   }
 }

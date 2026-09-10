@@ -1,26 +1,43 @@
 "use client";
 
 import Link from "next/link";
-
 import { Mail, Globe, ArrowUpRight } from "lucide-react";
 import { FaWhatsapp, FaInstagram } from "react-icons/fa";
 import Image from "next/image";
+import NewsletterCard from "@/components/NewsletterCard";
 
 const Footer = () => {
   const footerLinkClass =
     "group inline-flex items-center hover:text-white transition-colors";
   return (
-    <footer className="bg-emerald-950 text-cream-50 px-8 pt-24 pb-12 rounded-t-4xl md:rounded-t-[4rem] mt-32 relative overflow-hidden">
+    <footer className="bg-emerald-950 text-cream-50 px-8 pt-20 pb-12 rounded-t-4xl md:rounded-t-[4rem] mt-32 relative overflow-hidden">
       {/* TOP LINE */}
-
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* GRID */}
+        {/* NEWSLETTER BANNER IN FOOTER */}
+        <div className="mb-20 pb-16 border-b border-white/10">
+          <div className="max-w-4xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8 bg-white/5 border border-white/10 rounded-3xl p-8 lg:p-10 backdrop-blur-md">
+            <div className="space-y-2 text-center lg:text-left">
+              <span className="text-xs uppercase font-bold tracking-[0.2em] text-emerald-400">
+                Weekly Literary Dispatch
+              </span>
+              <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">
+                Receive fresh essays & author spotlights
+              </h3>
+              <p className="text-cream-50/60 text-xs sm:text-sm max-w-md">
+                No spam, ever. Unsubscribe anytime with a single click.
+              </p>
+            </div>
+            <div className="w-full lg:w-96">
+              <NewsletterCard variant="inline" />
+            </div>
+          </div>
+        </div>
 
+        {/* GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-12">
           {/* BRAND */}
-
           <div className="space-y-8">
             <div className="relative h-12 md:h-16 w-40">
               <Link href="/" className="flex items-center">
@@ -39,7 +56,6 @@ const Footer = () => {
             </p>
 
             {/* SOCIALS */}
-
             <div className="flex gap-4 pt-2">
               {[
                 {
@@ -73,7 +89,6 @@ const Footer = () => {
           </div>
 
           {/* RESOURCES */}
-
           <div>
             <h4 className="text-white font-bold mb-10 uppercase tracking-[0.2em] text-sm">
               Resources
@@ -83,7 +98,6 @@ const Footer = () => {
               <li>
                 <Link href="/submit" className={footerLinkClass}>
                   <span>Submission Guidelines</span>
-
                   <span className="w-4 ml-1 overflow-hidden">
                     <ArrowUpRight className="w-4 h-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" />
                   </span>
@@ -93,7 +107,6 @@ const Footer = () => {
               <li>
                 <Link href="/submit" className={footerLinkClass}>
                   <span>Editorial Policy</span>
-
                   <span className="w-4 ml-1 overflow-hidden">
                     <ArrowUpRight className="w-4 h-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" />
                   </span>
@@ -103,7 +116,6 @@ const Footer = () => {
               <li>
                 <Link href="/" className={footerLinkClass}>
                   <span>Author Interviews</span>
-
                   <span className="w-4 ml-1 overflow-hidden">
                     <ArrowUpRight className="w-4 h-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" />
                   </span>
@@ -113,7 +125,6 @@ const Footer = () => {
               <li>
                 <Link href="/about" className={footerLinkClass}>
                   <span>Writing Tips & Tricks</span>
-
                   <span className="w-4 ml-1 overflow-hidden">
                     <ArrowUpRight className="w-4 h-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" />
                   </span>
@@ -123,7 +134,6 @@ const Footer = () => {
           </div>
 
           {/* PLATFORM */}
-
           <div>
             <h4 className="text-white font-bold mb-10 uppercase tracking-[0.2em] text-sm">
               Platform
@@ -151,7 +161,6 @@ const Footer = () => {
               <li>
                 <Link href="/auth" className={footerLinkClass}>
                   <span>Join the Team</span>
-
                   <span className="w-4 ml-1 overflow-hidden">
                     <ArrowUpRight className="w-4 h-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" />
                   </span>
@@ -170,7 +179,6 @@ const Footer = () => {
           </div>
 
           {/* PARTNER */}
-
           <div className="relative overflow-hidden rounded-[2.5rem] border border-white/15 bg-white/5 backdrop-blur-2xl p-8 transition-all duration-500 hover:bg-white/8 hover:border-white/20">
             <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-white/5 blur-3xl" />
 
@@ -205,7 +213,6 @@ const Footer = () => {
         </div>
 
         {/* BOTTOM */}
-
         <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8 text-[10px] uppercase tracking-[0.2em] font-bold text-cream-50/30">
           <div>
             © {new Date().getFullYear()} CHROMADIARIES WEB MAGAZINE. ALL RIGHTS

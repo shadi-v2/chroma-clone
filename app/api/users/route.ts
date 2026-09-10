@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import User from "@/models/User";
 import { connectDB } from "@/lib/db";
 import { getUserFromToken } from "@/lib/auth";
 import { isAdminRole } from "@/lib/roles";
+import { listUsers } from "@/lib/db/users";
 import type { UserRole } from "@/types/user";
 
 export async function GET(req: Request) {
@@ -18,12 +18,11 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const role = searchParams.get("role") as UserRole | null;
 
-    const query = role ? { role } : {};
-
-    const users = await User.find(query).select("-password");
+    const users = await listUsers(role || undefined);
 
     return NextResponse.json(users);
-  } catch {
+  } catch (error) {
+    console.error("USERS GET ERROR:", error);
     return NextResponse.json({ message: "Server Error" }, { status: 500 });
   }
 }

@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
-
-import Notification from "@/models/Notification";
+import { getUnreadNotificationCount } from "@/lib/db/notifications";
 
 export async function GET() {
   try {
@@ -15,22 +13,13 @@ export async function GET() {
       return NextResponse.json({ count: 0 }, { status: 401 });
     }
 
-    const notifications = await Notification.find({
-      $or: [{ isGlobal: true }, { recipients: user._id }],
-    }).lean();
-
-    const unreadCount = notifications.filter(
-      (notification) =>
-        !notification.readBy?.some(
-          (id: string) => id.toString() === user._id.toString(),
-        ),
-    ).length;
+    const unreadCount = await getUnreadNotificationCount(user.id || user._id);
 
     return NextResponse.json({
       count: unreadCount,
     });
   } catch (error) {
-    console.error(error);
+    console.error("UNREAD COUNT ERROR:", error);
 
     return NextResponse.json({ count: 0 }, { status: 500 });
   }

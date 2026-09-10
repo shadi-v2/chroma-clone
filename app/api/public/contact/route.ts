@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
-
-import Contact from "@/models/Contact";
+import { createContactMessage } from "@/lib/db/public";
 
 export async function POST(req: Request) {
   try {
@@ -23,7 +21,7 @@ export async function POST(req: Request) {
       );
     }
 
-    await Contact.create({
+    await createContactMessage({
       name,
       email,
       subject,
@@ -39,7 +37,7 @@ export async function POST(req: Request) {
       },
     );
   } catch (error) {
-    console.error(error);
+    console.error("CONTACT POST ERROR:", error);
 
     return NextResponse.json(
       {

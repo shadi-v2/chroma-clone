@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
-
-import Article from "@/models/Article";
+import { recoverArticle, hardDeleteArticle } from "@/lib/db/articles";
 import { requireAdmin } from "@/lib/requireAdmin";
-import { notifyArticleAudience } from "@/lib/articleNotifications";
 
 export async function PATCH(
   req: Request,
@@ -24,33 +21,11 @@ export async function PATCH(
     }
 
     const { id } = await context.params;
-
-    const article = await Article.findByIdAndUpdate(
-      id,
-      {
-        $unset: {
-          deletedAt: 1,
-        },
-        status: "Pending",
-      },
-      {
-        new: true,
-      },
-    );
-
-    if (article) {
-      await notifyArticleAudience({
-        article,
-        title: "Article Recovered",
-        message: `"${article.title}" was recovered and sent back for review.`,
-        createdBy: auth.user.id,
-        excludeRecipients: [auth.user.id],
-      });
-    }
+    const article = await recoverArticle(id);
 
     return NextResponse.json(article);
   } catch (error) {
-    console.error(error);
+    console.error("RECOVERY PATCH ERROR:", error);
 
     return NextResponse.json(
       {
@@ -81,14 +56,13 @@ export async function DELETE(
     }
 
     const { id } = await context.params;
-
-    await Article.findByIdAndDelete(id);
+    await hardDeleteArticle(id);
 
     return NextResponse.json({
       success: true,
     });
   } catch (error) {
-    console.error(error);
+    console.error("PERMANENT DELETE ERROR:", error);
 
     return NextResponse.json(
       {

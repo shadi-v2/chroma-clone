@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/requireAuth";
-import { notifyArticleAudience } from "@/lib/articleNotifications";
-
-import Article from "@/models/Article";
+import { findArticleById, toggleBookmarkArticle } from "@/lib/db/articles";
 
 export async function POST(
   req: Request,
@@ -18,16 +15,13 @@ export async function POST(
     await connectDB();
 
     const { id } = await context.params;
-
     const auth = await requireAuth(req);
 
     if (auth.error) {
       return auth.error;
     }
 
-    const userId = auth.user.id;
-
-    const article = await Article.findById(id);
+    const article = await findArticleById(id);
 
     if (!article) {
       return NextResponse.json(
@@ -40,47 +34,21 @@ export async function POST(
       );
     }
 
-    const isBookmarked = article.bookmarkedBy.includes(userId);
+    const result = await toggleBookmarkArticle(id, auth.user.id);
 
-    if (isBookmarked) {
-      await Article.findByIdAndUpdate(id, {
-        $pull: {
-          bookmarkedBy: userId,
-        },
-        $inc: {
-          bookmarksCount: -1,
-        },
-      });
-
+    if (result.bookmarked) {
       return NextResponse.json({
-        message: "Bookmark removed",
-        bookmarked: false,
+        message: "Article bookmarked",
+        bookmarked: true,
       });
     }
 
-    await Article.findByIdAndUpdate(id, {
-      $push: {
-        bookmarkedBy: userId,
-      },
-      $inc: {
-        bookmarksCount: 1,
-      },
-    });
-
-    await notifyArticleAudience({
-      article,
-      title: "New Bookmark",
-      message: `"${article.title}" was bookmarked.`,
-      createdBy: auth.user.id,
-      excludeRecipients: [auth.user.id],
-    });
-
     return NextResponse.json({
-      message: "Article bookmarked",
-      bookmarked: true,
+      message: "Bookmark removed",
+      bookmarked: false,
     });
   } catch (error) {
-    console.error(error);
+    console.error("BOOKMARK ERROR:", error);
 
     return NextResponse.json(
       {

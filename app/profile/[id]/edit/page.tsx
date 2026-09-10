@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
-import User from "@/models/User";
+import { findUserById, toPublicUser } from "@/lib/db/users";
 import { isAdminRole } from "@/lib/roles";
 
 import EditProfileForm from "@/components/profile/EditProfileForm";
@@ -20,20 +20,20 @@ export default async function AdminEditProfilePage({ params }: Props) {
   }
 
   if (!isAdminRole(currentUser.role)) {
-    redirect(`/profile/${currentUser._id}`);
+    redirect(`/profile/${currentUser._id || currentUser.id}`);
   }
 
   const { id } = await params;
 
   await connectDB();
 
-  const user = await User.findById(id).select("-password");
+  const user = await findUserById(id);
 
   if (!user) {
     redirect("/dashboard");
   }
 
-  const serializedUser = JSON.parse(JSON.stringify(user));
+  const serializedUser = JSON.parse(JSON.stringify(toPublicUser(user)));
 
   return (
     <main className="min-h-screen bg-cream-50 py-20">

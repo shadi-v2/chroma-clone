@@ -18,5 +18,18 @@ export async function requireAuth(req: Request) {
     };
   }
 
+  if (user.isFrozen) {
+    return {
+      error: NextResponse.json(
+        {
+          message: "Your account has been frozen (restricted for users up to 18 years of age).",
+        },
+        {
+          status: 403,
+        },
+      ),
+    };
+  }
+
   return { user };
 }

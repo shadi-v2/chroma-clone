@@ -1,5 +1,6 @@
 export interface Category {
   _id: string;
+  id?: string;
   name: string;
   slug: string;
   createdAt?: string;
@@ -8,6 +9,7 @@ export interface Category {
 
 export interface Tag {
   _id: string;
+  id?: string;
   name: string;
   createdAt?: string;
   updatedAt?: string;

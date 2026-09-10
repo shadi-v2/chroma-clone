@@ -9,11 +9,14 @@ export interface UpdateArticleStatusPayload {
 
 export interface ArticleCategory {
   _id: string;
+  id?: string;
   name: string;
+  slug?: string;
 }
 
 export interface PublicArticle {
   _id: string;
+  id?: string;
   title: string;
   excerpt?: string;
   content: string;
@@ -29,9 +32,11 @@ export interface PublicArticle {
   commentsCount: number;
   bookmarksCount: number;
   likedBy?: string[];
+  bookmarkedBy?: string[];
   viewedBy?: string[];
   reads: number;
   assignedEditor?: string | PublicUser;
+  deletedAt?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -76,6 +81,7 @@ export interface CommentPayload {
 
 export interface ArticleComment {
   _id: string;
+  id?: string;
   content: string;
   article: string;
   author: PublicUser;
@@ -85,12 +91,14 @@ export interface ArticleComment {
 
 export interface PopulatedCategory {
   _id: string;
+  id?: string;
   name: string;
   slug: string;
 }
 
 export interface PopulatedArticle {
   _id: string;
+  id?: string;
   title: string;
   excerpt?: string;
   content: string;

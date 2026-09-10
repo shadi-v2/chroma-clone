@@ -1,9 +1,7 @@
 import NotificationList from "@/components/notifications/NotificationList";
 import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
-
-import Notification from "@/models/Notification";
-
+import { findNotificationsForUser } from "@/lib/db/notifications";
 
 export default async function NotificationsPage() {
   await connectDB();
@@ -14,21 +12,7 @@ export default async function NotificationsPage() {
     return null;
   }
 
-  const notifications = await Notification.find({
-    $or: [
-      {
-        isGlobal: true,
-      },
-      {
-        recipients: user._id,
-      },
-    ],
-  })
-    .sort({
-      createdAt: -1,
-    })
-    .lean();
-
+  const notifications = await findNotificationsForUser(user.id || user._id);
   const serializedNotifications = JSON.parse(JSON.stringify(notifications));
 
   return (
@@ -36,7 +20,7 @@ export default async function NotificationsPage() {
       <div className="container mx-auto max-w-5xl px-4">
         <NotificationList
           notifications={serializedNotifications}
-          userId={user._id}
+          userId={user.id || user._id}
         />
       </div>
     </main>

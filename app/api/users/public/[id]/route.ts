@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import User from "@/models/User";
+import { findUserById, toPublicUser } from "@/lib/db/users";
 
 export async function GET(
   req: Request,
@@ -15,14 +15,15 @@ export async function GET(
 
     const { id } = await context.params;
 
-    const user = await User.findById(id).select("-password");
+    const user = await findUserById(id);
 
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json(user);
-  } catch {
+    return NextResponse.json(toPublicUser(user));
+  } catch (error) {
+    console.error("GET PUBLIC USER ERROR:", error);
     return NextResponse.json({ message: "Server Error" }, { status: 500 });
   }
 }

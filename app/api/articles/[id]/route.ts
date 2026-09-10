@@ -1,43 +1,13 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
-
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/requireAuth";
-import "@/models/User";
-import "@/models/Category";
-
-import Article from "@/models/Article";
-import Category from "@/models/Category";
-import { PopulatedArticle } from "@/types/article";
-import { createNotification } from "@/lib/createNotification";
-import { notifyArticleAudience } from "@/lib/articleNotifications";
+import {
+  findArticleById,
+  updateArticle,
+  softDeleteArticle,
+} from "@/lib/db/articles";
+import { resolveCategoryId } from "@/lib/db/categories";
 import { isAdminRole } from "@/lib/roles";
-import User from "@/models/User";
-
-const resolveCategoryId = async (categoryInput: string) => {
-  if (!categoryInput) {
-    return null;
-  }
-
-  if (mongoose.Types.ObjectId.isValid(categoryInput)) {
-    return categoryInput;
-  }
-
-  let category = await Category.findOne({
-    name: {
-      $regex: new RegExp(`^${categoryInput}$`, "i"),
-    },
-  });
-
-  if (!category) {
-    category = await Category.create({
-      name: categoryInput,
-      slug: categoryInput.toLowerCase().replace(/\s+/g, "-"),
-    });
-  }
-
-  return category._id;
-};
 
 export async function GET(
   req: Request,
@@ -51,15 +21,7 @@ export async function GET(
     await connectDB();
 
     const { id } = await context.params;
-    console.log("ARTICLE ID:", id);
-    const allArticles = await Article.find();
-    console.log("ALL ARTICLES:", allArticles);
-
-    const article = await Article.findById(id)
-      .populate("author", "firstName surname role school bio avatar")
-      .populate("category", "_id name")
-      .populate("assignedEditor", "firstName surname email avatar role")
-      .lean<PopulatedArticle | null>();
+    const article = await findArticleById(id);
 
     if (!article || article.deletedAt) {
       return NextResponse.json(
@@ -74,7 +36,7 @@ export async function GET(
 
     return NextResponse.json(article);
   } catch (error) {
-    console.error(error);
+    console.error("GET ARTICLE BY ID ERROR:", error);
 
     return NextResponse.json(
       {
@@ -104,7 +66,7 @@ export async function PUT(
       return auth.error;
     }
 
-    const article = await Article.findById(id);
+    const article = await findArticleById(id);
 
     if (!article) {
       return NextResponse.json(
@@ -117,10 +79,17 @@ export async function PUT(
       );
     }
 
-    const isAssignedEditor = article.assignedEditor && article.assignedEditor.toString() === auth.user.id;
+    const assignedEditorId = typeof article.assignedEditor === "object"
+      ? article.assignedEditor?.id || article.assignedEditor?._id
+      : article.assignedEditor;
+    const authorId = typeof article.author === "object"
+      ? article.author.id || article.author._id
+      : article.author;
+
+    const isAssignedEditor = assignedEditorId && String(assignedEditorId) === String(auth.user.id);
 
     if (
-      article.author.toString() !== auth.user.id &&
+      String(authorId) !== String(auth.user.id) &&
       !isAdminRole(auth.user.role) &&
       !isAssignedEditor
     ) {
@@ -144,51 +113,27 @@ export async function PUT(
       thumbnail,
       featuredImage,
       readTime,
+      tags,
     } = body;
 
     const categoryId = categoryInput
       ? await resolveCategoryId(categoryInput)
-      : article.category;
+      : article.category?.id || article.category?._id;
 
-    const updatedArticle = await Article.findByIdAndUpdate(
-      id,
-      {
-        title,
-        excerpt,
-        content,
-        category: categoryId,
-        thumbnail: thumbnail || featuredImage,
-        featuredImage: featuredImage || thumbnail,
-        readTime,
-      },
-      {
-        returnDocument: "after",
-      },
-    );
-
-    if (article.author.toString() === auth.user.id) {
-      const adminsAndEditors = await User.find({ role: { $in: ["Admin", "Editor"] } }, "_id");
-      const adminEditorIds = adminsAndEditors.map(u => u._id.toString());
-      await createNotification({
-        title: "Article Resubmitted",
-        message: `"${title}" has been resubmitted for review.`,
-        createdBy: auth.user.id,
-        recipients: adminEditorIds,
-        type: "Article",
-      });
-    }
-
-    await notifyArticleAudience({
-      article,
-      title: "Article Updated",
-      message: `"${title}" was updated.`,
-      createdBy: auth.user.id,
-      excludeRecipients: [auth.user.id],
+    const updatedArticle = await updateArticle(id, {
+      title,
+      excerpt,
+      content,
+      categoryId: categoryId || undefined,
+      thumbnail: thumbnail || featuredImage,
+      featuredImage: featuredImage || thumbnail,
+      readTime,
+      tags: Array.isArray(tags) ? tags : undefined,
     });
 
     return NextResponse.json(updatedArticle);
   } catch (error) {
-    console.error(error);
+    console.error("PUT ARTICLE ERROR:", error);
 
     return NextResponse.json(
       {
@@ -219,8 +164,7 @@ export async function DELETE(
     }
 
     const { id } = await context.params;
-
-    const article = await Article.findById(id);
+    const article = await findArticleById(id);
 
     if (!article) {
       return NextResponse.json(
@@ -233,8 +177,12 @@ export async function DELETE(
       );
     }
 
+    const authorId = typeof article.author === "object"
+      ? article.author.id || article.author._id
+      : article.author;
+
     if (
-      article.author.toString() !== auth.user.id &&
+      String(authorId) !== String(auth.user.id) &&
       !isAdminRole(auth.user.role)
     ) {
       return NextResponse.json(
@@ -247,24 +195,13 @@ export async function DELETE(
       );
     }
 
-    await Article.findByIdAndUpdate(id, {
-      deletedAt: new Date(),
-      status: "Draft",
-    });
-
-    await notifyArticleAudience({
-      article,
-      title: "Article Archived",
-      message: `"${article.title}" was archived.`,
-      createdBy: auth.user.id,
-      excludeRecipients: [auth.user.id],
-    });
+    await softDeleteArticle(id);
 
     return NextResponse.json({
       message: "Article archived successfully",
     });
   } catch (error) {
-    console.error(error);
+    console.error("DELETE ARTICLE ERROR:", error);
 
     return NextResponse.json(
       {

@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
-
-import mongoose from "mongoose";
-
 import { connectDB } from "@/lib/db";
-
 import { requireRole } from "@/lib/requireRole";
-
-import Category from "@/models/Category";
+import { updateCategory, deleteCategory } from "@/lib/db/categories";
 
 export async function PATCH(
   req: Request,
@@ -27,17 +22,6 @@ export async function PATCH(
       return auth.error;
     }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return NextResponse.json(
-        {
-          message: "Invalid category id",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
     const body = await req.json();
 
     const {
@@ -48,21 +32,7 @@ export async function PATCH(
       slug?: string;
     } = body;
 
-    const category = await Category.findByIdAndUpdate(
-      id,
-      {
-        ...(name && {
-          name,
-        }),
-
-        ...(slug && {
-          slug,
-        }),
-      },
-      {
-        returnDocument: "after",
-      },
-    );
+    const category = await updateCategory(id, { name, slug });
 
     if (!category) {
       return NextResponse.json(
@@ -77,7 +47,7 @@ export async function PATCH(
 
     return NextResponse.json(category);
   } catch (error) {
-    console.error(error);
+    console.error("CATEGORY PATCH ERROR:", error);
 
     return NextResponse.json(
       {
@@ -109,35 +79,13 @@ export async function DELETE(
       return auth.error;
     }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return NextResponse.json(
-        {
-          message: "Invalid category id",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    const category = await Category.findByIdAndDelete(id);
-
-    if (!category) {
-      return NextResponse.json(
-        {
-          message: "Category not found",
-        },
-        {
-          status: 404,
-        },
-      );
-    }
+    await deleteCategory(id);
 
     return NextResponse.json({
       message: "Category deleted successfully",
     });
   } catch (error) {
-    console.error(error);
+    console.error("CATEGORY DELETE ERROR:", error);
 
     return NextResponse.json(
       {

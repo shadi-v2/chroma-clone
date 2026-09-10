@@ -1,12 +1,8 @@
 import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
-
-import "@/models/User";
-import "@/models/Category";
-
-import Article from "@/models/Article";
-import Category from "@/models/Category";
+import { findArticleById } from "@/lib/db/articles";
+import { listCategories } from "@/lib/db/categories";
 import ArticleEditorForm from "@/components/editor/ArticleEditorForm";
 import { isEditorialRole } from "@/lib/roles";
 
@@ -25,21 +21,18 @@ export default async function EditPiecePage({ params }: EditPiecePageProps) {
 
   const { id } = await params;
   const [article, categories] = await Promise.all([
-    Article.findById(id)
-      .populate("author", "firstName surname role")
-      .populate("category", "_id name")
-      .lean(),
-    Category.find()
-      .sort({
-        createdAt: -1,
-      })
-      .lean(),
+    findArticleById(id),
+    listCategories(),
   ]);
 
   if (!article) {
     redirect("/dashboard");
   }
-  const isAuthor = article.author._id.toString() === user._id;
+
+  const authorId = typeof article.author === "object" ? article.author.id || article.author._id : article.author;
+  const currentUserId = user.id || user._id;
+
+  const isAuthor = String(authorId) === String(currentUserId);
   const isAdmin = isEditorialRole(user.role);
   if (!isAuthor && !isAdmin) {
     redirect("/dashboard");

@@ -1,40 +1,10 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
-import type { SortOrder } from "mongoose";
-
 import { connectDB } from "@/lib/db";
 import { requireRole } from "@/lib/requireRole";
-
-import User from "@/models/User";
-import Article from "@/models/Article";
-import Category from "@/models/Category";
-import { PopulatedArticle } from "@/types/article";
+import { findArticles, createArticle } from "@/lib/db/articles";
+import { resolveCategoryId } from "@/lib/db/categories";
+import { findUsersByRoles, findUserById } from "@/lib/db/users";
 import { createNotification } from "@/lib/createNotification";
-
-const resolveCategoryId = async (categoryInput: string) => {
-  if (!categoryInput) {
-    return null;
-  }
-
-  if (mongoose.Types.ObjectId.isValid(categoryInput)) {
-    return categoryInput;
-  }
-
-  let category = await Category.findOne({
-    name: {
-      $regex: new RegExp(`^${categoryInput}$`, "i"),
-    },
-  });
-
-  if (!category) {
-    category = await Category.create({
-      name: categoryInput,
-      slug: categoryInput.toLowerCase().replace(/\s+/g, "-"),
-    });
-  }
-
-  return category._id;
-};
 
 export async function GET(req: Request) {
   try {
@@ -47,92 +17,22 @@ export async function GET(req: Request) {
     const limit = Number(searchParams.get("limit") || 10);
     const author = searchParams.get("author");
     const status = searchParams.get("status");
-    const sortBy = searchParams.get("sortBy");
+    const sortBy = searchParams.get("sortBy") as "likes" | "latest" | null;
 
-    const query: Record<string, unknown> = {
-      deletedAt: {
-        $exists: false,
-      },
-    };
-
-    // STATUS
-    if (status === "all") {
-      // Do not filter by status
-    } else if (status) {
-      query.status = status;
-    } else {
-      query.status = "Published";
-    }
-
-    // AUTHOR
-    if (author) {
-      query.author = author;
-    }
-
-    // CATEGORY
-    if (category) {
-      let foundCategory = null;
-
-      // ObjectId
-      if (mongoose.Types.ObjectId.isValid(category)) {
-        foundCategory = await Category.findById(category);
-      }
-
-      // Name or slug
-      if (!foundCategory) {
-        foundCategory = await Category.findOne({
-          $or: [
-            {
-              name: {
-                $regex: new RegExp(`^${category}$`, "i"),
-              },
-            },
-            {
-              slug: category.toLowerCase(),
-            },
-          ],
-        });
-      }
-
-      if (foundCategory) {
-        query.category = foundCategory._id;
-      } else {
-        return NextResponse.json({
-          articles: [],
-          totalPages: 0,
-          currentPage: page,
-          totalArticles: 0,
-        });
-      }
-    }
-
-    let sortOption: Record<string, SortOrder> = {
-      createdAt: -1,
-    };
-
-    if (sortBy === "likes") {
-      sortOption = {
-        likes: -1,
-        createdAt: -1,
-      };
-    }
-
-    const articles = await Article.find(query)
-      .populate("author", "firstName surname email avatar")
-      .populate("category", "_id name slug")
-      .populate("assignedEditor", "firstName surname email avatar role")
-      .sort(sortOption)
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean();
-
-    const total = await Article.countDocuments(query);
+    const result = await findArticles({
+      category,
+      page,
+      limit,
+      author,
+      status,
+      sortBy,
+    });
 
     return NextResponse.json({
-      articles,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
-      totalArticles: total,
+      articles: result.articles,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage,
+      totalArticles: result.total,
     });
   } catch (error) {
     console.error("ARTICLES API ERROR:", error);
@@ -149,7 +49,6 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  console.log("POST /api/articles HIT");
   try {
     await connectDB();
 
@@ -160,7 +59,6 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    console.log("REQUEST BODY:", body);
 
     const {
       title,
@@ -170,6 +68,7 @@ export async function POST(req: Request) {
       thumbnail,
       featuredImage,
       readTime,
+      tags,
     } = body;
 
     const categoryId = await resolveCategoryId(categoryInput);
@@ -185,43 +84,46 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log("READ TIME BEFORE SAVE:", readTime);
-
-    const article = await Article.create({
+    const article = await createArticle({
       title,
       excerpt,
       content,
-      category: categoryId,
+      categoryId,
       thumbnail: thumbnail || featuredImage,
       featuredImage: featuredImage || thumbnail,
       readTime,
-      author: auth.user.id,
-      enrolledBy: [auth.user.id],
+      authorId: auth.user.id,
       status: "Pending",
+      tags: Array.isArray(tags) ? tags : [],
     });
 
-    const adminsAndEditors = await User.find({ role: { $in: ["Admin", "Editor"] } }, "_id");
-    const adminEditorIds = adminsAndEditors.map(u => u._id.toString());
+    try {
+      const owners = await findUsersByRoles(["Owner"]);
+      const ownerIds = owners.map((u) => u.id || u._id);
 
-    await createNotification({
-      title: "New Article Submission",
-      message: `A new article "${title}" is pending review.`,
-      createdBy: auth.user.id,
-      recipients: adminEditorIds,
-      type: "Approval",
-    });
+      if (ownerIds.length > 0) {
+        const authorUser = await findUserById(auth.user.id);
+        const authorName = authorUser
+          ? `${authorUser.firstName} ${authorUser.surname}`.trim()
+          : auth.user.email;
 
-    console.log("SAVED ARTICLE:", article.readTime);
+        await createNotification({
+          title: "New Article Submission",
+          message: `A new article "${title}" was submitted by ${authorName || "an author"} and is pending review.`,
+          createdBy: auth.user.id,
+          recipients: ownerIds,
+          type: "Approval",
+        });
+      }
+    } catch (notifErr) {
+      console.error("Failed to notify owner of new article:", notifErr);
+    }
 
-    const populatedArticle = await Article.findById(article._id)
-      .populate("category", "name")
-      .lean<PopulatedArticle | null>();
-
-    return NextResponse.json(populatedArticle, {
+    return NextResponse.json(article, {
       status: 201,
     });
   } catch (error) {
-    console.error(error);
+    console.error("CREATE ARTICLE ERROR:", error);
 
     return NextResponse.json(
       {

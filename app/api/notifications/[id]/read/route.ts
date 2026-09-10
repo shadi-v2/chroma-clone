@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
-
-import Notification from "@/models/Notification";
+import { markNotificationAsRead } from "@/lib/db/notifications";
 
 export async function PATCH(
   req: Request,
@@ -24,21 +22,11 @@ export async function PATCH(
 
     const { id } = await context.params;
 
-    const notification = await Notification.findByIdAndUpdate(
-      id,
-      {
-        $addToSet: {
-          readBy: user._id,
-        },
-      },
-      {
-        new: true,
-      },
-    );
+    const notification = await markNotificationAsRead(id, user.id || user._id);
 
     return NextResponse.json(notification);
   } catch (error) {
-    console.error(error);
+    console.error("NOTIFICATION READ ERROR:", error);
 
     return NextResponse.json(
       { message: "Failed to mark notification as read" },

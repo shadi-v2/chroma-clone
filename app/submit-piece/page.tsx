@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
-import Category from "@/models/Category";
+import { listCategories } from "@/lib/db/categories";
 import ArticleEditorForm from "@/components/editor/ArticleEditorForm";
 
 export default async function SubmitPiecePage() {
@@ -10,12 +10,7 @@ export default async function SubmitPiecePage() {
   if (!user) {
     redirect("/auth");
   }
-  const categories = await Category.find()
-    .sort({
-      createdAt: -1,
-    })
-    .lean();
-
+  const categories = await listCategories();
   const serializedCategories = JSON.parse(JSON.stringify(categories));
   return <ArticleEditorForm categories={serializedCategories} isEdit={false} />;
 }

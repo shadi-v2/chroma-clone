@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
 import { requireAuth } from "@/lib/requireAuth";
-
-import "@/models/User";
-
-import Article from "@/models/Article";
-import Comment from "@/models/Comment";
-import { notifyArticleAudience } from "@/lib/articleNotifications";
+import {
+  findCommentsByArticleId,
+  createComment,
+  findCommentById,
+  deleteComment,
+} from "@/lib/db/comments";
+import { isAdminRole } from "@/lib/roles";
 
 export async function POST(
   req: Request,
@@ -21,7 +21,6 @@ export async function POST(
     await connectDB();
 
     const { id } = await context.params;
-
     const auth = await requireAuth(req);
 
     if (auth.error) {
@@ -29,10 +28,9 @@ export async function POST(
     }
 
     const body = await req.json();
+    const { content, parentComment } = body;
 
-    const { content } = body;
-
-    if (!content) {
+    if (!content || typeof content !== "string" || !content.trim()) {
       return NextResponse.json(
         {
           message: "Comment content is required",
@@ -43,37 +41,20 @@ export async function POST(
       );
     }
 
-    const comment = await Comment.create({
-      article: id,
-      author: auth.user.id,
-      content,
+    const authorId = auth.user.id || auth.user._id;
+
+    const comment = await createComment({
+      articleId: id,
+      authorId,
+      content: content.trim(),
+      parentCommentId: parentComment || undefined,
     });
 
-    const article = await Article.findByIdAndUpdate(id, {
-      $inc: {
-        commentsCount: 1,
-      },
-    });
-
-    if (article) {
-      await notifyArticleAudience({
-        article,
-        title: "New Comment",
-        message: `A new comment was added to "${article.title}".`,
-        createdBy: auth.user.id,
-        excludeRecipients: [auth.user.id],
-      });
-    }
-
-    const populatedComment = await Comment.findById(comment._id)
-      .populate("author", "firstName surname avatar")
-      .lean();
-
-    return NextResponse.json(populatedComment, {
+    return NextResponse.json(comment, {
       status: 201,
     });
   } catch (error) {
-    console.error(error);
+    console.error("COMMENT POST ERROR:", error);
 
     return NextResponse.json(
       {
@@ -98,15 +79,7 @@ export async function GET(
     await connectDB();
 
     const { id } = await context.params;
-
-    const comments = await Comment.find({
-      article: id,
-    })
-      .populate("author", "firstName surname avatar")
-      .sort({
-        createdAt: -1,
-      })
-      .lean();
+    const comments = await findCommentsByArticleId(id);
 
     return NextResponse.json(comments);
   } catch (error) {
@@ -120,5 +93,48 @@ export async function GET(
         status: 500,
       },
     );
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  context: {
+    params: Promise<{
+      id: string;
+    }>;
+  },
+) {
+  try {
+    await connectDB();
+    await context.params;
+    const auth = await requireAuth(req);
+
+    if (auth.error) return auth.error;
+
+    const url = new URL(req.url);
+    const commentId = url.searchParams.get("commentId");
+
+    if (!commentId) {
+      return NextResponse.json({ message: "Comment ID is required" }, { status: 400 });
+    }
+
+    const comment = await findCommentById(commentId);
+    if (!comment) {
+      return NextResponse.json({ message: "Comment not found" }, { status: 404 });
+    }
+
+    const authorId = auth.user.id || auth.user._id;
+    const isOwnerOrAuthor = comment.author?.id === authorId || comment.author?._id === authorId;
+    const isAdmin = isAdminRole(auth.user.role);
+
+    if (!isOwnerOrAuthor && !isAdmin) {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
+    await deleteComment(commentId);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("COMMENT DELETE ERROR:", error);
+    return NextResponse.json({ message: "Failed to delete comment" }, { status: 500 });
   }
 }

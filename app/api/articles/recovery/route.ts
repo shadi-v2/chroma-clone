@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/lib/db";
-
-import "@/models/User";
-import "@/models/Category";
-
-import Article from "@/models/Article";
+import { getRecoveryArticles } from "@/lib/db/articles";
 import { requireAdmin } from "@/lib/requireAdmin";
 
 export async function GET() {
@@ -18,30 +13,13 @@ export async function GET() {
       return auth.error;
     }
 
-    const articles = await Article.find({
-      $or: [
-        {
-          deletedAt: {
-            $exists: true,
-          },
-        },
-        {
-          status: "Draft",
-        },
-      ],
-    })
-      .populate("author", "firstName surname avatar")
-      .populate("category", "name slug")
-      .sort({
-        updatedAt: -1,
-      })
-      .lean();
+    const articles = await getRecoveryArticles();
 
     return NextResponse.json({
       articles,
     });
   } catch (error) {
-    console.error(error);
+    console.error("RECOVERY GET ERROR:", error);
 
     return NextResponse.json(
       {

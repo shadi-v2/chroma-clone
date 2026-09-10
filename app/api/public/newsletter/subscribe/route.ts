@@ -1,65 +1,44 @@
 import { NextResponse } from "next/server";
-
-import { connectDB } from "@/lib/db";
-
-import Newsletter from "@/models/Newsletter";
+import { subscribeNewsletter } from "@/lib/db/newsletters";
+import { sendNewsletterWelcomeEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
   try {
-    await connectDB();
-
     const body = await req.json();
-
     const { email } = body;
 
-    if (!email) {
+    if (!email || typeof email !== "string" || !email.includes("@")) {
       return NextResponse.json(
-        {
-          message: "Email is required",
-        },
-        {
-          status: 400,
-        },
+        { message: "Please provide a valid email address." },
+        { status: 400 },
       );
     }
 
-    const exists = await Newsletter.findOne({
-      email,
-    });
+    const { subscriber, alreadySubscribed, reactivated } = await subscribeNewsletter(email);
 
-    if (exists) {
+    if (alreadySubscribed) {
       return NextResponse.json(
-        {
-          message: "Already subscribed",
-        },
-        {
-          status: 400,
-        },
+        { message: "You are already subscribed to our newsletter! ✨" },
+        { status: 200 },
       );
     }
 
-    await Newsletter.create({
-      email,
-    });
+    // Send welcome email with 1-click unsubscribe token
+    await sendNewsletterWelcomeEmail(subscriber.email, subscriber.unsubscribe_token);
+
+    const message = reactivated
+      ? "Welcome back! Your subscription has been reactivated. 💌"
+      : "Thank you for subscribing! A welcome note has been sent to your inbox. 💌";
 
     return NextResponse.json(
-      {
-        message: "Subscribed successfully",
-      },
-      {
-        status: 201,
-      },
+      { message, subscriber },
+      { status: 201 },
     );
   } catch (error) {
-    console.error(error);
-
+    console.error("NEWSLETTER SUBSCRIBE ERROR:", error);
     return NextResponse.json(
-      {
-        message: "Failed to subscribe",
-      },
-      {
-        status: 500,
-      },
+      { message: "Failed to process subscription. Please try again later." },
+      { status: 500 },
     );
   }
 }
