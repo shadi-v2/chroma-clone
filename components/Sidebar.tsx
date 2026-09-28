@@ -43,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({ trendingArticles }) => {
             </h2>
           </div>
 
-          <Sparkles className="w-4 h-4 text-amber-500" />
+          <Sparkles className="w-4 h-4 text-emerald-800" />
         </div>
 
         <div className="space-y-6">

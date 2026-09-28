@@ -1,18 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import Image from "next/image";
-import {
-  Search,
-  X,
-  Clock,
-  Sparkles,
-  ArrowRight,
-  BookOpen,
-  Loader2,
-  Tag,
-} from "lucide-react";
+import { Search, X } from "lucide-react";
+import { api } from "@/services/api";
 import type { PublicArticle } from "@/types/article";
 
 interface QuickSearchModalProps {
@@ -24,22 +16,10 @@ export default function QuickSearchModal({
   isOpen,
   onClose,
 }: QuickSearchModalProps) {
-  const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<PublicArticle[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<PublicArticle[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-
-  const quickCategories = [
-    { name: "Stories", slug: "Story" },
-    { name: "Poetry", slug: "Poetry" },
-    { name: "Essays", slug: "Essays" },
-    { name: "Reviews", slug: "Reviews" },
-    { name: "Letters", slug: "Letters" },
-    { name: "Translations", slug: "Translations" },
-  ];
 
   useEffect(() => {
     if (isOpen) {
@@ -53,267 +33,197 @@ export default function QuickSearchModal({
     };
   }, [isOpen]);
 
-  const handleCloseModal = useCallback(() => {
-    setQuery("");
-    setResults([]);
-    onClose();
-  }, [onClose]);
-
-  const searchArticles = useCallback(async (q: string) => {
-    if (!q.trim() || q.trim().length < 2) {
-      setResults([]);
-      setLoading(false);
-      return;
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsSearching(false);
+        setSearchQuery("");
+        setSearchResults([]);
+        onClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
     }
-    try {
-      setLoading(true);
-      const res = await fetch(
-        `/api/articles/search?query=${encodeURIComponent(q.trim())}&limit=6`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setResults(data.articles || []);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (searchQuery.trim()) {
+        try {
+          setIsSearching(true);
+          const data = await api.articles.search(searchQuery.trim());
+          setSearchResults(data.articles || []);
+        } catch (error) {
+          console.error("Search failed:", error);
+          setSearchResults([]);
+        } finally {
+          setIsSearching(false);
+        }
       } else {
-        setResults([]);
+        setSearchResults([]);
       }
-    } catch {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    }, 250);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setQuery(val);
-    setSelectedIndex(0);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-
-    if (!val.trim()) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    debounceRef.current = setTimeout(() => {
-      searchArticles(val);
-    }, 280);
-  };
-
-  const handleSelectArticle = (articleId: string) => {
-    handleCloseModal();
-    router.push(`/article/${articleId}`);
-  };
-
-  const handleSelectCategory = (catSlug: string) => {
-    handleCloseModal();
-    router.push(`/?category=${encodeURIComponent(catSlug)}`);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") {
-      handleCloseModal();
-    } else if (e.key === "ArrowDown") {
-      e.preventDefault();
-      if (results.length > 0) {
-        setSelectedIndex((prev) => (prev + 1) % results.length);
-      }
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      if (results.length > 0) {
-        setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
-      }
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (results.length > 0 && results[selectedIndex]) {
-        handleSelectArticle(results[selectedIndex]._id || results[selectedIndex].id || "");
-      } else if (query.trim()) {
-        handleCloseModal();
-        router.push(`/?category=${encodeURIComponent(query.trim())}`);
-      }
-    }
+  const handleClose = () => {
+    setSearchQuery("");
+    setSearchResults([]);
+    onClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-100 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-emerald-950/60 backdrop-blur-md animate-in fade-in duration-200"
-      onClick={handleCloseModal}
-    >
-      <div
-        className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-emerald-950/10 overflow-hidden flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-200"
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={handleKeyDown}
-      >
-        {/* Search Header */}
-        <div className="flex items-center gap-3 px-6 py-4 border-b border-emerald-950/10 bg-cream-50/50">
-          <Search className="w-5 h-5 text-emerald-950/50 shrink-0" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={handleInputChange}
-            placeholder="Search stories, poems, essays, authors, or topics..."
-            className="w-full bg-transparent text-emerald-950 text-base sm:text-lg font-medium placeholder-emerald-950/40 focus:outline-none"
-          />
-          {loading ? (
-            <Loader2 className="w-5 h-5 text-emerald-800 animate-spin shrink-0" />
-          ) : query ? (
-            <button
-              onClick={() => {
-                setQuery("");
-                setResults([]);
-                inputRef.current?.focus();
-              }}
-              className="p-1 rounded-full text-emerald-950/40 hover:text-emerald-950 hover:bg-emerald-950/5 transition-colors cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          ) : (
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/5 text-emerald-950/40 border border-emerald-950/10 hidden sm:inline-block">
-              ESC
-            </span>
-          )}
+    <div className="fixed inset-0 z-9999 flex flex-col overflow-hidden bg-white animate-in fade-in duration-200">
+      <div className="container mx-auto px-4 h-full flex flex-col">
+        {/* HEADER */}
+        <div className="flex justify-between items-center py-8">
+          <Link href="/" onClick={handleClose} className="flex items-center">
+            <Image
+              src="/logo.png"
+              alt="Chroma Diaries"
+              width={120}
+              height={40}
+              className="h-8 md:h-10 w-auto object-contain"
+            />
+          </Link>
+
+          <button
+            onClick={handleClose}
+            className="group p-4 bg-emerald-950/5 hover:bg-emerald-950 rounded-full transition-all duration-300 cursor-pointer"
+            aria-label="Close search"
+          >
+            <X className="w-6 h-6 text-emerald-950 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+          </button>
         </div>
 
-        {/* Modal Body */}
-        <div className="overflow-y-auto p-6 space-y-6">
-          {/* Active Search Results */}
-          {results.length > 0 ? (
-            <div className="space-y-3">
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-emerald-950/40 block">
-                Found Pieces ({results.length})
-              </span>
-              <div className="space-y-2">
-                {results.map((art, idx) => {
-                  const isSelected = idx === selectedIndex;
-                  return (
-                    <div
-                      key={art._id || art.id}
-                      onClick={() => handleSelectArticle(art._id || art.id || "")}
-                      onMouseEnter={() => setSelectedIndex(idx)}
-                      className={`group flex items-center gap-4 p-3.5 rounded-2xl cursor-pointer transition-all ${
-                        isSelected
-                          ? "bg-emerald-950 text-cream-50 shadow-md"
-                          : "hover:bg-emerald-950/5 text-emerald-950"
-                      }`}
-                    >
-                      <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-emerald-950/10">
-                        <Image
-                          src={art.thumbnail || "/placeholder.jpg"}
-                          alt={art.title}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
+        {/* CONTENT */}
+        <div className="max-w-4xl mx-auto w-full pt-12 md:pt-16 flex-1 flex flex-col min-h-0">
+          {/* INPUT */}
+          <div className="relative group mb-12">
+            <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 text-emerald-950/20 group-focus-within:text-emerald-950 transition-colors" />
+            <input
+              ref={inputRef}
+              autoFocus
+              type="text"
+              placeholder="Ask anything..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-transparent border-b border-emerald-950/10 focus:border-emerald-950 py-6 md:py-8 pl-14 md:pl-18 text-2xl md:text-5xl font-serif outline-none transition-all placeholder:text-emerald-950/10 text-emerald-950"
+            />
+          </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className={`text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${
-                              isSelected
-                                ? "bg-white/20 text-cream-50"
-                                : "bg-emerald-950/10 text-emerald-950"
-                            }`}
-                          >
-                            {typeof art.category === "string"
-                              ? art.category
-                              : art.category?.name}
-                          </span>
-                          <span
-                            className={`text-[10px] flex items-center gap-1 ${
-                              isSelected ? "text-cream-50/60" : "text-emerald-950/40"
-                            }`}
-                          >
-                            <Clock className="w-3 h-3" />
-                            {art.readTime}
-                          </span>
+          {/* RESULTS */}
+          <div className="flex-1 overflow-y-auto pb-20 scrollbar-hide">
+            {searchQuery.trim() === "" ? (
+              <div className="space-y-12">
+                <div className="space-y-6">
+                  <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-950/40">
+                    Suggested for you
+                  </h3>
+
+                  <div className="flex flex-wrap gap-3">
+                    {[
+                      "Literary Essays",
+                      "Historical Fiction",
+                      "Poetry",
+                      "Travelogues",
+                      "Book Reviews",
+                    ].map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => setSearchQuery(tag)}
+                        className="px-6 md:px-8 py-3 md:py-4 border border-emerald-950/10 hover:border-emerald-950 hover:bg-emerald-950 hover:text-cream-50 rounded-full text-xs md:text-sm font-bold transition-all text-emerald-950/60 cursor-pointer"
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : isSearching ? (
+              <div className="flex items-center justify-center py-32">
+                <div className="w-12 h-12 border-4 border-emerald-950/10 border-t-emerald-950 rounded-full animate-spin" />
+              </div>
+            ) : searchResults.length > 0 ? (
+              <div className="space-y-12">
+                <div className="flex items-center justify-between border-b border-emerald-950/5 pb-8">
+                  <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-950/40">
+                    {searchResults.length}{" "}
+                    {searchResults.length === 1 ? "Result" : "Results"} found
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 gap-12">
+                  {searchResults.map((article) => {
+                    const catName =
+                      typeof article.category === "string"
+                        ? article.category
+                        : article.category?.name || "General";
+                    const authorName = article.author
+                      ? `${article.author.firstName} ${article.author.surname}`
+                      : "Chroma Author";
+                    const artId = article._id || article.id;
+                    return (
+                      <Link
+                        key={artId}
+                        href={`/article/${artId}`}
+                        onClick={handleClose}
+                        className="group flex gap-8 md:gap-12 items-center justify-between border-b border-emerald-950/5 pb-12 last:border-0"
+                      >
+                        <div className="flex-1 space-y-5">
+                          <div className="flex items-center gap-4">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-4 py-1.5 rounded-full">
+                              {catName}
+                            </span>
+
+                            <span className="text-[10px] font-bold text-emerald-950/30 uppercase tracking-widest">
+                              {article.readTime || "5 min"} read
+                            </span>
+                          </div>
+
+                          <h4 className="font-serif font-bold text-2xl md:text-4xl text-emerald-950 leading-[1.2] group-hover:text-emerald-700 transition-colors">
+                            {article.title}
+                          </h4>
+
+                          <p className="text-sm text-emerald-950/50 flex items-center gap-2">
+                            <span>written by</span>
+
+                            <span className="font-bold text-emerald-950/80">
+                              {authorName}
+                            </span>
+                          </p>
                         </div>
 
-                        <h4 className="font-serif font-bold text-sm sm:text-base leading-snug line-clamp-1 truncate">
-                          {art.title}
-                        </h4>
-
-                        <p
-                          className={`text-xs truncate ${
-                            isSelected ? "text-cream-50/70" : "text-emerald-950/60"
-                          }`}
-                        >
-                          By {art.author.firstName} {art.author.surname}
-                        </p>
-                      </div>
-
-                      <ArrowRight
-                        className={`w-4 h-4 transform group-hover:translate-x-1 transition-transform shrink-0 ${
-                          isSelected ? "text-amber-400" : "text-emerald-950/30"
-                        }`}
-                      />
-                    </div>
-                  );
-                })}
+                        <div className="w-24 h-24 md:w-48 md:h-48 shrink-0 rounded-[2rem] md:rounded-[2.5rem] overflow-hidden bg-emerald-950/5 shadow-2xl group-hover:shadow-emerald-950/20 transition-all border border-emerald-950/5 relative">
+                          <Image
+                            src={article.thumbnail || "/placeholder.jpg"}
+                            alt=""
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-1000"
+                          />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ) : query.trim().length >= 2 && !loading ? (
-            <div className="py-12 text-center space-y-3">
-              <BookOpen className="w-10 h-10 text-emerald-950/20 mx-auto" />
-              <h4 className="text-lg font-serif font-bold text-emerald-950">
-                No matching articles found
-              </h4>
-              <p className="text-xs text-emerald-950/50 max-w-sm mx-auto">
-                We couldn&apos;t find any published piece matching &quot;{query}&quot;. Try searching for a different keyword or category.
-              </p>
-            </div>
-          ) : null}
+            ) : (
+              <div className="text-center py-32 space-y-6">
+                <p className="text-emerald-950/20 font-serif italic text-3xl">
+                  Searching for something else?
+                </p>
 
-          {/* Quick Categories & Topics */}
-          {!query && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-emerald-950/40">
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>Explore Creative Realms</span>
+                <p className="text-emerald-950/40 font-bold uppercase tracking-[0.2em] text-xs">
+                  No matches found for {searchQuery}
+                </p>
               </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                {quickCategories.map((cat) => (
-                  <button
-                    key={cat.slug}
-                    onClick={() => handleSelectCategory(cat.slug)}
-                    className="flex items-center justify-between p-3 rounded-2xl bg-cream-50 hover:bg-emerald-950 hover:text-cream-50 text-emerald-950 border border-emerald-950/5 transition-all text-xs font-bold group cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Tag className="w-3.5 h-3.5 opacity-60" />
-                      <span>{cat.name}</span>
-                    </div>
-                    <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Footer info */}
-        <div className="px-6 py-3 border-t border-emerald-950/5 bg-cream-50/50 flex items-center justify-between text-[11px] text-emerald-950/50">
-          <div className="flex items-center gap-3">
-            <span>
-              <kbd className="px-1.5 py-0.5 rounded bg-emerald-950/5 border border-emerald-950/10 font-mono text-[10px]">
-                ↑↓
-              </kbd>{" "}
-              to navigate
-            </span>
-            <span>
-              <kbd className="px-1.5 py-0.5 rounded bg-emerald-950/5 border border-emerald-950/10 font-mono text-[10px]">
-                ↵
-              </kbd>{" "}
-              to select
-            </span>
+            )}
           </div>
-          <span>Chroma Diaries Search</span>
         </div>
       </div>
     </div>

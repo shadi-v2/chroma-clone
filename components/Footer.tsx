@@ -25,9 +25,6 @@ const Footer = () => {
               <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">
                 Receive fresh essays & author spotlights
               </h3>
-              <p className="text-cream-50/60 text-xs max-w-md">
-                Get curated stories and author highlights delivered straight to your inbox.
-              </p>
             </div>
             <div className="w-full lg:w-96">
               <NewsletterCard variant="inline" />

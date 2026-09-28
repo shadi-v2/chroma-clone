@@ -22,7 +22,7 @@ export default function ReadingProgressBar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-60 h-1 bg-transparent pointer-events-none">
       <div
-        className="h-full bg-linear-to-r from-emerald-800 via-amber-400 to-emerald-600 transition-all duration-100 ease-out shadow-sm"
+        className="h-full bg-linear-to-r from-emerald-800 via-emerald-400 to-emerald-300 transition-all duration-100 ease-out shadow-sm"
         style={{ width: `${progress}%` }}
       />
     </div>

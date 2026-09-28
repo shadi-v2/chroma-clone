@@ -44,22 +44,8 @@ const ArticleActions = ({ article }: ArticleActionsProps) => {
   const [isLiking, setIsLiking] = useState(false);
   const [isTogglingEnrollment, setIsTogglingEnrollment] = useState(false);
 
-  // Trigger login prompt when viewing an article without being signed in
+  // Increment read count when viewing article
   useEffect(() => {
-    if (!loading && !user) {
-      const timer = setTimeout(() => {
-        openAuthModal({
-          title: "Sign in to Continue Reading",
-          message:
-            "Please log in or create an account to like this article, post comments, subscribe to updates, and support the author.",
-        });
-      }, 700);
-      return () => clearTimeout(timer);
-    }
-  }, [loading, user, article._id, openAuthModal]);
-
-  useEffect(() => {
-    if (!user) return;
     let cancelled = false;
 
     const incrementViews = async () => {
@@ -78,7 +64,7 @@ const ArticleActions = ({ article }: ArticleActionsProps) => {
     return () => {
       cancelled = true;
     };
-  }, [article._id, user]);
+  }, [article._id]);
 
   const handleLike = async () => {
     if (isLiking) return;

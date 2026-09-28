@@ -92,7 +92,7 @@ export default function EmailWrapperDesigner({
           {/* PRESET THEMES */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-emerald-950/60 mb-2.5 flex items-center gap-1.5">
-              <Sparkles className="w-3 h-3 text-amber-500" />
+              <Sparkles className="w-3 h-3 text-emerald-800" />
               <span>1-Click Theme Presets</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
@@ -111,7 +111,7 @@ export default function EmailWrapperDesigner({
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="font-serif font-bold text-xs">{item.name}</span>
-                      {isActive && <Check className="w-3.5 h-3.5 text-amber-300" />}
+                      {isActive && <Check className="w-3.5 h-3.5 text-white" />}
                     </div>
                     <p className={`text-[10px] leading-tight ${isActive ? "text-cream-100/70" : "text-gray-500"}`}>
                       {item.description}

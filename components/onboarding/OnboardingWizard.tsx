@@ -420,8 +420,8 @@ export default function OnboardingWizard() {
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <Icon className={`w-5 h-5 ${isSelected ? "text-amber-300" : "text-emerald-800"}`} />
-                    {isSelected && <CheckCircle2 className="w-4 h-4 text-amber-300" />}
+                    <Icon className={`w-5 h-5 ${isSelected ? "text-white" : "text-emerald-800"}`} />
+                    {isSelected && <CheckCircle2 className="w-4 h-4 text-white" />}
                   </div>
                   <div>
                     <h4 className="font-serif font-bold text-sm mb-0.5">{genre.name}</h4>
@@ -472,7 +472,7 @@ export default function OnboardingWizard() {
             ) : (
               <>
                 <span>Complete Onboarding</span>
-                <Sparkles className="w-4 h-4 text-amber-300" />
+                <Sparkles className="w-4 h-4 text-white" />
               </>
             )}
           </button>

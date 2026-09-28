@@ -121,7 +121,7 @@ const Hero: React.FC<HeroProps> = ({ articles }) => {
         <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10 md:p-16 z-20">
           <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6 flex-wrap">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/15 backdrop-blur-md rounded-full text-[9px] sm:text-[10px] font-bold tracking-[0.2em] uppercase border border-white/20 text-cream-50 shadow-sm">
-              <Sparkles className="w-3 h-3 text-amber-400" />
+              <Sparkles className="w-3 h-3 text-white" />
               Featured{" "}
               {typeof article.category === "string"
                 ? article.category
@@ -143,11 +143,11 @@ const Hero: React.FC<HeroProps> = ({ articles }) => {
             </div>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-4 sm:mb-6 max-w-4xl leading-tight sm:leading-none tracking-tight text-white drop-shadow-md">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-3 sm:mb-4 max-w-4xl leading-tight tracking-tight text-white drop-shadow-md line-clamp-1 truncate">
             {article.title}
           </h1>
 
-          <p className="text-sm sm:text-base md:text-lg text-cream-50/80 mb-6 max-w-3xl line-clamp-2 font-light leading-relaxed drop-shadow-sm">
+          <p className="text-sm sm:text-base md:text-lg text-cream-50/80 mb-6 max-w-3xl line-clamp-1 truncate font-light leading-relaxed drop-shadow-sm">
             &quot;{article.excerpt}&quot;
           </p>
 
@@ -257,8 +257,8 @@ const Hero: React.FC<HeroProps> = ({ articles }) => {
               }}
               className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                 idx === currentIndex
-                  ? "w-8 bg-amber-400"
-                  : "w-2.5 bg-white/30 hover:bg-white/50"
+                  ? "w-8 bg-white shadow-md"
+                  : "w-2.5 bg-white/40 hover:bg-white/70"
               }`}
               aria-label={`Slide ${idx + 1}`}
             />

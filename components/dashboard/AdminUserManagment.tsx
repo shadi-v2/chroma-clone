@@ -429,7 +429,7 @@ const AdminUserManagement = ({ currentUser }: AdminUserManagementProps) => {
           {/* SUGGESTION FILTER PILLS */}
           <div className="pt-2">
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+              <Sparkles className="w-3.5 h-3.5 text-emerald-800" />
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-950/40">
                 Filter Suggestions:
               </span>

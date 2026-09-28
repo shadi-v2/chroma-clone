@@ -17,17 +17,7 @@ export async function POST(
     const { id } = await context.params;
     const user = await getUserFromToken(req);
 
-    if (!user) {
-      return NextResponse.json(
-        {
-          message: "Views only counted for authenticated users",
-          incremented: false,
-        },
-        { status: 200 },
-      );
-    }
-
-    const result = await incrementArticleViews(id, user.id);
+    const result = await incrementArticleViews(id, user?.id || null);
 
     return NextResponse.json(result);
   } catch (error) {

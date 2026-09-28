@@ -83,7 +83,7 @@ export default function NewsletterCard({ className = "", variant = "card" }: New
         {feedback && (
           <p
             className={`mt-2 text-xs font-medium ${
-              status === "success" ? "text-emerald-300" : "text-amber-300"
+              status === "success" ? "text-emerald-300" : "text-rose-300"
             }`}
           >
             {feedback}
@@ -95,7 +95,7 @@ export default function NewsletterCard({ className = "", variant = "card" }: New
 
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-[#033b2e] to-emerald-900 border border-emerald-800/40 p-8 sm:p-10 text-white shadow-2xl ${className}`}
+      className={`relative overflow-hidden rounded-3xl bg-emerald-950 border-emerald-800/40 p-8 sm:p-10 text-white shadow-2xl ${className}`}
     >
       {/* Background Decorative Glow */}
       <div className="absolute -top-24 -right-24 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -111,11 +111,8 @@ export default function NewsletterCard({ className = "", variant = "card" }: New
             Chroma Diaries Dispatch
           </span>
           <h3 className="text-lg sm:text-xl font-serif font-bold text-cream-50 leading-tight">
-            Stories, Essays & Literary Thoughts Delivered to Your Inbox
+             Join our curated circle of readers.
           </h3>
-          <p className="text-cream-50/70 text-xs leading-relaxed max-w-md mx-auto font-light">
-            Join our curated circle of readers. Receive weekly handpicked essays, author reflections, and creative highlights.
-          </p>
         </div>
 
         {status === "success" ? (
@@ -157,7 +154,7 @@ export default function NewsletterCard({ className = "", variant = "card" }: New
         )}
 
         {status === "error" && (
-          <p className="text-xs text-amber-300 font-medium">{feedback}</p>
+          <p className="text-xs text-rose-300 font-medium">{feedback}</p>
         )}
       </div>
     </div>

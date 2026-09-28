@@ -464,11 +464,11 @@ export async function incrementArticleViews(
   userId?: string | null,
 ): Promise<{ reads: number; incremented: boolean }> {
   if (!userId) {
-    const current = await queryOne<{ reads: number }>(
-      `SELECT reads FROM articles WHERE id = $1`,
+    const updated = await queryOne<{ reads: number }>(
+      `UPDATE articles SET reads = reads + 1, updated_at = NOW() WHERE id = $1 RETURNING reads`,
       [id],
     );
-    return { reads: Number(current?.reads || 0), incremented: false };
+    return { reads: Number(updated?.reads || 0), incremented: true };
   }
 
   const existing = await queryOne<{ article_id: string }>(

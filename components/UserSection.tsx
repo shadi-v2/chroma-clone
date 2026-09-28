@@ -70,17 +70,13 @@ export default function UserSection({ user, notifications }: Props) {
   return (
     <>
       <div className="flex items-center gap-3 sm:gap-4">
-        {/* Desktop Quick Search Button */}
+        {/* Desktop Search Button */}
         <button
           onClick={() => setSearchOpen(true)}
-          className="hidden sm:inline-flex items-center gap-2.5 px-3.5 py-2 rounded-full border border-emerald-950/10 bg-white/70 hover:bg-white text-emerald-950/70 hover:text-emerald-950 hover:border-emerald-950/20 shadow-xs transition-all cursor-pointer text-xs font-semibold"
+          className="hidden sm:flex p-2.5 hover:bg-emerald-950/5 rounded-full transition-colors relative cursor-pointer"
           aria-label="Search articles"
         >
-          <Search className="w-3.5 h-3.5 text-emerald-800" />
-          <span>Search...</span>
-          <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/5 text-emerald-950/40 border border-emerald-950/10">
-            ⌘K
-          </kbd>
+          <Search className="w-5 h-5 text-emerald-950" />
         </button>
 
         {/* Desktop Write Piece Quick Link */}

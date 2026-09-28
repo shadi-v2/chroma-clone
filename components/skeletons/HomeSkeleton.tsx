@@ -93,7 +93,7 @@ const HomeSkeleton = () => {
 
             {/* Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 xl:gap-16">
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
                   className="sk-card rounded-[2.5rem] overflow-hidden border border-emerald-950/5 bg-white"

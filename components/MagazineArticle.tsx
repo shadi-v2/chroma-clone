@@ -292,7 +292,7 @@ export default function MagazineArticle({
           <span>Interactive Dictionary: Click or hover any word for concise meaning</span>
         </div>
         <div className="flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-emerald-900/60 bg-emerald-950/5 px-2.5 py-0.5 rounded-full">
-          <Sparkles className="w-3 h-3 text-amber-500" />
+          <Sparkles className="w-3 h-3 text-emerald-800" />
           Pronounce & Define
         </div>
       </div>
@@ -303,7 +303,7 @@ export default function MagazineArticle({
         onClick={handleClick}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="cursor-pointer selection:bg-amber-200/80 selection:text-emerald-950 transition-colors"
+        className="cursor-pointer selection:bg-emerald-200 selection:text-emerald-950 transition-colors"
       >
         {children}
       </div>
@@ -323,7 +323,7 @@ export default function MagazineArticle({
           {/* Header with Word, Phonetics & Pronunciation button */}
           <div className="flex items-center justify-between pb-2 border-b border-emerald-900/60 mb-2">
             <div className="flex items-center gap-2 min-w-0">
-              <span className="font-serif font-bold text-base text-amber-300 capitalize truncate">
+              <span className="font-serif font-bold text-base text-cream-50 capitalize truncate">
                 {popup.word}
               </span>
 
@@ -337,7 +337,7 @@ export default function MagazineArticle({
                 type="button"
                 onClick={handlePronounce}
                 className={`p-1 rounded-lg hover:bg-emerald-900/60 transition-colors cursor-pointer text-emerald-300 hover:text-white ${
-                  isSpeaking ? "text-amber-400 animate-pulse" : ""
+                  isSpeaking ? "text-emerald-300 animate-pulse" : ""
                 }`}
                 title="Pronounce word"
               >

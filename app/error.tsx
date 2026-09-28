@@ -19,7 +19,7 @@ export default function Error({
     <div className="min-h-[70vh] bg-cream-50 flex items-center justify-center px-6 py-24">
       <div className="max-w-2xl mx-auto text-center space-y-8">
         <div className="w-16 h-16 rounded-3xl bg-emerald-950/5 border border-emerald-950/10 flex items-center justify-center mx-auto text-emerald-950 shadow-inner">
-          <Sparkles className="w-8 h-8 text-amber-500" />
+          <Sparkles className="w-8 h-8 text-emerald-800" />
         </div>
 
         <div className="space-y-3">

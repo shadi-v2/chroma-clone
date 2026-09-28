@@ -439,7 +439,7 @@ export default function VisualEmailBuilder({
               onClick={() => setShowShapeMenu(!showShapeMenu)}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-950 text-cream-50 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-emerald-900 transition-all cursor-pointer shadow-xs"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <Sparkles className="w-3.5 h-3.5 text-white" />
               <span>Insert Shape / Design</span>
               <ChevronDown className="w-3 h-3" />
             </button>
