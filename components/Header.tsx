@@ -84,12 +84,12 @@ export default async function Header() {
 
     {
       name: "Letters",
-      path: "/?category=Letters",
+      path: "/?category=letters",
     },
 
     {
       name: "Essays",
-      path: "/?category=Essays",
+      path: "/?category=essays",
     },
 
     {
