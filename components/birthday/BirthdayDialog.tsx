@@ -56,7 +56,7 @@ export default function BirthdayDialog() {
         onClick={(e) => e.stopPropagation()}
       >
         {/* TOP DECORATIVE BANNER */}
-        <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-amber-400 via-emerald-600 to-amber-500" />
+        <div className="absolute top-0 left-0 right-0 h-2 bg-emerald-950" />
 
         {/* CLOSE BUTTON */}
         <button
@@ -69,44 +69,41 @@ export default function BirthdayDialog() {
 
         {/* CELEBRATION ICON CLUSTER */}
         <div className="relative mx-auto w-24 h-24 mb-6 flex items-center justify-center">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-200 to-emerald-100 animate-pulse opacity-70" />
-          <div className="relative w-20 h-20 rounded-full bg-cream-50 border-2 border-amber-300 flex items-center justify-center shadow-lg shadow-amber-200/50">
-            <Cake className="w-10 h-10 text-amber-600 animate-bounce" />
+          <div className="absolute inset-0 rounded-full bg-emerald-950/5 animate-pulse" />
+          <div className="relative w-20 h-20 rounded-full bg-white border-2 border-emerald-950/20 flex items-center justify-center shadow-lg shadow-emerald-950/10">
+            <Cake className="w-10 h-10 text-emerald-800 animate-bounce" />
           </div>
 
-          <Sparkles className="absolute -top-1 -right-1 w-6 h-6 text-amber-500 animate-spin" />
-          <PartyPopper className="absolute -bottom-1 -left-1 w-6 h-6 text-emerald-700" />
+          <Sparkles className="absolute -top-1 -right-1 w-6 h-6 text-emerald-800 animate-spin" />
+          <PartyPopper className="absolute -bottom-1 -left-1 w-6 h-6 text-emerald-800" />
         </div>
 
         {/* BADGE */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-[0.25em] mb-4 border border-amber-300/60">
-          <Gift className="w-3.5 h-3.5 text-amber-700" />
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/5 text-emerald-950 text-[10px] font-bold uppercase tracking-[0.25em] mb-4 border border-emerald-950/10">
+          <Gift className="w-3.5 h-3.5 text-emerald-800" />
           <span>Special Celebration</span>
         </div>
 
         {/* HEADLINE */}
         <h2 className="text-3xl md:text-4xl font-serif font-bold text-emerald-950 mb-4 leading-tight">
           Happy Birthday,{" "}
-          <span className="text-amber-700 underline decoration-amber-300 underline-offset-4">
+          <span className="text-emerald-800 underline decoration-emerald-800/30 underline-offset-4">
             {user.firstName}
           </span>
           ! 🎂
         </h2>
 
-        {/* POETIC MESSAGE */}
-        <p className="text-emerald-950/70 text-sm md:text-base leading-relaxed max-w-md mx-auto mb-8 font-medium">
-          On this extraordinary day, the entire{" "}
-          <span className="font-bold text-emerald-950">Chroma Diaries</span> family
-          celebrates the wonderful author, reader, and creative soul that you are.
-          May your new chapter be woven with boundless inspiration, joy, and unforgettable stories!
+        {/* CONCISE BIRTHDAY MESSAGE */}
+        <p className="text-emerald-950/70 text-sm md:text-base leading-relaxed max-w-sm mx-auto mb-8 font-medium">
+          Wishing you a wonderful birthday! May your new chapter be filled with boundless inspiration, joy, and unforgettable stories.
         </p>
 
         {/* DECORATIVE HEARTS / SPARKLES */}
-        <div className="flex items-center justify-center gap-6 text-xs text-amber-700/80 font-bold uppercase tracking-widest mb-8">
+        <div className="flex items-center justify-center gap-6 text-xs text-emerald-950/70 font-bold uppercase tracking-widest mb-8">
           <span className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" /> Inspiring Journey
+            <Sparkles className="w-3.5 h-3.5 text-emerald-800" /> Inspiring Journey
           </span>
-          <span className="w-1 h-1 rounded-full bg-amber-400" />
+          <span className="w-1 h-1 rounded-full bg-emerald-950/30" />
           <span className="flex items-center gap-1.5">
             <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" /> Endless Joy
           </span>
@@ -115,7 +112,7 @@ export default function BirthdayDialog() {
         {/* ACTION BUTTON */}
         <button
           onClick={handleClose}
-          className="w-full py-4.5 px-8 bg-gradient-to-r from-emerald-950 via-emerald-900 to-emerald-950 text-cream-50 rounded-2xl font-bold text-xs tracking-[0.25em] uppercase hover:shadow-2xl hover:shadow-emerald-950/40 hover:scale-[1.02] transition-all cursor-pointer border border-emerald-800/30 active:scale-95"
+          className="w-full py-4.5 px-8 bg-emerald-950 text-cream-50 rounded-2xl font-bold text-xs tracking-[0.25em] uppercase hover:bg-emerald-900 hover:shadow-2xl hover:shadow-emerald-950/20 transition-all cursor-pointer border border-emerald-950 active:scale-95"
         >
           Celebrate & Enter My Studio ✨
         </button>

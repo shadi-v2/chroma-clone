@@ -60,6 +60,8 @@ export default function AdminEmailCenter() {
   const [subject, setSubject] = useState("");
   const [htmlContent, setHtmlContent] = useState("");
   const [senderName, setSenderName] = useState("Chroma Diaries Editorial");
+  const [senderEmail, setSenderEmail] = useState("editorial@chromadiaries.in");
+  const [customSenderPrefix, setCustomSenderPrefix] = useState("");
   const [wrapperConfig, setWrapperConfig] = useState<EmailWrapperConfig>(DEFAULT_WRAPPER_CONFIG);
   const [sending, setSending] = useState(false);
 
@@ -238,6 +240,10 @@ export default function AdminEmailCenter() {
     setFeedback(null);
 
     try {
+      const resolvedFromEmail = senderEmail === "custom"
+        ? (customSenderPrefix.trim() ? (customSenderPrefix.includes("@") ? customSenderPrefix.trim() : `${customSenderPrefix.trim()}@chromadiaries.in`) : "editorial@chromadiaries.in")
+        : senderEmail;
+
       const res = await fetch("/api/admin/email/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -246,6 +252,7 @@ export default function AdminEmailCenter() {
           subject: subject.trim(),
           htmlContent: htmlContent.trim(),
           senderName: senderName.trim(),
+          fromEmail: resolvedFromEmail,
           wrapTemplate: wrapperConfig.enabled,
           wrapperConfig,
         }),
@@ -460,15 +467,15 @@ export default function AdminEmailCenter() {
           <div className="lg:col-span-7 bg-white p-8 sm:p-10 rounded-[2.5rem] border border-emerald-950/5 shadow-2xl shadow-emerald-950/5 space-y-6">
             <form onSubmit={handleSendEmail} className="space-y-6">
               {/* SENDER & TEMPLATE SELECTION BAR */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 border-b border-emerald-950/5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-4 border-b border-emerald-950/5">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-emerald-950/50 mb-2">
-                    Official Sender Persona
+                    Sender Persona
                   </label>
                   <select
                     value={senderName}
                     onChange={(e) => setSenderName(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-emerald-950/15 bg-emerald-950/2 text-xs font-semibold text-emerald-950 focus:outline-none focus:border-emerald-950"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-emerald-950/15 bg-emerald-950/2 text-xs font-semibold text-emerald-950 focus:outline-none focus:border-emerald-950"
                   >
                     <option value="Chroma Diaries Editorial">Chroma Diaries Editorial</option>
                     <option value="Chroma Diaries Administration">Chroma Diaries Administration</option>
@@ -480,12 +487,42 @@ export default function AdminEmailCenter() {
 
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-widest text-emerald-950/50 mb-2">
+                    From Address
+                  </label>
+                  <select
+                    value={senderEmail}
+                    onChange={(e) => setSenderEmail(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-emerald-950/15 bg-emerald-950/2 text-xs font-semibold text-emerald-950 focus:outline-none focus:border-emerald-950 truncate"
+                  >
+                    <option value="editorial@chromadiaries.in">editorial@chromadiaries.in</option>
+                    <option value="newsletter@chromadiaries.in">newsletter@chromadiaries.in</option>
+                    <option value="dispatch@chromadiaries.in">dispatch@chromadiaries.in</option>
+                    <option value="contact@chromadiaries.in">contact@chromadiaries.in</option>
+                    <option value="curator@chromadiaries.in">curator@chromadiaries.in</option>
+                    <option value="custom">Custom address...</option>
+                  </select>
+                  {senderEmail === "custom" && (
+                    <div className="mt-2 flex items-center bg-emerald-950/5 rounded-xl border border-emerald-950/15 px-2.5 py-1">
+                      <input
+                        type="text"
+                        placeholder="e.g. awards"
+                        value={customSenderPrefix}
+                        onChange={(e) => setCustomSenderPrefix(e.target.value)}
+                        className="w-full bg-transparent text-xs font-medium text-emerald-950 outline-none placeholder:text-emerald-950/30"
+                      />
+                      <span className="text-[10px] font-bold text-emerald-950/60 ml-1 shrink-0">@chromadiaries.in</span>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-widest text-emerald-950/50 mb-2">
                     Apply Saved Template
                   </label>
                   <select
                     value={selectedTemplateId}
                     onChange={(e) => handleSelectTemplate(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-emerald-950/15 bg-emerald-950/2 text-xs font-semibold text-emerald-950 focus:outline-none focus:border-emerald-950"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-emerald-950/15 bg-emerald-950/2 text-xs font-semibold text-emerald-950 focus:outline-none focus:border-emerald-950"
                   >
                     <option value="">-- Choose a template --</option>
                     {templates.map((t) => (

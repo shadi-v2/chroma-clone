@@ -6,55 +6,23 @@ const HomeSkeleton = () => {
   return (
     <div className="font-sans select-none overflow-hidden">
       <style jsx global>{`
-        @keyframes skeleton-shimmer {
-          0% {
-            transform: translateX(-100%);
+        @keyframes home-pulse-glow {
+          0%, 100% {
+            opacity: 1;
           }
-          100% {
-            transform: translateX(100%);
+          50% {
+            opacity: 0.5;
           }
         }
 
-        /* Light plate — base fill for most elements */
         .sk {
-          position: relative;
-          overflow: hidden;
           background-color: rgba(2, 44, 34, 0.06);
-        }
-        .sk::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          transform: translateX(-100%);
-          background-image: linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.35) 40%,
-            rgba(255, 255, 255, 0.55) 60%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          animation: skeleton-shimmer 2s infinite ease-in-out;
+          animation: home-pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
-        /* Dark plate — hero, CTA, heavier blocks */
         .sk-dark {
-          position: relative;
-          overflow: hidden;
           background-color: rgba(2, 44, 34, 0.1);
-        }
-        .sk-dark::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          transform: translateX(-100%);
-          background-image: linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.06) 40%,
-            rgba(255, 255, 255, 0.14) 60%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          animation: skeleton-shimmer 2s infinite ease-in-out;
+          animation: home-pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
         /* Stagger shimmer per card */

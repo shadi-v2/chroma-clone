@@ -78,23 +78,23 @@ export default function QuickSearchModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-9999 flex flex-col overflow-hidden bg-white animate-in fade-in duration-200">
-      <div className="container mx-auto px-4 h-full flex flex-col">
+    <div className="fixed inset-0 z-9999 w-screen h-screen min-h-screen bg-white overflow-hidden flex flex-col animate-in fade-in duration-200">
+      <div className="w-full h-full max-w-6xl mx-auto px-6 md:px-12 flex flex-col">
         {/* HEADER */}
-        <div className="flex justify-between items-center py-8">
+        <div className="flex justify-between items-center py-6 md:py-8 shrink-0">
           <Link href="/" onClick={handleClose} className="flex items-center">
             <Image
               src="/logo.png"
               alt="Chroma Diaries"
-              width={120}
-              height={40}
-              className="h-8 md:h-10 w-auto object-contain"
+              width={140}
+              height={45}
+              className="h-9 md:h-12 w-auto object-contain"
             />
           </Link>
 
           <button
             onClick={handleClose}
-            className="group p-4 bg-emerald-950/5 hover:bg-emerald-950 rounded-full transition-all duration-300 cursor-pointer"
+            className="group p-3.5 md:p-4 bg-emerald-950/5 hover:bg-emerald-950 rounded-full transition-all duration-300 cursor-pointer"
             aria-label="Close search"
           >
             <X className="w-6 h-6 text-emerald-950 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
@@ -102,10 +102,10 @@ export default function QuickSearchModal({
         </div>
 
         {/* CONTENT */}
-        <div className="max-w-4xl mx-auto w-full pt-12 md:pt-16 flex-1 flex flex-col min-h-0">
+        <div className="w-full pt-8 md:pt-14 flex-1 flex flex-col min-h-0">
           {/* INPUT */}
-          <div className="relative group mb-12">
-            <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 text-emerald-950/20 group-focus-within:text-emerald-950 transition-colors" />
+          <div className="relative group mb-10 md:mb-12 shrink-0">
+            <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-12 md:h-12 text-emerald-950/25 group-focus-within:text-emerald-950 transition-colors" />
             <input
               ref={inputRef}
               autoFocus
@@ -113,7 +113,7 @@ export default function QuickSearchModal({
               placeholder="Ask anything..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent border-b border-emerald-950/10 focus:border-emerald-950 py-6 md:py-8 pl-14 md:pl-18 text-2xl md:text-5xl font-serif outline-none transition-all placeholder:text-emerald-950/10 text-emerald-950"
+              className="w-full bg-transparent border-b-2 border-emerald-950/10 focus:border-emerald-950 py-5 md:py-8 pl-12 md:pl-20 pr-4 text-3xl md:text-6xl font-serif outline-none transition-all placeholder:text-emerald-950/15 text-emerald-950"
             />
           </div>
 

@@ -65,3 +65,23 @@ export async function getUserFromToken(req: Request) {
     return null;
   }
 }
+
+export async function getSessionUser() {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token || token === "null" || token === "undefined") {
+      return null;
+    }
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "secret",
+    ) as JwtPayload;
+    if (!decoded?.id) return null;
+    await connectDB();
+    return await findUserById(decoded.id);
+  } catch {
+    return null;
+  }
+}
+

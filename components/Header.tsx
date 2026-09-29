@@ -53,31 +53,31 @@ export default async function Header() {
       dropdown: [
         {
           name: "Feature Articles",
-          path: "/?category=Feature",
+          path: "/?category=feature",
         },
         {
           name: "Essays",
-          path: "/?category=Essays",
+          path: "/?category=essays",
         },
         {
           name: "Stories",
-          path: "/?category=Story",
+          path: "/?category=story",
         },
         {
           name: "Poems",
-          path: "/?category=Poetry",
+          path: "/?category=poetry",
         },
         {
           name: "Translations",
-          path: "/?category=Translations",
+          path: "/?category=translations",
         },
         {
           name: "Reviews",
-          path: "/?category=Reviews",
+          path: "/?category=reviews",
         },
         {
           name: "Travelogues",
-          path: "/?category=Travelogues",
+          path: "/?category=travelogues",
         },
       ],
     },

@@ -314,6 +314,7 @@ export async function updateArticle(id: string, data: Partial<{
   assignedEditorId: string | null;
   deletedAt: Date | null;
   tags: string[];
+  authorId: string;
 }>): Promise<PublicArticle | null> {
   const fields: string[] = [];
   const values: unknown[] = [];
@@ -362,6 +363,10 @@ export async function updateArticle(id: string, data: Partial<{
   if (data.tags !== undefined) {
     fields.push(`tags = $${idx++}`);
     values.push(data.tags);
+  }
+  if (data.authorId !== undefined) {
+    fields.push(`author_id = $${idx++}`);
+    values.push(data.authorId);
   }
 
   if (fields.length === 0) return findArticleById(id);

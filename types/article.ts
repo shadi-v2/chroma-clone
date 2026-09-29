@@ -50,6 +50,7 @@ export interface CreateArticlePayload {
   featuredImage?: string;
   tags?: string[];
   readTime?: string;
+  authorId?: string;
 }
 
 export interface UpdateArticlePayload {
@@ -62,6 +63,7 @@ export interface UpdateArticlePayload {
   tags?: string[];
   readTime?: string;
   status?: ArticleStatus;
+  authorId?: string;
 }
 
 export interface ArticleQueryParams {

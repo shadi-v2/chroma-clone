@@ -227,7 +227,7 @@ export default function VisualEmailBuilder({
           name: "Ornamental Literary Divider",
           icon: Minus,
           description: "Gentle styled emerald line divider",
-          html: `<div style="margin: 28px 0; text-align: center;"><div style="height: 1px; background: linear-gradient(90deg, rgba(2,44,34,0) 0%, rgba(2,44,34,0.25) 50%, rgba(2,44,34,0) 100%);"></div></div>`,
+          html: `<div style="margin: 28px 0; text-align: center;"><div style="height: 1px; background-color: rgba(2,44,34,0.15);"></div></div>`,
         },
       ],
     },

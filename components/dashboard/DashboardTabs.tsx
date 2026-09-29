@@ -237,6 +237,201 @@ export default function DashboardTabs({
     setMobileSidebarOpen(false);
   };
 
+  // ── NON-ADMIN / AUTHOR DASHBOARD (NO SIDEBAR) ──
+  if (!isEditorialRole(user.role)) {
+    return (
+      <div className="font-sans min-h-screen bg-cream-50">
+        <main className="container mx-auto px-6 sm:px-12 py-12 md:py-20 max-w-7xl">
+          {/* AUTHOR HEADER */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-16 gap-8">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-1.5 h-6 bg-emerald-950 rounded-full" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-950/40">
+                  Author Portal
+                </span>
+              </div>
+
+              <h1 className="text-3xl sm:text-5xl font-serif font-bold text-emerald-950 mb-4">
+                {user.firstName} {user.surname}&apos;s Studio
+              </h1>
+
+              <p className="text-emerald-950/60 font-medium max-w-md leading-relaxed text-sm sm:text-base italic">
+                &quot;Every secret of a writer&apos;s soul, every experience of his life, every quality of his mind, is written large in his works.&quot;
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3 sm:gap-4">
+              <Link
+                href={`/profile/${user._id}`}
+                className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-emerald-950/5 text-emerald-950 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-emerald-950/10 transition-all border border-emerald-950/10 active:scale-95 shadow-sm"
+              >
+                <User className="w-4 h-4" />
+                <span>View Profile</span>
+              </Link>
+
+              <Link
+                href="/submit-piece"
+                className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-emerald-950 text-cream-50 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-emerald-900 transition-all active:scale-95 shadow-lg shadow-emerald-950/15"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Submit Writing</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* STATS CARDS */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {[
+              {
+                label: "Published Works",
+                value: published.length,
+                icon: CheckCircle2,
+                color: "text-emerald-600",
+                bg: "bg-emerald-50",
+              },
+              {
+                label: "Pending Review",
+                value: pending.length,
+                icon: Clock,
+                color: "text-amber-600",
+                bg: "bg-amber-50",
+              },
+              {
+                label: "Total Admirers",
+                value: totalLikes,
+                icon: Heart,
+                color: "text-rose-600",
+                bg: "bg-rose-50",
+              },
+              {
+                label: "Total Reads",
+                value: totalReads,
+                icon: LayoutDashboard,
+                color: "text-emerald-950",
+                bg: "bg-emerald-950/5",
+              },
+            ].map((stat, idx) => (
+              <div
+                key={idx}
+                className="bg-white p-6 rounded-3xl border border-emerald-950/5 shadow-xl shadow-emerald-950/5 group hover:-translate-y-1 transition-all"
+              >
+                <div
+                  className={`w-12 h-12 ${stat.bg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}
+                >
+                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                </div>
+                <div className="text-3xl font-serif font-bold text-emerald-950 mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-emerald-950/40">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* RECENT SUBMISSIONS TABLE */}
+          <div className="bg-white rounded-[2.5rem] border border-emerald-950/5 shadow-2xl shadow-emerald-950/5 overflow-hidden">
+            <div className="p-6 sm:p-8 border-b border-emerald-950/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-2xl font-serif font-bold text-emerald-950">
+                  Your Submissions
+                </h3>
+                <p className="text-xs text-emerald-950/60 mt-1">
+                  Track the review stage, readership, and status of your written pieces.
+                </p>
+              </div>
+              <div className="w-full md:w-72">
+                <SearchBar
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                />
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-emerald-950/2 text-emerald-950/40 text-[10px] uppercase tracking-[0.2em] font-bold">
+                    <th className="w-[40%] px-8 py-5">Article Title</th>
+                    <th className="w-[20%] px-8 py-5 text-center">Category</th>
+                    <th className="w-[15%] px-8 py-5 text-center">Status</th>
+                    <th className="w-[15%] px-8 py-5 text-center">Created Date</th>
+                    <th className="w-[10%] px-8 py-5 text-center">Likes</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-emerald-950/5">
+                  {userArticles
+                    .filter(
+                      (article) =>
+                        article.title
+                          .toLowerCase()
+                          .includes(searchTerm.toLowerCase()) ||
+                        article.category?.name
+                          ?.toLowerCase()
+                          .includes(searchTerm.toLowerCase()),
+                    )
+                    .map((article) => (
+                      <tr
+                        key={article._id}
+                        className="group hover:bg-emerald-950/2 transition-colors cursor-pointer"
+                      >
+                        <td className="px-8 py-6">
+                          <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 rounded-2xl bg-emerald-950/5 overflow-hidden relative shrink-0 shadow-xs">
+                              <Image
+                                src={article.thumbnail as string}
+                                alt={article.title as string}
+                                className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                fill
+                                sizes="56px"
+                              />
+                            </div>
+                            <Link
+                              href={`/article/${article._id}`}
+                              className="group-hover:text-emerald-700 transition-colors"
+                            >
+                              <span className="font-serif font-bold text-base text-emerald-950 group-hover:text-emerald-700 line-clamp-1 transition-colors">
+                                {article.title}
+                              </span>
+                            </Link>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 text-center">
+                          <span className="px-3 py-1 bg-emerald-950/5 rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-950">
+                            {article.category?.name}
+                          </span>
+                        </td>
+                        <td className="px-8 py-6 text-center">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest ${getStatusChipClass(
+                              article.status,
+                            )}`}
+                          >
+                            {article.status}
+                          </span>
+                        </td>
+                        <td className="px-8 py-6 text-center text-xs text-emerald-950/50">
+                          {article.createdAt
+                            ? new Date(article.createdAt).toLocaleDateString()
+                            : "Unknown"}
+                        </td>
+                        <td className="px-8 py-6 text-center font-serif font-bold text-emerald-950">
+                          {article.likes}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // ── ADMIN / EDITORIAL CONSOLE (WITH SIDEBAR) ──
   return (
     <div className="min-h-screen bg-[#fcfbf7] font-sans flex text-emerald-950">
       {/* MOBILE SIDEBAR BACKDROP */}
@@ -385,7 +580,10 @@ export default function DashboardTabs({
                 <span>Magazine</span>
               </Link>
               <button
-                onClick={() => logout()}
+                type="button"
+                onClick={async () => {
+                  await logout();
+                }}
                 className="flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white/5 hover:bg-red-500/20 text-cream-50/70 hover:text-red-300 text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
                 title="Sign out"
               >
@@ -450,7 +648,7 @@ export default function DashboardTabs({
           {activeTab === "my-studio" && (
             <div className="space-y-12 animate-fade-in">
               {/* STUDIO HERO BANNER */}
-              <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-emerald-950 via-[#033b2e] to-emerald-900 text-cream-50 p-8 sm:p-10 shadow-2xl border border-emerald-800/40">
+              <div className="relative overflow-hidden rounded-[2.5rem] bg-emerald-950 text-cream-50 p-8 sm:p-10 shadow-2xl border border-emerald-800/40">
                 <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full -mr-20 -mt-20 blur-2xl pointer-events-none" />
                 <div className="relative z-10 max-w-2xl space-y-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-[10px] uppercase font-bold tracking-widest border border-white/10">

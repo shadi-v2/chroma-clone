@@ -90,6 +90,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Ignore
     }
+    if (typeof window !== "undefined") {
+      window.location.href = "/";
+    }
   };
 
   // Trigger login dialog on new website visit

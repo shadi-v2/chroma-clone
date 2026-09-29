@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { connectDB } from "@/lib/db";
-import { findUserByEmail, createUser } from "@/lib/db/users";
+import { findUserByEmail, createUser, toPublicUser } from "@/lib/db/users";
 
 export async function POST(req: Request) {
   try {
@@ -70,14 +70,7 @@ export async function POST(req: Request) {
     const response = NextResponse.json(
       {
         token,
-        user: {
-          id: user.id || user._id,
-          _id: user.id || user._id,
-          firstName: user.firstName,
-          surname: user.surname,
-          email: user.email,
-          role: user.role,
-        },
+        user: toPublicUser(user),
       },
       {
         status: 201,

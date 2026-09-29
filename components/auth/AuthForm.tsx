@@ -139,7 +139,12 @@ export default function AuthForm() {
             _id: authUser._id || authUser.id || "",
           });
 
-          if (!authUser.onboardingCompleted && (!authUser.school || !authUser.dateOfBirth)) {
+          const isSchoolValid = Boolean(authUser.school && authUser.school.trim() !== "" && authUser.school !== "Pending Onboarding");
+          const isDobValid = Boolean(authUser.dateOfBirth);
+          const isNameValid = Boolean(authUser.firstName?.trim() && authUser.surname?.trim());
+          const isCompleted = Boolean(authUser.onboardingCompleted || (isNameValid && isSchoolValid && isDobValid));
+
+          if (!isCompleted) {
             router.push("/onboarding");
           } else {
             router.push(redirectUrl);

@@ -114,11 +114,17 @@ export async function PUT(
       featuredImage,
       readTime,
       tags,
+      authorId: requestedAuthorId,
     } = body;
 
     const categoryId = categoryInput
       ? await resolveCategoryId(categoryInput)
       : article.category?.id || article.category?._id;
+
+    let updateAuthorId: string | undefined = undefined;
+    if (requestedAuthorId && isAdminRole(auth.user.role)) {
+      updateAuthorId = requestedAuthorId;
+    }
 
     const updatedArticle = await updateArticle(id, {
       title,
@@ -129,6 +135,7 @@ export async function PUT(
       featuredImage: featuredImage || thumbnail,
       readTime,
       tags: Array.isArray(tags) ? tags : undefined,
+      authorId: updateAuthorId,
     });
 
     return NextResponse.json(updatedArticle);

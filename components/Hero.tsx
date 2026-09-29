@@ -91,9 +91,8 @@ const Hero: React.FC<HeroProps> = ({ articles }) => {
         onClick={() => router.push(`/article/${article._id || article.id}`)}
         className="relative cursor-pointer transition-all duration-700"
       >
-        {/* Editorial Ambient Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/60 to-emerald-950/20 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/80 via-transparent to-emerald-950/30 z-10" />
+        {/* Editorial Ambient Overlay */}
+        <div className="absolute inset-0 bg-linear-to-t from-emerald-950/70 via-emerald-950/40 to-transparent z-10" />
 
         {/* IMAGE CAROUSEL WITH SMOOTH CROSSFADE */}
         <div className="relative w-full h-[32rem] sm:h-[36rem] md:h-[40rem] overflow-hidden">

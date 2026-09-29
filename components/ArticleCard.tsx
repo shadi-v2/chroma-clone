@@ -90,7 +90,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
             className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
 
-          <div className="absolute top-4 left-4 flex items-center gap-2 flex-wrap">
+          <div className="absolute top-4 px-4 flex items-center justify-between w-full gap-2 flex-wrap">
             <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-950 border border-emerald-950/10">
               {typeof article.category === "string"
                 ? article.category
@@ -163,15 +163,6 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
                 <span className="text-xs font-medium text-emerald-950/80 truncate">
                   {article.author.firstName} {article.author.surname}
                 </span>
-                {article.author?.dateOfBirth && (
-                  <div className="mt-0.5">
-                    <AgeBadge
-                      dateOfBirth={article.author.dateOfBirth}
-                      age={article.author.age}
-                      showCategoryName
-                    />
-                  </div>
-                )}
               </div>
             </div>
 

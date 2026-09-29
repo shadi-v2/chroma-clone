@@ -6,53 +6,23 @@ export default function AdminSkeleton() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex overflow-hidden font-sans select-none">
       <style jsx global>{`
-        @keyframes admin-skeleton-shimmer {
-          0% {
-            transform: translateX(-100%);
+        @keyframes admin-pulse-glow {
+          0%, 100% {
+            opacity: 1;
           }
-          100% {
-            transform: translateX(100%);
+          50% {
+            opacity: 0.5;
           }
         }
 
         .sk-admin {
-          position: relative;
-          overflow: hidden;
           background-color: rgba(2, 44, 34, 0.06);
-        }
-        .sk-admin::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          transform: translateX(-100%);
-          background-image: linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.35) 40%,
-            rgba(255, 255, 255, 0.6) 60%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          animation: admin-skeleton-shimmer 2s infinite ease-in-out;
+          animation: admin-pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
         .sk-admin-dark {
-          position: relative;
-          overflow: hidden;
           background-color: rgba(2, 44, 34, 0.12);
-        }
-        .sk-admin-dark::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          transform: translateX(-100%);
-          background-image: linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.1) 40%,
-            rgba(255, 255, 255, 0.2) 60%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          animation: admin-skeleton-shimmer 2s infinite ease-in-out;
+          animation: admin-pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
         .sk-card-stagger:nth-child(1) .sk-admin::after {

@@ -35,7 +35,7 @@ const GENRES = [
 
 export default function OnboardingWizard() {
   const router = useRouter();
-  const { user, login } = useAuth();
+  const { user, loading, login } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -43,7 +43,7 @@ export default function OnboardingWizard() {
     firstName: user?.firstName || "",
     surname: user?.surname || "",
     bio: user?.bio || "",
-    school: user?.school || "",
+    school: (user?.school && user.school !== "Pending Onboarding") ? user.school : "",
     phone: user?.phone || "",
     dateOfBirth: user?.dateOfBirth ? user.dateOfBirth.split("T")[0] : "",
     avatar: user?.avatar || "",
@@ -54,29 +54,67 @@ export default function OnboardingWizard() {
   const [avatarPreview, setAvatarPreview] = useState<string>(user?.avatar || "");
   const initializedUserIdRef = useRef<string | null>(null);
 
-  // Populate existing user info when user becomes available
+  // Populate existing user info and resume at first incomplete step
   useEffect(() => {
-    if (user && user._id !== initializedUserIdRef.current) {
-      initializedUserIdRef.current = user._id;
-      queueMicrotask(() => {
-        setFormData((prev) => ({
-          ...prev,
-          firstName: prev.firstName || user.firstName || "",
-          surname: prev.surname || user.surname || "",
-          bio: prev.bio || user.bio || "",
-          school: prev.school || user.school || "",
-          phone: prev.phone || user.phone || "",
-          dateOfBirth: prev.dateOfBirth || (user.dateOfBirth ? user.dateOfBirth.split("T")[0] : ""),
-          avatar: prev.avatar || user.avatar || "",
-          avatarPublicId: prev.avatarPublicId || user.avatarPublicId || "",
-          selectedGenres: prev.selectedGenres.length > 0 ? prev.selectedGenres : (user.genres || []),
-        }));
-        if (user.avatar) {
-          setAvatarPreview(user.avatar);
-        }
-      });
+    if (loading) return;
+
+    if (!user) {
+      router.replace("/auth?redirect=/onboarding");
+      return;
     }
-  }, [user]);
+
+    const hasCompletedName = Boolean(user.firstName?.trim() && user.surname?.trim());
+    const hasCompletedSchool = Boolean(user.school && user.school.trim() !== "" && user.school !== "Pending Onboarding");
+    const hasCompletedDob = Boolean(user.dateOfBirth);
+    const isFullyCompleted = Boolean(user.onboardingCompleted || (hasCompletedName && hasCompletedSchool && hasCompletedDob));
+
+    // Never show onboarding if details are already entered
+    if (isFullyCompleted) {
+      router.replace("/dashboard");
+      return;
+    }
+
+    if (user._id !== initializedUserIdRef.current) {
+      initializedUserIdRef.current = user._id;
+
+      const initialFirstName = user.firstName || "";
+      const initialSurname = user.surname || "";
+      const initialBio = user.bio || "";
+      const initialSchool = (user.school && user.school !== "Pending Onboarding") ? user.school : "";
+      const initialPhone = user.phone || "";
+      const initialDob = user.dateOfBirth ? user.dateOfBirth.split("T")[0] : "";
+      const initialGenres = (user.genres || []) as string[];
+
+      setFormData({
+        firstName: initialFirstName,
+        surname: initialSurname,
+        bio: initialBio,
+        school: initialSchool,
+        phone: initialPhone,
+        dateOfBirth: initialDob,
+        avatar: user.avatar || "",
+        avatarPublicId: user.avatarPublicId || "",
+        selectedGenres: initialGenres,
+      });
+
+      if (user.avatar) {
+        setAvatarPreview(user.avatar);
+      }
+
+      // Resume at the first incomplete step
+      let resumeStep = 1;
+      if (hasCompletedName) {
+        resumeStep = 2;
+        if (hasCompletedSchool) {
+          resumeStep = 3;
+          if (hasCompletedDob) {
+            resumeStep = 4;
+          }
+        }
+      }
+      setCurrentStep(resumeStep);
+    }
+  }, [user, loading, router]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -122,6 +160,32 @@ export default function OnboardingWizard() {
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
+      try {
+        if (currentStep === 1) {
+          api.users
+            .updateMe({
+              firstName: formData.firstName.trim(),
+              surname: formData.surname.trim(),
+              bio: formData.bio.trim(),
+            })
+            .catch(() => {});
+        } else if (currentStep === 2) {
+          api.users
+            .updateMe({
+              school: formData.school.trim(),
+              phone: formData.phone.trim(),
+            })
+            .catch(() => {});
+        } else if (currentStep === 3) {
+          api.users
+            .updateMe({
+              dateOfBirth: formData.dateOfBirth,
+            })
+            .catch(() => {});
+        }
+      } catch {
+        // Non-blocking
+      }
       setCurrentStep((prev) => Math.min(prev + 1, 4));
     }
   };
@@ -188,6 +252,15 @@ export default function OnboardingWizard() {
 
   const computedAge = formData.dateOfBirth ? calculateAge(formData.dateOfBirth) : null;
   const computedCategory = computedAge !== null ? getAgeCategory(computedAge) : null;
+
+  if (loading) {
+    return (
+      <div className="w-full max-w-2xl bg-white rounded-[2.5rem] border border-emerald-950/10 shadow-2xl p-12 flex flex-col items-center justify-center space-y-4">
+        <div className="w-8 h-8 border-2 border-emerald-950 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs uppercase tracking-widest font-bold text-emerald-950/50">Loading Author Profile...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-2xl bg-white rounded-[2.5rem] border border-emerald-950/10 shadow-2xl p-6 sm:p-12 relative overflow-hidden">

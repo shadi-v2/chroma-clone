@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Send, Book, Target, Type, X, ImageIcon, PenTool } from "lucide-react";
+import { Send, Book, Target, Type, X, ImageIcon, PenTool, User as UserIcon } from "lucide-react";
 import { api } from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { isEditorialRole } from "@/lib/roles";
 
 import type {
   PublicArticle,
@@ -12,11 +14,13 @@ import type {
   UpdateArticlePayload,
 } from "@/types/article";
 import type { Category } from "@/types/category";
+import type { PublicUser } from "@/types/user";
 import { RichTextEditor } from "../rich-text-editor/Editor";
 import { useToast } from "@/contexts/ToastContext";
 
 interface ArticleEditorFormProps {
   categories: Category[];
+  users?: PublicUser[];
   article?: PublicArticle;
   isEdit?: boolean;
 }
@@ -28,6 +32,7 @@ interface FormDataState {
   category: string;
   thumbnail: string;
   thumbnailPublicId: string;
+  authorId: string;
 }
 
 function calculateReadTime(text: string, wpm = 225) {
@@ -44,13 +49,16 @@ function calculateReadTime(text: string, wpm = 225) {
 
 export default function ArticleEditorForm({
   categories,
+  users: initialUsers = [],
   article,
   isEdit = false,
 }: ArticleEditorFormProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const { success: toastSuccess, error: toastError } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [userList, setUserList] = useState<PublicUser[]>(initialUsers);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState<FormDataState>({
     title: article?.title || "",
@@ -59,7 +67,23 @@ export default function ArticleEditorForm({
     category: article?.category?._id || "",
     thumbnail: article?.thumbnail || "",
     thumbnailPublicId: "",
+    authorId: article?.author?._id || article?.author?.id || "",
   });
+
+  const canChooseAuthor = isEditorialRole(user?.role);
+
+  // If user is admin/editor but users list wasn't passed via SSR, load on client
+  useEffect(() => {
+    if (canChooseAuthor && userList.length === 0) {
+      api.users.listAll().then((list) => {
+        if (Array.isArray(list)) {
+          setUserList(list);
+        }
+      }).catch((err) => {
+        console.error("Failed to load users for author selection:", err);
+      });
+    }
+  }, [canChooseAuthor, userList.length]);
 
   const readTime = calculateReadTime(formData.body);
   const wordCount = formData.body.trim()
@@ -171,6 +195,7 @@ export default function ArticleEditorForm({
         category: formData.category,
         thumbnail: formData.thumbnail,
         readTime: `${readTime} min`,
+        authorId: formData.authorId || undefined,
       };
 
       if (isEdit && article?._id) {
@@ -233,9 +258,9 @@ export default function ArticleEditorForm({
         {/* FORM */}
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* TITLE + CATEGORY */}
+          {/* TITLE + CATEGORY + AUTHOR (FOR ADMINS) */}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className={`grid grid-cols-1 ${canChooseAuthor ? "md:grid-cols-3" : "md:grid-cols-2"} gap-8`}>
             {/* TITLE */}
 
             <div className="bg-white p-8 rounded-[2.5rem] border border-emerald-950/5 shadow-xl">
@@ -294,6 +319,37 @@ export default function ArticleEditorForm({
                 ))}
               </select>
             </div>
+
+            {/* AUTHOR (FOR ADMIN / EDITORIAL USERS) */}
+            {canChooseAuthor && (
+              <div className="bg-white p-8 rounded-[2.5rem] border border-emerald-950/5 shadow-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <UserIcon className="w-4 h-4 text-emerald-950/40" />
+
+                  <span className="text-[10px] uppercase tracking-widest text-emerald-950/40">
+                    Author (Publish in Name Of)
+                  </span>
+                </div>
+
+                <select
+                  value={formData.authorId}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      authorId: e.target.value,
+                    }))
+                  }
+                  className="w-full bg-transparent outline-none text-base font-serif font-bold text-emerald-950 cursor-pointer"
+                >
+                  <option value="">Myself ({user?.firstName} {user?.surname})</option>
+                  {userList.map((u) => (
+                    <option key={u._id || u.id} value={u._id || u.id}>
+                      {u.firstName} {u.surname} ({u.email})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           {/* EXCERPT */}
@@ -381,11 +437,7 @@ export default function ArticleEditorForm({
                 </button>
               </div>
             ) : (
-              <label className="group relative flex flex-col items-center justify-center h-72 border-2 border-dashed border-emerald-950/10 rounded-4xl cursor-pointer overflow-hidden transition-all hover:border-emerald-950/30 hover:bg-emerald-950/2">
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                  <div className="absolute inset-y-0 left-[-40%] w-[30%] animate-[uploadShimmer_2.5s_infinite] bg-linear-to-r from-transparent via-emerald-500/10 to-transparent blur-2xl rotate-12" />
-                </div>
-
+              <label className="group relative flex flex-col items-center justify-center h-72 border-2 border-dashed border-emerald-950/10 rounded-4xl cursor-pointer overflow-hidden transition-all hover:border-emerald-950/30 hover:bg-emerald-950/5">
                 <div className="relative z-10 flex flex-col items-center">
                   <div className="w-20 h-20 rounded-3xl bg-emerald-950/5 flex items-center justify-center mb-6 shadow-inner">
                     <ImageIcon className="w-10 h-10 text-emerald-950/30" />

@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     if (auth.error) return auth.error;
 
     const body = await req.json();
-    const { toEmail, subject, htmlContent, senderName, wrapTemplate, wrapperConfig } = body;
+    const { toEmail, subject, htmlContent, senderName, fromEmail, wrapTemplate, wrapperConfig } = body;
 
     if (!toEmail || !toEmail.includes("@")) {
       return NextResponse.json(
@@ -42,6 +42,7 @@ export async function POST(req: Request) {
       subject: subject.trim(),
       htmlContent: htmlContent.trim(),
       senderName: cleanSenderName,
+      fromEmail: (fromEmail && typeof fromEmail === "string") ? fromEmail.trim() : undefined,
       wrapInOfficialTemplate: wrapTemplate !== false,
       wrapperConfig: wrapperConfig || undefined,
     });

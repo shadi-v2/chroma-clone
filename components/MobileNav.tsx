@@ -156,6 +156,25 @@ export default function MobileNav({ user, onOpenSearch }: MobileNavProps) {
 
         {/* Scrollable Navigation Area */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Search Bar Input inside Mobile Drawer */}
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-950/40" />
+            <input
+              type="text"
+              placeholder="Search articles, authors..."
+              onFocus={() => {
+                handleClose();
+                onOpenSearch();
+              }}
+              onClick={() => {
+                handleClose();
+                onOpenSearch();
+              }}
+              readOnly
+              className="w-full bg-white border border-emerald-950/10 rounded-full py-3 pl-11 pr-4 text-xs font-semibold text-emerald-950 placeholder:text-emerald-950/40 shadow-xs cursor-pointer focus:outline-none"
+            />
+          </div>
+
           <div className="space-y-1">
             <Link
               href="/"

@@ -185,11 +185,11 @@ export async function GET(req: Request) {
       },
     );
 
-    const needsOnboarding =
-      isNewUser ||
-      !user.onboardingCompleted ||
-      !user.school ||
-      !user.dateOfBirth;
+    const isSchoolValid = Boolean(user.school && user.school.trim() !== "" && user.school !== "Pending Onboarding");
+    const isDobValid = Boolean(user.dateOfBirth);
+    const isNameValid = Boolean(user.firstName?.trim() && user.surname?.trim());
+    const isCompleted = Boolean(user.onboardingCompleted || (isNameValid && isSchoolValid && isDobValid));
+    const needsOnboarding = !isCompleted;
 
     // 5. Build response and set HTTP-only cookie
     const destination = needsOnboarding

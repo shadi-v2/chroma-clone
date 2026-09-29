@@ -105,7 +105,7 @@ const Sidebar: React.FC<SidebarProps> = ({ trendingArticles }) => {
                 onClick={() =>
                   router.push(`/?category=${encodeURIComponent(cat.slug)}`)
                 }
-                className="flex items-center justify-between w-full p-2.5 rounded-xl text-sm font-medium hover:bg-white/10 hover:text-white transition-all cursor-pointer group/item text-left"
+                className="flex items-center justify-between w-full px-2.5 py-1 rounded-xl text-sm font-medium hover:text-white transition-all cursor-pointer group/item text-left"
               >
                 <span className="text-cream-50/70 group-hover/item:text-white group-hover/item:translate-x-1 transition-all duration-300">
                   {cat.name}

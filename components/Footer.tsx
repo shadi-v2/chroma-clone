@@ -12,7 +12,7 @@ const Footer = () => {
   return (
     <footer className="bg-emerald-950 text-cream-50 px-8 pt-20 pb-12 rounded-t-4xl md:rounded-t-[4rem] mt-32 relative overflow-hidden">
       {/* TOP LINE */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-white/10" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* NEWSLETTER BANNER IN FOOTER */}

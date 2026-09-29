@@ -69,6 +69,7 @@ export async function POST(req: Request) {
       featuredImage,
       readTime,
       tags,
+      authorId: requestedAuthorId,
     } = body;
 
     const categoryId = await resolveCategoryId(categoryInput);
@@ -84,6 +85,15 @@ export async function POST(req: Request) {
       );
     }
 
+    // If caller is admin/editor and specified authorId, use that author
+    let finalAuthorId = auth.user.id;
+    if (requestedAuthorId && (auth.user.role === "Admin" || auth.user.role === "Owner" || auth.user.role === "Editor")) {
+      const targetUser = await findUserById(requestedAuthorId);
+      if (targetUser) {
+        finalAuthorId = targetUser.id || targetUser._id;
+      }
+    }
+
     const article = await createArticle({
       title,
       excerpt,
@@ -92,7 +102,7 @@ export async function POST(req: Request) {
       thumbnail: thumbnail || featuredImage,
       featuredImage: featuredImage || thumbnail,
       readTime,
-      authorId: auth.user.id,
+      authorId: finalAuthorId,
       status: "Pending",
       tags: Array.isArray(tags) ? tags : [],
     });

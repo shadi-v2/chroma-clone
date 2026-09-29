@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db";
 import { getCurrentUser } from "@/lib/getCurrentUser";
 import { findArticleById } from "@/lib/db/articles";
 import { listCategories } from "@/lib/db/categories";
+import { listUsers } from "@/lib/db/users";
 import ArticleEditorForm from "@/components/editor/ArticleEditorForm";
 import { isEditorialRole } from "@/lib/roles";
 
@@ -20,9 +21,12 @@ export default async function EditPiecePage({ params }: EditPiecePageProps) {
   }
 
   const { id } = await params;
-  const [article, categories] = await Promise.all([
+  const isAdmin = isEditorialRole(user.role);
+
+  const [article, categories, users] = await Promise.all([
     findArticleById(id),
     listCategories(),
+    isAdmin ? listUsers() : Promise.resolve([]),
   ]);
 
   if (!article) {
@@ -33,18 +37,19 @@ export default async function EditPiecePage({ params }: EditPiecePageProps) {
   const currentUserId = user.id || user._id;
 
   const isAuthor = String(authorId) === String(currentUserId);
-  const isAdmin = isEditorialRole(user.role);
   if (!isAuthor && !isAdmin) {
     redirect("/dashboard");
   }
 
   const serializedArticle = JSON.parse(JSON.stringify(article));
   const serializedCategories = JSON.parse(JSON.stringify(categories));
+  const serializedUsers = JSON.parse(JSON.stringify(users));
 
   return (
     <ArticleEditorForm
       article={serializedArticle}
       categories={serializedCategories}
+      users={serializedUsers}
       isEdit
     />
   );

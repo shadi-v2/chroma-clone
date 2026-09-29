@@ -1,19 +1,32 @@
 import { Resend } from "resend";
+import { renderEmailWithWrapper, type EmailWrapperConfig } from "./emailWrapper";
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+export function resolveFromEmail(custom?: string, defaultPrefix = "editorial"): string {
+  if (custom && custom.trim()) {
+    const trimmed = custom.trim();
+    if (trimmed.includes("@")) {
+      return trimmed;
+    }
+    return `${trimmed}@chromadiaries.in`;
+  }
+  return process.env.RESEND_FROM_EMAIL || `${defaultPrefix}@chromadiaries.in`;
+}
 
 export async function sendVerificationEmail(
   email: string,
   code: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+    const fromEmail = resolveFromEmail(process.env.RESEND_AUTH_FROM, "verify");
 
     if (!resend) {
       console.log(`\n=======================================================`);
       console.log(`📧 [DEV / MOCK RESEND EMAIL] Verification code for ${email}: ${code}`);
+      console.log(`From: Chroma Diaries <${fromEmail}>`);
       console.log(`=======================================================\n`);
       return { success: true };
     }
@@ -83,12 +96,13 @@ export async function sendNewsletterWelcomeEmail(
   unsubscribeToken: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+    const fromEmail = resolveFromEmail(process.env.RESEND_NEWSLETTER_FROM, "newsletter");
     const unsubscribeUrl = `${siteUrl}/newsletter/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`;
 
     if (!resend) {
       console.log(`\n=======================================================`);
       console.log(`📧 [DEV / MOCK RESEND EMAIL] Welcome to Newsletter for ${email}`);
+      console.log(`From: Chroma Diaries Dispatch <${fromEmail}>`);
       console.log(`🔗 Unsubscribe Link: ${unsubscribeUrl}`);
       console.log(`=======================================================\n`);
       return { success: true };
@@ -172,12 +186,13 @@ export async function sendNewsletterBroadcast(
   unsubscribeToken: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+    const fromEmail = resolveFromEmail(process.env.RESEND_NEWSLETTER_FROM, "newsletter");
     const unsubscribeUrl = `${siteUrl}/newsletter/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`;
 
     if (!resend) {
       console.log(`\n=======================================================`);
       console.log(`📧 [DEV / MOCK RESEND EMAIL] Newsletter Broadcast to ${toEmail}`);
+      console.log(`From: Chroma Diaries Dispatch <${fromEmail}>`);
       console.log(`Subject: ${subject}`);
       console.log(`=======================================================\n`);
       return { success: true };
@@ -237,12 +252,13 @@ export async function sendInactivityReminderEmail(
   authorName: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+    const fromEmail = resolveFromEmail(process.env.RESEND_EDITORIAL_FROM, "editorial");
     const writeUrl = `${siteUrl}/write`;
 
     if (!resend) {
       console.log(`\n=======================================================`);
       console.log(`📧 [DEV / MOCK RESEND EMAIL] 30-Day Inactivity Reminder to ${authorEmail} (${authorName})`);
+      console.log(`From: Chroma Diaries Editorial <${fromEmail}>`);
       console.log(`=======================================================\n`);
       return { success: true };
     }
@@ -305,13 +321,12 @@ export async function sendInactivityReminderEmail(
   }
 }
 
-import { renderEmailWithWrapper, type EmailWrapperConfig } from "./emailWrapper";
-
 export async function sendOfficialEmail({
   to,
   subject,
   htmlContent,
   senderName = "Chroma Diaries Editorial",
+  fromEmail,
   wrapInOfficialTemplate = true,
   wrapperConfig,
 }: {
@@ -319,11 +334,12 @@ export async function sendOfficialEmail({
   subject: string;
   htmlContent: string;
   senderName?: string;
+  fromEmail?: string;
   wrapInOfficialTemplate?: boolean;
   wrapperConfig?: Partial<EmailWrapperConfig>;
 }): Promise<{ success: boolean; error?: string }> {
   try {
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+    const resolvedFromEmail = resolveFromEmail(fromEmail || process.env.RESEND_FROM_EMAIL, "editorial");
 
     const finalHtml = renderEmailWithWrapper(subject, htmlContent, {
       ...wrapperConfig,
@@ -333,7 +349,7 @@ export async function sendOfficialEmail({
     if (!resend) {
       console.log(`\n=======================================================`);
       console.log(`📧 [DEV / MOCK RESEND EMAIL] Official Email Sent`);
-      console.log(`From: ${senderName} <${fromEmail}>`);
+      console.log(`From: ${senderName} <${resolvedFromEmail}>`);
       console.log(`To: ${to}`);
       console.log(`Subject: ${subject}`);
       console.log(`Content:\n${htmlContent.slice(0, 300)}...`);
@@ -342,7 +358,7 @@ export async function sendOfficialEmail({
     }
 
     const { error } = await resend.emails.send({
-      from: `${senderName} <${fromEmail}>`,
+      from: `${senderName} <${resolvedFromEmail}>`,
       to: [to],
       subject: subject,
       html: finalHtml,
@@ -360,3 +376,4 @@ export async function sendOfficialEmail({
     return { success: false, error: message };
   }
 }
+
