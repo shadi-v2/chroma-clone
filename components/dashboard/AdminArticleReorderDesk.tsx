@@ -23,6 +23,24 @@ import {
 import { DashboardArticle } from "@/types/dashboard";
 import { api } from "@/services/api";
 
+const getStatusBadgeStyle = (status: string) => {
+  switch (status) {
+    case "Published":
+      return "bg-emerald-100 text-emerald-800 border-emerald-200";
+    case "Pending":
+      return "bg-amber-100 text-amber-800 border-amber-200";
+    case "Editing":
+      return "bg-purple-100 text-purple-800 border-purple-200";
+    case "Edited":
+      return "bg-pink-100 text-pink-800 border-pink-200";
+    case "Paused":
+      return "bg-blue-100 text-blue-800 border-blue-200";
+    case "Draft":
+    default:
+      return "bg-stone-100 text-stone-700 border-stone-200";
+  }
+};
+
 export default function AdminArticleReorderDesk() {
   const [articles, setArticles] = useState<DashboardArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +51,7 @@ export default function AdminArticleReorderDesk() {
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [onlyPublished, setOnlyPublished] = useState(true);
+  const [selectedStatus, setSelectedStatus] = useState("all");
 
   // Drag and Drop state
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -50,7 +68,7 @@ export default function AdminArticleReorderDesk() {
     setLoading(true);
     setErrorMessage(null);
     try {
-      const data = await api.articles.list({ status: "all" });
+      const data = await api.articles.list({ status: "all", limit: 1000 });
       const fetched: DashboardArticle[] = Array.isArray(data)
         ? data
         : data.articles || [];
@@ -95,8 +113,10 @@ export default function AdminArticleReorderDesk() {
   // Displayed articles list based on active filters
   const filteredArticles = useMemo(() => {
     return articles.filter((article) => {
-      if (onlyPublished && article.status !== "Published") {
-        return false;
+      if (selectedStatus !== "all") {
+        if (article.status?.toLowerCase() !== selectedStatus.toLowerCase()) {
+          return false;
+        }
       }
 
       if (selectedCategory !== "all") {
@@ -115,12 +135,13 @@ export default function AdminArticleReorderDesk() {
           .toLowerCase()
           .includes(q);
         const catMatch = article.category?.name?.toLowerCase().includes(q);
-        if (!titleMatch && !authorMatch && !catMatch) return false;
+        const statusMatch = article.status?.toLowerCase().includes(q);
+        if (!titleMatch && !authorMatch && !catMatch && !statusMatch) return false;
       }
 
       return true;
     });
-  }, [articles, onlyPublished, selectedCategory, searchQuery]);
+  }, [articles, selectedStatus, selectedCategory, searchQuery]);
 
   // Reorder in full array helper
   const reorderArray = (fromIndex: number, toIndex: number) => {
@@ -408,19 +429,21 @@ export default function AdminArticleReorderDesk() {
             </select>
           </div>
 
-          {/* PUBLISHED ONLY TOGGLE */}
-          <div className="flex items-center">
-            <button
-              type="button"
-              onClick={() => setOnlyPublished((prev) => !prev)}
-              className={`w-full py-3 px-4 rounded-2xl text-xs font-bold transition-all border cursor-pointer ${
-                onlyPublished
-                  ? "bg-emerald-950 text-cream-50 border-emerald-950 shadow-sm"
-                  : "bg-cream-50 text-emerald-950/70 border-emerald-950/10 hover:bg-emerald-950/5"
-              }`}
+          {/* STATUS FILTER */}
+          <div>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full px-4 py-3 bg-cream-50 border border-emerald-950/10 rounded-2xl text-xs font-semibold text-emerald-950 focus:outline-none focus:ring-2 focus:ring-emerald-950/10 cursor-pointer"
             >
-              {onlyPublished ? "Showing Published Works" : "Showing All Statuses"}
-            </button>
+              <option value="all">All Statuses ({articles.length})</option>
+              <option value="Published">Published ({articles.filter((a) => a.status === "Published").length})</option>
+              <option value="Pending">Pending ({articles.filter((a) => a.status === "Pending").length})</option>
+              <option value="Editing">Editing ({articles.filter((a) => a.status === "Editing").length})</option>
+              <option value="Edited">Edited ({articles.filter((a) => a.status === "Edited").length})</option>
+              <option value="Draft">Draft ({articles.filter((a) => a.status === "Draft").length})</option>
+              <option value="Paused">Paused ({articles.filter((a) => a.status === "Paused").length})</option>
+            </select>
           </div>
         </div>
       </div>
@@ -519,11 +542,9 @@ export default function AdminArticleReorderDesk() {
                         {article.category?.name || "General"}
                       </span>
                       <span
-                        className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                          article.status === "Published"
-                            ? "bg-emerald-100 text-emerald-800"
-                            : "bg-amber-100 text-amber-800"
-                        }`}
+                        className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border ${getStatusBadgeStyle(
+                          article.status,
+                        )}`}
                       >
                         {article.status}
                       </span>

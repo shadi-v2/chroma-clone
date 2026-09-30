@@ -102,7 +102,7 @@ export default function AdminArticleManagement({
   useEffect(() => {
     const fetchArticlesAndEditors = async () => {
       try {
-        const articlesPromise = api.articles.list({ status: "all" });
+        const articlesPromise = api.articles.list({ status: "all", limit: 1000 });
         const usersPromise = isEditor
           ? Promise.resolve([])
           : api.users.listByRole("Editor");

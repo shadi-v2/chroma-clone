@@ -50,17 +50,17 @@ export default function AdminPublicOrderModal({
 
   if (!isOpen) return null;
 
-  // Published articles that are NOT currently in the ordered list
+  // Articles that are NOT currently in the ordered list
   const orderedIds = new Set(orderedArticles.map((a) => a._id));
-  const availablePublished = articles.filter(
+  const availableArticles = articles.filter(
     (a) =>
-      a.status === "Published" &&
       !orderedIds.has(a._id) &&
       (unpinnedSearch.trim() === "" ||
         a.title.toLowerCase().includes(unpinnedSearch.toLowerCase()) ||
         `${a.author?.firstName || ""} ${a.author?.surname || ""}`
           .toLowerCase()
-          .includes(unpinnedSearch.toLowerCase())),
+          .includes(unpinnedSearch.toLowerCase()) ||
+        (a.status && a.status.toLowerCase().includes(unpinnedSearch.toLowerCase()))),
   );
 
   const moveUp = (index: number) => {
@@ -215,9 +215,22 @@ export default function AdminPublicOrderModal({
 
                     {/* TITLE & AUTHOR */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-emerald-950 truncate">
-                        {article.title}
-                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-xs font-bold text-emerald-950 truncate">
+                          {article.title}
+                        </p>
+                        <span
+                          className={`text-[9px] font-bold uppercase px-1.5 py-0.2 rounded-sm shrink-0 ${
+                            article.status === "Published"
+                              ? "bg-emerald-100 text-emerald-800"
+                              : article.status === "Pending"
+                              ? "bg-amber-100 text-amber-800"
+                              : "bg-stone-100 text-stone-700"
+                          }`}
+                        >
+                          {article.status}
+                        </span>
+                      </div>
                       <p className="text-[10px] text-emerald-950/50 truncate">
                         {article.author?.firstName} {article.author?.surname} • {article.category?.name || "General"}
                       </p>
@@ -258,10 +271,10 @@ export default function AdminPublicOrderModal({
             )}
           </div>
 
-          {/* RIGHT: AVAILABLE PUBLISHED ARTICLES (5 COLS) */}
+          {/* RIGHT: AVAILABLE ARTICLES (5 COLS) */}
           <div className="lg:col-span-5 space-y-4 border-t lg:border-t-0 lg:border-l border-emerald-950/10 lg:pl-8 pt-6 lg:pt-0">
             <h3 className="font-serif font-bold text-lg text-emerald-950">
-              Add Published Piece
+              Add Piece to Showcase
             </h3>
 
             {/* SEARCH */}
@@ -269,7 +282,7 @@ export default function AdminPublicOrderModal({
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-emerald-950/30" />
               <input
                 type="text"
-                placeholder="Search published pieces..."
+                placeholder="Search all pieces by title, author, status..."
                 value={unpinnedSearch}
                 onChange={(e) => setUnpinnedSearch(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 bg-cream-50 border border-emerald-950/10 rounded-xl text-xs font-medium text-emerald-950 placeholder:text-emerald-950/30 focus:outline-none focus:ring-1 focus:ring-emerald-950/20"
@@ -278,12 +291,12 @@ export default function AdminPublicOrderModal({
 
             {/* LIST */}
             <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">
-              {availablePublished.length === 0 ? (
+              {availableArticles.length === 0 ? (
                 <p className="text-xs text-center text-emerald-950/40 py-6">
-                  {unpinnedSearch ? "No matching published articles" : "All published articles are in the ordered list."}
+                  {unpinnedSearch ? "No matching articles" : "All articles are in the ordered list."}
                 </p>
               ) : (
-                availablePublished.map((article) => (
+                availableArticles.map((article) => (
                   <div
                     key={article._id}
                     className="flex items-center justify-between gap-2 p-2.5 bg-white border border-emerald-950/5 hover:border-emerald-950/15 rounded-xl transition-all"
@@ -302,9 +315,22 @@ export default function AdminPublicOrderModal({
                         <p className="text-xs font-bold text-emerald-950 truncate max-w-[150px]">
                           {article.title}
                         </p>
-                        <p className="text-[10px] text-emerald-950/40 truncate">
-                          {article.author?.firstName} {article.author?.surname}
-                        </p>
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`text-[9px] font-bold uppercase px-1.5 py-0.2 rounded-sm shrink-0 ${
+                              article.status === "Published"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : article.status === "Pending"
+                                ? "bg-amber-100 text-amber-800"
+                                : "bg-stone-100 text-stone-700"
+                            }`}
+                          >
+                            {article.status}
+                          </span>
+                          <span className="text-[10px] text-emerald-950/40 truncate">
+                            {article.author?.firstName} {article.author?.surname}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
