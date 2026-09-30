@@ -1,0 +1,1981 @@
+[
+  {
+    "_id": "6a256ed70836fb5005757eea",
+    "title": "Welcome to Our Authors",
+    "message": "Welcome to ChromaDiaries, where every shade of thought becomes a story worth sharing. Your words have the power to inspire, connect, and leave lasting impressions. We are grateful to have your voice as part of this journey and look forward to the unique colors you bring to these pages.",
+    "type": "General",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693",
+      "6a0fe9989ab55f3746cad410",
+      "6a2e6948a3e453e3e61e0f91",
+      "6a36696690698c56f367fad4",
+      "6a3b7424a3277d31803f63f1",
+      "6a56637a2abc173068d123a3",
+      "6a5a36400599407cc5fe58d4",
+      "6a977d4fe1daf005b225e30c",
+      "6a9c450331d37aef5f9476c8",
+      "6ab3a7df29ce54fa9ebbcee9",
+      "6ab65d2d00ba98cdc71f8dc6",
+      "6ab7cdb9dcfae771e463cb3a"
+    ],
+    "isGlobal": true,
+    "createdAt": "2026-06-07T13:15:03.724Z",
+    "updatedAt": "2026-09-26T13:52:23.249Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a364e6e19fc25764d9b5214",
+    "title": "Role Updated",
+    "message": "Your role has been changed to Editor.",
+    "type": "Role",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a30245981b56180791ca4b7"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-20T08:25:18.250Z",
+    "updatedAt": "2026-06-20T08:25:18.250Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a36699f90698c56f367fad5",
+    "title": "Role Updated",
+    "message": "Your role has been changed to Editor.",
+    "type": "Role",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [
+      "6a36696690698c56f367fad4"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-20T10:21:19.818Z",
+    "updatedAt": "2026-06-21T08:40:01.810Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a367dbdd3ff1b6d74405240",
+    "title": "Article Published",
+    "message": "Congratulations! Your article \"The Hand That Slipped Away\" is now live.",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-20T11:47:09.539Z",
+    "updatedAt": "2026-06-20T11:47:09.539Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a367e86d3ff1b6d74405242",
+    "title": "Article Assigned",
+    "message": "You have been assigned to review \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [
+      "6a36696690698c56f367fad4"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-20T11:50:30.821Z",
+    "updatedAt": "2026-06-21T08:40:01.810Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a368028d3ff1b6d74405245",
+    "title": "Article Assigned",
+    "message": "You have been assigned to review \"Text\".",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [
+      "6a36696690698c56f367fad4"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-20T11:57:28.881Z",
+    "updatedAt": "2026-06-21T08:40:01.810Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a368982d69fd489b373f467",
+    "title": "Article Published",
+    "message": "Congratulations! Your article \"The Hand That Slipped Away\" is now live.",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-20T12:37:22.654Z",
+    "updatedAt": "2026-06-20T12:37:22.654Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a368bb8d69fd489b373f468",
+    "title": "Article Assigned",
+    "message": "You have been assigned to review \"Text\".",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [
+      "6a36696690698c56f367fad4"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-20T12:46:48.117Z",
+    "updatedAt": "2026-06-21T08:40:01.810Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a3741c2e3b278526bc8b00c",
+    "title": "Article Published",
+    "message": "Congratulations! Your article \"The Last Message\" is now live.",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a24eb0a254e27428cafec54"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T01:43:30.859Z",
+    "updatedAt": "2026-06-21T01:43:30.859Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a3742f6e3b278526bc8b00d",
+    "title": "Article Published",
+    "message": "Congratulations! Your article \"The Hand That Slipped Away\" is now live.",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T01:48:38.166Z",
+    "updatedAt": "2026-06-21T01:48:38.166Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a374a1208bcacce22ab92b0",
+    "title": "Article Updated",
+    "message": "\"Text\" was updated.",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [
+      "6a36696690698c56f367fad4"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T02:18:58.740Z",
+    "updatedAt": "2026-06-21T08:40:01.810Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37a3253f819d65f31827b5",
+    "title": "Article Status Updated",
+    "message": "\"Text\" changed to Pending.",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [
+      "6a36696690698c56f367fad4"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T08:39:01.028Z",
+    "updatedAt": "2026-06-21T08:40:01.810Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37a32f3f819d65f31827b6",
+    "title": "Article Status Updated",
+    "message": "\"Text\" changed to Editing.",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [
+      "6a36696690698c56f367fad4"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T08:39:11.819Z",
+    "updatedAt": "2026-06-21T08:40:01.810Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37a3303f819d65f31827b7",
+    "title": "Article Assigned",
+    "message": "You have been assigned to review \"Text\".",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [
+      "6a36696690698c56f367fad4"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T08:39:12.025Z",
+    "updatedAt": "2026-06-21T08:40:01.810Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37b178e1041622443f8a27",
+    "title": "Article Assigned",
+    "message": "You have been assigned to review \"Text\".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T09:40:08.324Z",
+    "updatedAt": "2026-06-21T09:40:08.324Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37b178e1041622443f8a28",
+    "title": "Article Assignment Updated",
+    "message": "\"Text\" was assigned to a new editor.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T09:40:08.533Z",
+    "updatedAt": "2026-06-21T09:40:08.533Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37b181e1041622443f8a29",
+    "title": "Article Assigned",
+    "message": "You have been assigned to review \"Text\".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T09:40:17.369Z",
+    "updatedAt": "2026-06-21T09:40:17.369Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37b181e1041622443f8a2a",
+    "title": "Article Assignment Updated",
+    "message": "\"Text\" was assigned to a new editor.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T09:40:17.574Z",
+    "updatedAt": "2026-06-21T09:40:17.574Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37b191c16793d6cffc65ee",
+    "title": "Article Status Updated",
+    "message": "\"love\" changed to Editing.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a309b463501b277ce8ed676"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T09:40:33.180Z",
+    "updatedAt": "2026-06-21T09:40:33.180Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37b191c16793d6cffc65ef",
+    "title": "Article Assigned",
+    "message": "You have been assigned to review \"love\".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a30245981b56180791ca4b7"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T09:40:33.387Z",
+    "updatedAt": "2026-06-21T09:40:33.387Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37b194c16793d6cffc65f0",
+    "title": "Article Assigned",
+    "message": "You have been assigned to review \"love\".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T09:40:36.990Z",
+    "updatedAt": "2026-06-21T09:40:36.990Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37b195c16793d6cffc65f1",
+    "title": "Article Assignment Updated",
+    "message": "\"love\" was assigned to a new editor.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a309b463501b277ce8ed676"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T09:40:37.196Z",
+    "updatedAt": "2026-06-21T09:40:37.196Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37cdcff380348f68de2bd8",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a24eb0a254e27428cafec54"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T11:41:03.585Z",
+    "updatedAt": "2026-06-21T11:41:03.585Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37cee92a49f4cd5fa701ea",
+    "title": "Article Status Updated",
+    "message": "\"Text\" changed to Pending.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T11:45:45.878Z",
+    "updatedAt": "2026-06-21T11:45:45.878Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37cf6c92c42d773162ebc8",
+    "title": "Article Status Updated",
+    "message": "\"Qur’anic Epistemology and Knowledge Construction: Medieval Models \" changed to Editing.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a24eb84f7aa4a3ca0cbfc45"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T11:47:56.015Z",
+    "updatedAt": "2026-06-21T11:47:56.015Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37cf6c92c42d773162ebc9",
+    "title": "Article Assigned",
+    "message": "You have been assigned to review \"Qur’anic Epistemology and Knowledge Construction: Medieval Models \".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T11:47:56.207Z",
+    "updatedAt": "2026-06-21T11:47:56.207Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37cfb5f2e373722c30c656",
+    "title": "Article Status Updated",
+    "message": "\"Qur’anic Epistemology and Knowledge Construction: Medieval Models \" changed to Edited.",
+    "type": "Article",
+    "createdBy": "6a24e3f3b3263d4f6315df52",
+    "recipients": [
+      "6a24eb84f7aa4a3ca0cbfc45"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T11:49:09.802Z",
+    "updatedAt": "2026-06-21T11:49:09.802Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a37cfc6e4edd86efbaad5e9",
+    "title": "Article Status Updated",
+    "message": "\"Qur’anic Epistemology and Knowledge Construction: Medieval Models \" changed to Editing.",
+    "type": "Article",
+    "createdBy": "6a24e3f3b3263d4f6315df52",
+    "recipients": [
+      "6a24eb84f7aa4a3ca0cbfc45"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-06-21T11:49:26.812Z",
+    "updatedAt": "2026-06-21T11:49:26.812Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a3f2354882d1e1b15d093a8",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a24eb0a254e27428cafec54",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-27T01:11:48.048Z",
+    "updatedAt": "2026-09-03T01:56:30.808Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a3f235f882d1e1b15d093aa",
+    "title": "New Comment",
+    "message": "A new comment was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a24eb0a254e27428cafec54",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-27T01:11:59.372Z",
+    "updatedAt": "2026-09-03T01:56:30.808Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a3f248f887fe110fed242bf",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a24eb0a254e27428cafec54",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-27T01:17:03.878Z",
+    "updatedAt": "2026-09-03T01:56:30.808Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a40b5008fc2f701b314192f",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a24eb0a254e27428cafec54",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-06-28T05:45:36.366Z",
+    "updatedAt": "2026-09-03T01:56:30.808Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a46710b84d17e73dbf6a61f",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a24eb0a254e27428cafec54",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-02T14:09:15.291Z",
+    "updatedAt": "2026-09-03T01:56:30.808Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a46711584d17e73dbf6a620",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a24eb0a254e27428cafec54",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-02T14:09:25.196Z",
+    "updatedAt": "2026-09-03T01:56:30.808Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a46712b478a3f1ce219e248",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a24eb0a254e27428cafec54",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-02T14:09:47.330Z",
+    "updatedAt": "2026-09-03T01:56:30.808Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a48f278d7bffc5f9b04066f",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a24eb0a254e27428cafec54",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-04T11:46:00.173Z",
+    "updatedAt": "2026-09-03T01:56:30.808Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a4c9c932fc8e92e76931c9c",
+    "title": "Article Archived",
+    "message": "\"Text\" was archived.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a36696690698c56f367fad4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-07-07T06:28:35.221Z",
+    "updatedAt": "2026-07-07T06:28:35.221Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a4c9cf8245dc793705faaf6",
+    "title": "Hi",
+    "message": "HI",
+    "type": "General",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-07T06:30:16.134Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a4c9d04245dc793705faaf7",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a24eb0a254e27428cafec54"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-07T06:30:28.428Z",
+    "updatedAt": "2026-09-03T01:56:30.808Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a4c9d2d245dc793705faaf8",
+    "title": "ggggggg",
+    "message": "gggggg",
+    "type": "General",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-07T06:31:09.405Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a4cf90da97ce96f5da2e9d7",
+    "title": "New Article Submission",
+    "message": "A new article \"salary in everything\" is pending review.",
+    "type": "Approval",
+    "createdBy": "6a4cf2297b73f7f66079b0f8",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693",
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-07T13:03:09.026Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a4f87fdc392cea2de7a0fb2",
+    "title": "New Like",
+    "message": "A new like was added to \"The Hand That Slipped Away\".",
+    "type": "Article",
+    "createdBy": "6a3b7424a3277d31803f63f1",
+    "recipients": [
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-07-09T11:37:33.820Z",
+    "updatedAt": "2026-07-09T11:37:33.820Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a4f8812c392cea2de7a0fb3",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a3b7424a3277d31803f63f1",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a24eb0a254e27428cafec54",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693",
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-09T11:37:54.890Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a4f882263ffe078ad47517f",
+    "title": "New Like",
+    "message": "A new like was added to \"After the Echo\".",
+    "type": "Article",
+    "createdBy": "6a3b7424a3277d31803f63f1",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-09T11:38:10.795Z",
+    "updatedAt": "2026-09-03T01:56:30.808Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a50eeb1e4179b12f3483293",
+    "title": "New Article Submission",
+    "message": "A new article \"a love in dream\" is pending review.",
+    "type": "Approval",
+    "createdBy": "6a4cf2297b73f7f66079b0f8",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693",
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-10T13:08:01.336Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a5208ae463c9cb80bb25b81",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a24eb0a254e27428cafec54",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693",
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-11T09:11:10.034Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a586e12ef912dd8a1fcab6b",
+    "title": "New Article Submission",
+    "message": "A new article \"Commercialization of Education: Opportunities and the Oppression of Knowledge Production\" is pending review.",
+    "type": "Approval",
+    "createdBy": "6a586bc4ef912dd8a1fcab69",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693",
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-07-16T05:37:22.983Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a911a70a79fd49a044928a0",
+    "title": "New Like",
+    "message": "A new like was added to \"The Hand That Slipped Away\".",
+    "type": "Article",
+    "createdBy": "6a8ff5f794ceb98133b1f05e",
+    "recipients": [
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-08-28T05:19:44.195Z",
+    "updatedAt": "2026-08-28T05:19:44.195Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a930d3a322dbca185ba0c68",
+    "title": "Role Updated",
+    "message": "Your role has been changed to Author.",
+    "type": "Role",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-08-29T16:47:54.282Z",
+    "updatedAt": "2026-08-29T16:47:54.282Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a94e77d41c1c156989d87c8",
+    "title": "Article Published",
+    "message": "\"love\" by Muhammed Hashir is now live.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a309b463501b277ce8ed676"
+    ],
+    "readBy": [
+      "6a977d4fe1daf005b225e30c",
+      "6a16a850476f9fb6a3fa6693",
+      "6a0fe9989ab55f3746cad410",
+      "6a9c450331d37aef5f9476c8",
+      "6ab3a7df29ce54fa9ebbcee9",
+      "6ab65d2d00ba98cdc71f8dc6",
+      "6ab7cdb9dcfae771e463cb3a"
+    ],
+    "isGlobal": true,
+    "createdAt": "2026-08-31T02:31:25.750Z",
+    "updatedAt": "2026-09-26T13:52:23.249Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a94e87941c1c156989d87c9",
+    "title": "HI",
+    "message": "Hi",
+    "type": "General",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-08-31T02:35:37.853Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a94e8a14d997f66d4dcd4f6",
+    "title": "Role Updated",
+    "message": "Your role has been changed to Editor.",
+    "type": "Role",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a2e6948a3e453e3e61e0f91"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-08-31T02:36:17.592Z",
+    "updatedAt": "2026-08-31T02:36:17.592Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a94e8ae49f00797d061950d",
+    "title": "Article Status Updated",
+    "message": "\"Commercialization of Education: Opportunities and the Oppression of Knowledge Production\" changed to Editing.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a586bc4ef912dd8a1fcab69"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-08-31T02:36:30.602Z",
+    "updatedAt": "2026-08-31T02:36:30.602Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a94e8ae49f00797d061950e",
+    "title": "Article Assigned",
+    "message": "You have been assigned to review \"Commercialization of Education: Opportunities and the Oppression of Knowledge Production\".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a2e6948a3e453e3e61e0f91"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-08-31T02:36:30.793Z",
+    "updatedAt": "2026-08-31T02:36:30.793Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a94e8d04d997f66d4dcd4f7",
+    "title": "Role Updated",
+    "message": "Your role has been changed to Author.",
+    "type": "Role",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a2e6948a3e453e3e61e0f91"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-08-31T02:37:04.355Z",
+    "updatedAt": "2026-08-31T02:37:04.355Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a94ea12e9d80a1d9696ecbf",
+    "title": "Article Status Updated",
+    "message": "\"love\" changed to Paused.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a309b463501b277ce8ed676"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-08-31T02:42:26.658Z",
+    "updatedAt": "2026-08-31T02:42:26.658Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a965847af0e313e0d714e2f",
+    "title": "New Article Submission",
+    "message": "A new article \"What Hardship Taught Me\" is pending review.",
+    "type": "Approval",
+    "createdBy": "6a9635ab9096f7896b6996aa",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693",
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-09-01T04:44:55.213Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a97850f37b9c23bf3ea87c5",
+    "title": "New Article Submission",
+    "message": "A new article \"Daily Routine \" is pending review.",
+    "type": "Approval",
+    "createdBy": "6a977d4fe1daf005b225e30c",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693",
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-09-02T02:08:15.587Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a979c195506c39a874ab7a8",
+    "title": "Article Updated",
+    "message": "\"What Hardship Taught Me\" was updated.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a9635ab9096f7896b6996aa"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-02T03:46:33.327Z",
+    "updatedAt": "2026-09-02T03:46:33.327Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a979c66a9912d594f1ce8fa",
+    "title": "Article Updated",
+    "message": "\"Daily Routine \" was updated.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a977d4fe1daf005b225e30c"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-02T03:47:50.332Z",
+    "updatedAt": "2026-09-02T03:47:50.332Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9807a4c10f6d1f1d2fbe74",
+    "title": "New Article Submission",
+    "message": "A new article \"Loveliest Poison \" is pending review.",
+    "type": "Approval",
+    "createdBy": "6a5a36400599407cc5fe58d4",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-09-02T11:25:24.416Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a980ad3867335368104a4ea",
+    "title": "Article Updated",
+    "message": "\"Loveliest Poison \" was updated.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a5a36400599407cc5fe58d4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-02T11:38:59.955Z",
+    "updatedAt": "2026-09-02T11:38:59.955Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9853f89cab97d717be2e4c",
+    "title": "New Article Submission",
+    "message": "A new article \"Two Parrot\" is pending review.",
+    "type": "Approval",
+    "createdBy": "6a985369ef80b5e768bf64ba",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-09-02T16:51:04.623Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a98d36f8ef0155f610b4db1",
+    "title": "Article Published",
+    "message": "\"What Hardship Taught Me\" by Muhammed Hamees is now live.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a9635ab9096f7896b6996aa"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a9c450331d37aef5f9476c8",
+      "6ab3a7df29ce54fa9ebbcee9",
+      "6ab65d2d00ba98cdc71f8dc6",
+      "6ab7cdb9dcfae771e463cb3a"
+    ],
+    "isGlobal": true,
+    "createdAt": "2026-09-03T01:54:55.176Z",
+    "updatedAt": "2026-09-26T13:52:23.249Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a98d36f8ef0155f610b4db2",
+    "title": "Article Published",
+    "message": "\"Daily Routine \" by Sabith Km is now live.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a977d4fe1daf005b225e30c"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a9c450331d37aef5f9476c8",
+      "6ab3a7df29ce54fa9ebbcee9",
+      "6ab65d2d00ba98cdc71f8dc6",
+      "6ab7cdb9dcfae771e463cb3a"
+    ],
+    "isGlobal": true,
+    "createdAt": "2026-09-03T01:54:55.379Z",
+    "updatedAt": "2026-09-26T13:52:23.249Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a98d3718ef0155f610b4db3",
+    "title": "Article Published",
+    "message": "\"Loveliest Poison \" by Midlaj Vattoli is now live.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a5a36400599407cc5fe58d4"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a9c450331d37aef5f9476c8",
+      "6ab3a7df29ce54fa9ebbcee9",
+      "6ab65d2d00ba98cdc71f8dc6",
+      "6ab7cdb9dcfae771e463cb3a"
+    ],
+    "isGlobal": true,
+    "createdAt": "2026-09-03T01:54:57.345Z",
+    "updatedAt": "2026-09-26T13:52:23.249Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a98d3768ef0155f610b4db4",
+    "title": "Article Published",
+    "message": "\"Two Parrot\" by Muhammed Jalal T is now live.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a985369ef80b5e768bf64ba"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a9c450331d37aef5f9476c8",
+      "6ab3a7df29ce54fa9ebbcee9",
+      "6ab65d2d00ba98cdc71f8dc6",
+      "6ab7cdb9dcfae771e463cb3a"
+    ],
+    "isGlobal": true,
+    "createdAt": "2026-09-03T01:55:02.015Z",
+    "updatedAt": "2026-09-26T13:52:23.249Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a98d37717eeb0cb2404a3e2",
+    "title": "Article Published",
+    "message": "\"Qur’anic Epistemology and Knowledge Construction: Medieval Models \" by Shad Ahmed is now live.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a24eb84f7aa4a3ca0cbfc45"
+    ],
+    "readBy": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a9c450331d37aef5f9476c8",
+      "6ab3a7df29ce54fa9ebbcee9",
+      "6ab65d2d00ba98cdc71f8dc6",
+      "6ab7cdb9dcfae771e463cb3a"
+    ],
+    "isGlobal": true,
+    "createdAt": "2026-09-03T01:55:03.928Z",
+    "updatedAt": "2026-09-26T13:52:23.249Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a98d3847b344d8eb2f8a765",
+    "title": "New Like",
+    "message": "A new like was added to \"Daily Routine \".",
+    "type": "Article",
+    "createdBy": "6a2e6948a3e453e3e61e0f91",
+    "recipients": [
+      "6a977d4fe1daf005b225e30c"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-03T01:55:16.855Z",
+    "updatedAt": "2026-09-03T01:55:16.855Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a98d3857b344d8eb2f8a766",
+    "title": "New Like",
+    "message": "A new like was added to \"What Hardship Taught Me\".",
+    "type": "Article",
+    "createdBy": "6a2e6948a3e453e3e61e0f91",
+    "recipients": [
+      "6a9635ab9096f7896b6996aa"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-03T01:55:17.596Z",
+    "updatedAt": "2026-09-03T01:55:17.596Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a98d3857b344d8eb2f8a767",
+    "title": "New Like",
+    "message": "A new like was added to \"The Hand That Slipped Away\".",
+    "type": "Article",
+    "createdBy": "6a2e6948a3e453e3e61e0f91",
+    "recipients": [
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-03T01:55:17.871Z",
+    "updatedAt": "2026-09-03T01:55:17.871Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a98d3e39e75668cd7a4d875",
+    "title": "Article Updated",
+    "message": "\"Two Parrots\" was updated.",
+    "type": "Article",
+    "createdBy": "6a0fe9989ab55f3746cad410",
+    "recipients": [
+      "6a985369ef80b5e768bf64ba"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-03T01:56:51.600Z",
+    "updatedAt": "2026-09-03T01:56:51.600Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9905217d2eec66a6ee97c7",
+    "title": "New Like",
+    "message": "A new like was added to \"Two Parrots\".",
+    "type": "Article",
+    "createdBy": "6a3b7424a3277d31803f63f1",
+    "recipients": [
+      "6a985369ef80b5e768bf64ba"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-03T05:26:57.080Z",
+    "updatedAt": "2026-09-03T05:26:57.080Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9905357d2eec66a6ee97c8",
+    "title": "New Like",
+    "message": "A new like was added to \"Loveliest Poison \".",
+    "type": "Article",
+    "createdBy": "6a3b7424a3277d31803f63f1",
+    "recipients": [
+      "6a5a36400599407cc5fe58d4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-03T05:27:17.255Z",
+    "updatedAt": "2026-09-03T05:27:17.255Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a99053d3006d1b4eaa02ff2",
+    "title": "New Like",
+    "message": "A new like was added to \"Two Parrots\".",
+    "type": "Article",
+    "createdBy": "6a3b7424a3277d31803f63f1",
+    "recipients": [
+      "6a985369ef80b5e768bf64ba"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-03T05:27:25.062Z",
+    "updatedAt": "2026-09-03T05:27:25.062Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9a32f623115754542f27e9",
+    "title": "New Like",
+    "message": "A new like was added to \"Loveliest Poison \".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a5a36400599407cc5fe58d4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-04T02:54:46.321Z",
+    "updatedAt": "2026-09-04T02:54:46.321Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9a32f923115754542f27ea",
+    "title": "New Like",
+    "message": "A new like was added to \"Two Parrots\".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a985369ef80b5e768bf64ba"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-04T02:54:49.923Z",
+    "updatedAt": "2026-09-04T02:54:49.923Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9a330123115754542f27eb",
+    "title": "New Like",
+    "message": "A new like was added to \"What Hardship Taught Me\".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a9635ab9096f7896b6996aa"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-04T02:54:57.496Z",
+    "updatedAt": "2026-09-04T02:54:57.496Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9a8d95d3b20411eb405743",
+    "title": "New Article Submission",
+    "message": "A new article \"Mental Health Awareness Among Youth\" is pending review.",
+    "type": "Approval",
+    "createdBy": "6a8ff5f794ceb98133b1f05e",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-09-04T09:21:25.615Z",
+    "updatedAt": "2026-09-08T02:01:03.349Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9c46272d5d8aeb37c2e3cf",
+    "title": "Role Updated",
+    "message": "Your role has been changed to Editor.",
+    "type": "Role",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a9c460648e7376987e0162f"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-05T16:41:11.363Z",
+    "updatedAt": "2026-09-05T16:41:11.363Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9c463148e7376987e01630",
+    "title": "Article Status Updated",
+    "message": "\"Mental Health Awareness Among Youth\" changed to Editing.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a8ff5f794ceb98133b1f05e"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-05T16:41:21.227Z",
+    "updatedAt": "2026-09-05T16:41:21.227Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9c463148e7376987e01631",
+    "title": "Article Assigned",
+    "message": "You have been assigned to review \"Mental Health Awareness Among Youth\".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a9c460648e7376987e0162f"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-05T16:41:21.431Z",
+    "updatedAt": "2026-09-05T16:41:21.431Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9c46502d5d8aeb37c2e3d0",
+    "title": "Article Updated",
+    "message": "\"Mental Health Awareness Among Youth\" was updated.",
+    "type": "Article",
+    "createdBy": "6a9c460648e7376987e0162f",
+    "recipients": [
+      "6a8ff5f794ceb98133b1f05e"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-05T16:41:52.389Z",
+    "updatedAt": "2026-09-05T16:41:52.389Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9c46612d5d8aeb37c2e3d1",
+    "title": "Article Status Updated",
+    "message": "\"Mental Health Awareness Among Youth\" changed to Edited.",
+    "type": "Article",
+    "createdBy": "6a9c460648e7376987e0162f",
+    "recipients": [
+      "6a8ff5f794ceb98133b1f05e"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-05T16:42:09.303Z",
+    "updatedAt": "2026-09-05T16:42:09.303Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9c467731d37aef5f9476c9",
+    "title": "Article Status Updated",
+    "message": "\"Mental Health Awareness Among Youth\" changed to Editing.",
+    "type": "Article",
+    "createdBy": "6a9c460648e7376987e0162f",
+    "recipients": [
+      "6a8ff5f794ceb98133b1f05e"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-05T16:42:31.403Z",
+    "updatedAt": "2026-09-05T16:42:31.403Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9c467b31d37aef5f9476ca",
+    "title": "Article Status Updated",
+    "message": "\"Mental Health Awareness Among Youth\" changed to Pending.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a8ff5f794ceb98133b1f05e"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-05T16:42:35.598Z",
+    "updatedAt": "2026-09-05T16:42:35.598Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9cd2e8f4c2bd9e0ba734cf",
+    "title": "New Like",
+    "message": "A new like was added to \"Daily Routine \".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a977d4fe1daf005b225e30c"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-06T02:41:44.431Z",
+    "updatedAt": "2026-09-06T02:41:44.431Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9ef2bd32d4366aa95ad03d",
+    "title": "New Comment",
+    "message": "A new comment was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a24eb0a254e27428cafec54"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-07T17:22:05.336Z",
+    "updatedAt": "2026-09-07T17:22:05.336Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9ef36032d4366aa95ad03e",
+    "title": "Article Published",
+    "message": "\"love\" by Muhammed Hashir is now live.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a309b463501b277ce8ed676"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693",
+      "6a9c450331d37aef5f9476c8",
+      "6ab3a7df29ce54fa9ebbcee9",
+      "6ab65d2d00ba98cdc71f8dc6",
+      "6ab7cdb9dcfae771e463cb3a"
+    ],
+    "isGlobal": true,
+    "createdAt": "2026-09-07T17:24:48.503Z",
+    "updatedAt": "2026-09-26T13:52:23.249Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9ef36532d4366aa95ad03f",
+    "title": "Article Status Updated",
+    "message": "\"love\" changed to Paused.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a309b463501b277ce8ed676"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-07T17:24:53.219Z",
+    "updatedAt": "2026-09-07T17:24:53.219Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9f85d011e6829f12ea30f4",
+    "title": "Article Published",
+    "message": "\"a love in dream\" by Zayan Basheer is now live.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a4cf2297b73f7f66079b0f8"
+    ],
+    "readBy": [
+      "6a9c450331d37aef5f9476c8",
+      "6aa0ba3d8b220476a4f71e30",
+      "6ab3a7df29ce54fa9ebbcee9",
+      "6ab65d2d00ba98cdc71f8dc6",
+      "6ab7cdb9dcfae771e463cb3a"
+    ],
+    "isGlobal": true,
+    "createdAt": "2026-09-08T03:49:36.406Z",
+    "updatedAt": "2026-09-26T13:52:23.249Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9f8609740a0a8ce632b4c2",
+    "title": "Article Archived",
+    "message": "\"a love in dream\" was archived.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a4cf2297b73f7f66079b0f8"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-08T03:50:33.869Z",
+    "updatedAt": "2026-09-08T03:50:33.869Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9f8616740a0a8ce632b4c3",
+    "title": "Article Archived",
+    "message": "\"salary in everything\" was archived.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a4cf2297b73f7f66079b0f8"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-08T03:50:46.348Z",
+    "updatedAt": "2026-09-08T03:50:46.348Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a9f9f5b4d4bbcfd6ab1914c",
+    "title": "New Like",
+    "message": "A new like was added to \"After the Echo\".",
+    "type": "Article",
+    "createdBy": "6a9c450331d37aef5f9476c8",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-08T05:38:35.969Z",
+    "updatedAt": "2026-09-08T05:38:35.969Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aa0e35ed2385a1df3911fd4",
+    "title": "New Like",
+    "message": "A new like was added to \"Loveliest Poison \".",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a5a36400599407cc5fe58d4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-09T04:41:02.931Z",
+    "updatedAt": "2026-09-09T04:41:02.931Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aa8a06334b9923bac0d6a87",
+    "title": "New Article Submission",
+    "message": "A new article \"That type of woman\" is pending review.",
+    "type": "Approval",
+    "createdBy": "6aa89ef11d46d3fd5f70a528",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a9c460648e7376987e0162f"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "isGlobal": false,
+    "createdAt": "2026-09-15T01:33:23.074Z",
+    "updatedAt": "2026-09-22T06:04:27.046Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aab3a6db6adb472508d9a13",
+    "title": "New Comment",
+    "message": "A new comment was added to \"Two Parrots\".",
+    "type": "Article",
+    "createdBy": "6a9aed898608deab7781efc7",
+    "recipients": [
+      "6a985369ef80b5e768bf64ba"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-17T00:55:09.097Z",
+    "updatedAt": "2026-09-17T00:55:09.097Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aab3a8b8638df61895d318a",
+    "title": "New Comment",
+    "message": "A new comment was added to \"After the Echo\".",
+    "type": "Article",
+    "createdBy": "6a9aed898608deab7781efc7",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-17T00:55:39.682Z",
+    "updatedAt": "2026-09-17T00:55:39.682Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aab3a8d8638df61895d318b",
+    "title": "New Like",
+    "message": "A new like was added to \"After the Echo\".",
+    "type": "Article",
+    "createdBy": "6a9aed898608deab7781efc7",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-17T00:55:41.342Z",
+    "updatedAt": "2026-09-17T00:55:41.342Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aab3ac8b6adb472508d9a14",
+    "title": "New Like",
+    "message": "A new like was added to \"Loveliest Poison \".",
+    "type": "Article",
+    "createdBy": "6a9aed898608deab7781efc7",
+    "recipients": [
+      "6a5a36400599407cc5fe58d4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-17T00:56:40.501Z",
+    "updatedAt": "2026-09-17T00:56:40.501Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aab3ad5b6adb472508d9a16",
+    "title": "New Comment",
+    "message": "A new comment was added to \"Loveliest Poison \".",
+    "type": "Article",
+    "createdBy": "6a9aed898608deab7781efc7",
+    "recipients": [
+      "6a5a36400599407cc5fe58d4"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-17T00:56:53.264Z",
+    "updatedAt": "2026-09-17T00:56:53.264Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aabbbb1e1d2363fecd72d28",
+    "title": "Article Updated",
+    "message": "\"The Price of Love\" was updated.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a309b463501b277ce8ed676"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-17T10:06:41.414Z",
+    "updatedAt": "2026-09-17T10:06:41.414Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aabbbc7a28f5168b7f6760a",
+    "title": "Article Published",
+    "message": "\"The Price of Love\" by Muhammed Hashir is now live.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a309b463501b277ce8ed676"
+    ],
+    "readBy": [
+      "6a16a850476f9fb6a3fa6693",
+      "6ab3a7df29ce54fa9ebbcee9",
+      "6ab65d2d00ba98cdc71f8dc6",
+      "6ab7cdb9dcfae771e463cb3a"
+    ],
+    "isGlobal": true,
+    "createdAt": "2026-09-17T10:07:03.788Z",
+    "updatedAt": "2026-09-26T13:52:23.249Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aabbbcaa28f5168b7f6760b",
+    "title": "Article Status Updated",
+    "message": "\"The Price of Love\" changed to Paused.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a309b463501b277ce8ed676"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-17T10:07:06.007Z",
+    "updatedAt": "2026-09-17T10:07:06.007Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aaf7ce1f306f413bd1692f2",
+    "title": "Article Archived",
+    "message": "\"Mental Health Awareness Among Youth\" was archived.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a8ff5f794ceb98133b1f05e"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-20T06:27:45.802Z",
+    "updatedAt": "2026-09-20T06:27:45.802Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aaf7dc15df28d2705cf0125",
+    "title": "Article Archived",
+    "message": "\"Commercialization of Education: Opportunities and the Oppression of Knowledge Production\" was archived.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a586bc4ef912dd8a1fcab69"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-20T06:31:29.637Z",
+    "updatedAt": "2026-09-20T06:31:29.637Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab0c25194f6ede1e1761571",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6ab0c23294f6ede1e1761570",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a24eb0a254e27428cafec54",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-21T05:36:17.505Z",
+    "updatedAt": "2026-09-21T05:36:17.505Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab0c29094f6ede1e1761573",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6ab0c28094f6ede1e1761572",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a24eb0a254e27428cafec54",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-21T05:37:20.771Z",
+    "updatedAt": "2026-09-21T05:37:20.771Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab0c2c47833d1406dd9b7f2",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6ab0c2b694f6ede1e1761574",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a24eb0a254e27428cafec54",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-21T05:38:12.302Z",
+    "updatedAt": "2026-09-21T05:38:12.302Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab3ae3f82172aaaa2b5a1dd",
+    "title": "New Article Submission",
+    "message": "A new article \"“Wordsmith”\" is pending review.",
+    "type": "Approval",
+    "createdBy": "6ab3a7df29ce54fa9ebbcee9",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a9c460648e7376987e0162f"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-23T10:47:27.102Z",
+    "updatedAt": "2026-09-23T10:47:27.102Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab4a249e3b34d4d3a8aca85",
+    "title": "Article Updated",
+    "message": "\"The Last Message\" was updated.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a24eb0a254e27428cafec54"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-24T04:08:41.771Z",
+    "updatedAt": "2026-09-24T04:08:41.771Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab4a266e3b34d4d3a8aca86",
+    "title": "Article Updated",
+    "message": "\"The Hand That Slipped Away\" was updated.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-24T04:09:10.095Z",
+    "updatedAt": "2026-09-24T04:09:10.095Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab6659e4c80d1daf5c47035",
+    "title": "New Article Submission",
+    "message": "A new article \"Last piece of the puzzle\" is pending review.",
+    "type": "Approval",
+    "createdBy": "6ab65d2d00ba98cdc71f8dc6",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a9c460648e7376987e0162f"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-25T12:14:22.899Z",
+    "updatedAt": "2026-09-25T12:14:22.899Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab67ff2530e5bf23c7e146b",
+    "title": "New Like",
+    "message": "A new like was added to \"Two Parrots\".",
+    "type": "Article",
+    "createdBy": "6ab65d2d00ba98cdc71f8dc6",
+    "recipients": [
+      "6a985369ef80b5e768bf64ba"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-25T14:06:42.344Z",
+    "updatedAt": "2026-09-25T14:06:42.344Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab6803e530e5bf23c7e146c",
+    "title": "New Like",
+    "message": "A new like was added to \"The Hand That Slipped Away\".",
+    "type": "Article",
+    "createdBy": "6ab65d2d00ba98cdc71f8dc6",
+    "recipients": [
+      "6a24e3f3b3263d4f6315df52"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-25T14:07:58.946Z",
+    "updatedAt": "2026-09-25T14:07:58.946Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab6804d530e5bf23c7e146d",
+    "title": "New Like",
+    "message": "A new like was added to \"The Last Message\".",
+    "type": "Article",
+    "createdBy": "6ab65d2d00ba98cdc71f8dc6",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a24eb0a254e27428cafec54",
+      "6a16a850476f9fb6a3fa6693"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-25T14:08:13.433Z",
+    "updatedAt": "2026-09-25T14:08:13.433Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab7cff1b048eb53aa31f7b0",
+    "title": "New Article Submission",
+    "message": "A new article \"The 2026 Escalation: Operation Epic Fury\" is pending review.",
+    "type": "Approval",
+    "createdBy": "6ab7cdb9dcfae771e463cb3a",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a9c460648e7376987e0162f"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-26T14:00:17.603Z",
+    "updatedAt": "2026-09-26T14:00:17.603Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ab9eefd2d435e10a467dd0a",
+    "title": "New Article Submission",
+    "message": "A new article \"Seeking my lost soul.\" is pending review.",
+    "type": "Approval",
+    "createdBy": "6ab9ed22890d2e086688f1ee",
+    "recipients": [
+      "6a0fe9989ab55f3746cad410",
+      "6a16a850476f9fb6a3fa6693",
+      "6a9c460648e7376987e0162f"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-28T04:37:17.130Z",
+    "updatedAt": "2026-09-28T04:37:17.130Z",
+    "__v": 0
+  },
+  {
+    "_id": "6abbddd16b7d74f822e28ef1",
+    "title": "Article Published",
+    "message": "\"The Price of Love\" by Muhammed Hashir is now live.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a309b463501b277ce8ed676"
+    ],
+    "readBy": [],
+    "isGlobal": true,
+    "createdAt": "2026-09-29T15:48:33.980Z",
+    "updatedAt": "2026-09-29T15:48:33.980Z",
+    "__v": 0
+  },
+  {
+    "_id": "6abbddeeb6788120c651c14d",
+    "title": "Article Status Updated",
+    "message": "\"The Price of Love\" changed to Paused.",
+    "type": "Article",
+    "createdBy": "6a16a850476f9fb6a3fa6693",
+    "recipients": [
+      "6a309b463501b277ce8ed676"
+    ],
+    "readBy": [],
+    "isGlobal": false,
+    "createdAt": "2026-09-29T15:49:02.983Z",
+    "updatedAt": "2026-09-29T15:49:02.983Z",
+    "__v": 0
+  }
+]

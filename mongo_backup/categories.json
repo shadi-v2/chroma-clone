@@ -1,0 +1,58 @@
+[
+  {
+    "_id": "6a16edcd2209aef14cfd8ed4",
+    "name": "Story",
+    "slug": "story",
+    "createdAt": "2026-05-27T13:12:45.112Z",
+    "updatedAt": "2026-05-27T13:12:45.112Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a16edd22209aef14cfd8ed5",
+    "name": "Article",
+    "slug": "article",
+    "createdAt": "2026-05-27T13:12:50.696Z",
+    "updatedAt": "2026-05-27T13:12:50.696Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a16ee4e2209aef14cfd8ed8",
+    "name": "Travelogues",
+    "slug": "travelogues",
+    "createdAt": "2026-05-27T13:14:54.148Z",
+    "updatedAt": "2026-05-27T13:14:54.148Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a16ee582209aef14cfd8ed9",
+    "name": "Letters",
+    "slug": "letters",
+    "createdAt": "2026-05-27T13:15:04.622Z",
+    "updatedAt": "2026-06-01T04:24:52.556Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a16ee662209aef14cfd8eda",
+    "name": "Essays",
+    "slug": "essays",
+    "createdAt": "2026-05-27T13:15:18.242Z",
+    "updatedAt": "2026-05-27T13:15:18.242Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a16ee722209aef14cfd8edb",
+    "name": "Feature",
+    "slug": "feature",
+    "createdAt": "2026-05-27T13:15:30.475Z",
+    "updatedAt": "2026-05-27T13:15:30.475Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a16ee7b2209aef14cfd8edc",
+    "name": "Poetry",
+    "slug": "poetry",
+    "createdAt": "2026-05-27T13:15:39.877Z",
+    "updatedAt": "2026-05-27T13:15:39.877Z",
+    "__v": 0
+  }
+]
