@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
+import { connectDB, query, queryOne } from "@/lib/db";
 import { findUserByEmail, updateUser } from "@/lib/db/users";
 
 export async function POST(req: Request) {
@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     await connectDB();
 
     const body = await req.json();
-    const { email, newPassword, phone, dateOfBirth } = body;
+    const { email, code, newPassword } = body;
 
     if (!email || !newPassword) {
       return NextResponse.json(
@@ -23,32 +23,44 @@ export async function POST(req: Request) {
       );
     }
 
-    const user = await findUserByEmail(email.trim());
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Verify 6-digit OTP code
+    if (!code || typeof code !== "string" || code.trim().length !== 6) {
+      return NextResponse.json(
+        { message: "Please enter the 6-digit verification code sent to your email." },
+        { status: 400 },
+      );
+    }
+
+    const cleanCode = code.trim();
+
+    const verification = await queryOne<{
+      id: string;
+      email: string;
+      code: string;
+      expires_at: string | Date;
+    }>(
+      `SELECT * FROM email_verifications 
+       WHERE LOWER(email) = LOWER($1) AND code = $2 AND expires_at > NOW()
+       ORDER BY created_at DESC LIMIT 1`,
+      [cleanEmail, cleanCode],
+    );
+
+    if (!verification) {
+      return NextResponse.json(
+        { message: "Invalid or expired verification code. Please request a new code." },
+        { status: 400 },
+      );
+    }
+
+    const user = await findUserByEmail(cleanEmail);
 
     if (!user) {
       return NextResponse.json(
         { message: "No account found with this email address." },
         { status: 404 },
       );
-    }
-
-    // Optional verification if provided
-    if (phone && user.phone && user.phone.trim() !== phone.trim()) {
-      return NextResponse.json(
-        { message: "Phone number does not match our records." },
-        { status: 400 },
-      );
-    }
-
-    if (dateOfBirth && user.dateOfBirth) {
-      const inputDob = new Date(dateOfBirth).toISOString().split("T")[0];
-      const userDob = new Date(user.dateOfBirth).toISOString().split("T")[0];
-      if (inputDob !== userDob) {
-        return NextResponse.json(
-          { message: "Date of birth does not match our records." },
-          { status: 400 },
-        );
-      }
     }
 
     const updated = await updateUser(user.id || user._id, {
@@ -62,9 +74,15 @@ export async function POST(req: Request) {
       );
     }
 
+    // Clean up verification record
+    await query(
+      `DELETE FROM email_verifications WHERE LOWER(email) = LOWER($1)`,
+      [cleanEmail],
+    );
+
     return NextResponse.json({
       success: true,
-      message: "Password has been reset successfully. You can now sign in.",
+      message: "Password has been reset successfully! You can now sign in with your new password.",
     });
   } catch (error) {
     console.error("RESET PASSWORD ERROR:", error);
@@ -74,3 +92,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

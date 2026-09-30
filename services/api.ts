@@ -257,6 +257,26 @@ export const api = {
       return response;
     },
 
+    updatePosition: async (id: string, position: number | null): Promise<PublicArticle> => {
+      const res = await apiFetch(`${BASE_URL}/articles/reorder`, {
+        method: "PATCH",
+        body: JSON.stringify({ id, position }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to update article position");
+      return data;
+    },
+
+    reorder: async (positions: { id: string; position: number | null }[]): Promise<{ success: boolean; count: number }> => {
+      const res = await apiFetch(`${BASE_URL}/articles/reorder`, {
+        method: "PATCH",
+        body: JSON.stringify({ positions }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to reorder articles");
+      return data;
+    },
+
     like: (id: string) =>
       apiFetch(`${BASE_URL}/articles/${id}/like`, {
         method: "POST",

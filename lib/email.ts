@@ -91,6 +91,81 @@ export async function sendVerificationEmail(
   }
 }
 
+export async function sendPasswordResetOtpEmail(
+  email: string,
+  code: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const fromEmail = resolveFromEmail(process.env.RESEND_AUTH_FROM, "verify");
+
+    if (!resend) {
+      console.log(`\n=======================================================`);
+      console.log(`📧 [DEV / MOCK RESEND EMAIL] Password reset OTP for ${email}: ${code}`);
+      console.log(`From: Chroma Diaries Security <${fromEmail}>`);
+      console.log(`=======================================================\n`);
+      return { success: true };
+    }
+
+    const { error } = await resend.emails.send({
+      from: `Chroma Diaries Security <${fromEmail}>`,
+      to: [email],
+      subject: `Your Chroma Diaries Password Reset Code: ${code}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Reset your password</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #fcfbf7; margin: 0; padding: 40px 20px;">
+          <div style="max-width: 520px; margin: 0 auto; background-color: #ffffff; border-radius: 24px; border: 1px solid rgba(2, 44, 34, 0.08); padding: 40px; box-shadow: 0 10px 30px rgba(2, 44, 34, 0.05); text-align: center;">
+            <div style="display: inline-block; background-color: #022c22; color: #fcfbf7; font-family: Georgia, serif; font-weight: bold; font-size: 18px; padding: 10px 20px; border-radius: 12px; margin-bottom: 24px;">
+              CHROMA DIARIES
+            </div>
+            
+            <h1 style="font-family: Georgia, serif; color: #022c22; font-size: 26px; margin: 0 0 12px 0; font-weight: 700;">
+              Reset Your Password
+            </h1>
+            
+            <p style="color: #4b5563; font-size: 14px; line-height: 1.6; margin: 0 0 28px 0;">
+              We received a request to reset your Chroma Diaries account password. Please enter the following 6-digit verification code:
+            </p>
+            
+            <div style="background-color: #f7f9f8; border: 2px dashed #022c22; border-radius: 16px; padding: 20px; margin: 0 0 28px 0;">
+              <span style="font-family: monospace; font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #022c22; display: inline-block;">
+                ${code}
+              </span>
+            </div>
+            
+            <p style="color: #9ca3af; font-size: 12px; line-height: 1.5; margin: 0 0 20px 0;">
+              This code will expire in <strong>10 minutes</strong>. If you did not request this password reset, please ignore this email and your account remains safe.
+            </p>
+            
+            <div style="border-top: 1px solid rgba(2, 44, 34, 0.08); padding-top: 20px; font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1.5px;">
+              Chroma Diaries • Security & Authentication
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.error("Resend error sending password reset OTP:", error);
+      console.log(`📧 [RESEND FALLBACK LOG] Password reset OTP for ${email}: ${code}`);
+      return { success: true, error: error.message };
+    }
+
+    return { success: true };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown email error";
+    console.error("Error in sendPasswordResetOtpEmail:", err);
+    console.log(`📧 [RESEND FALLBACK LOG] Password reset OTP for ${email}: ${code}`);
+    return { success: true, error: message };
+  }
+}
+
 export async function sendNewsletterWelcomeEmail(
   email: string,
   unsubscribeToken: string,

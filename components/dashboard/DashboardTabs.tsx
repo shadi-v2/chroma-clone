@@ -24,6 +24,8 @@ import {
   ChevronRight,
   LogOut,
   Sparkles,
+  ArrowLeft,
+  Layers,
 } from "lucide-react";
 import type { DashboardTab, AdminStats } from "@/types/dashboard";
 import type { PublicArticle } from "@/types/article";
@@ -58,6 +60,10 @@ const TabLoadingFallback = () => (
 
 const AdminArticleManagement = dynamic(
   () => import("@/components/dashboard/AdminArticleManagment"),
+  { loading: () => <TabLoadingFallback /> },
+);
+const AdminArticleReorderDesk = dynamic(
+  () => import("@/components/dashboard/AdminArticleReorderDesk"),
   { loading: () => <TabLoadingFallback /> },
 );
 const AdminCategoryManagement = dynamic(
@@ -158,6 +164,11 @@ export default function DashboardTabs({
               ...(isAdminRole(user.role)
                 ? [
                     {
+                      id: "public-order" as DashboardTab,
+                      label: "Showcase Ordering",
+                      icon: Layers,
+                    },
+                    {
                       id: "category-management" as DashboardTab,
                       label: "Categories & Tags",
                       icon: Tag,
@@ -215,6 +226,8 @@ export default function DashboardTabs({
         return "Author Studio & Submissions";
       case "all-articles":
         return "Global Article Control & Moderation";
+      case "public-order":
+        return "Public Showcase Order (Drag & Drop)";
       case "category-management":
         return "Category & Tag Architecture";
       case "deleted-articles":
@@ -242,6 +255,17 @@ export default function DashboardTabs({
     return (
       <div className="font-sans min-h-screen bg-cream-50">
         <main className="container mx-auto px-6 sm:px-12 py-12 md:py-20 max-w-7xl">
+          {/* BACK TO MAGAZINE NAVIGATION */}
+          <div className="mb-8">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-950/5 text-emerald-950 font-bold text-xs uppercase tracking-widest hover:bg-emerald-950/10 transition-all border border-emerald-950/10 group active:scale-95 shadow-xs"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+              <span>Back to Magazine</span>
+            </Link>
+          </div>
+
           {/* AUTHOR HEADER */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 sm:mb-16 gap-8">
             <div>
@@ -883,6 +907,13 @@ export default function DashboardTabs({
           {activeTab === "all-articles" && (
             <div className="animate-fade-in">
               <AdminArticleManagement currentUser={user} />
+            </div>
+          )}
+
+          {/* TAB: PUBLIC SHOWCASE ORDER (DRAG & DROP) */}
+          {activeTab === "public-order" && (
+            <div className="animate-fade-in">
+              <AdminArticleReorderDesk />
             </div>
           )}
 

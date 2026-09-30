@@ -62,9 +62,44 @@ export default function AuthForm() {
 
   const [resetData, setResetData] = useState({
     email: "",
+    code: "",
     newPassword: "",
     confirmPassword: "",
   });
+  const [isSendingResetCode, setIsSendingResetCode] = useState(false);
+  const [resetCodeSent, setResetCodeSent] = useState(false);
+
+  // Handle Send Reset Code via Resend
+  const handleSendResetCode = async () => {
+    if (!resetData.email || !resetData.email.includes("@")) {
+      setError("Please enter your registered email address first.");
+      return;
+    }
+
+    setIsSendingResetCode(true);
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resetData.email.trim() }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to send reset code.");
+      }
+
+      setResetCodeSent(true);
+      setSuccessMessage(data.message || "A 6-digit reset code was sent to your email!");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send reset code.");
+    } finally {
+      setIsSendingResetCode(false);
+    }
+  };
 
   // Handle Send Verification Code via Resend
   const handleSendCode = async () => {
@@ -192,8 +227,26 @@ export default function AuthForm() {
           setError(response.message || "Registration failed");
         }
       } else if (mode === "forgot") {
+        if (!resetData.email || !resetData.email.includes("@")) {
+          setError("Please enter your registered email address.");
+          setIsLoading(false);
+          return;
+        }
+
+        if (!resetData.code || resetData.code.trim().length !== 6) {
+          setError("Please enter the 6-digit verification code sent to your email.");
+          setIsLoading(false);
+          return;
+        }
+
+        if (resetData.newPassword.length < 6) {
+          setError("Password must be at least 6 characters long.");
+          setIsLoading(false);
+          return;
+        }
+
         if (resetData.newPassword !== resetData.confirmPassword) {
-          setError("Passwords do not match");
+          setError("Passwords do not match.");
           setIsLoading(false);
           return;
         }
@@ -204,8 +257,9 @@ export default function AuthForm() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: resetData.email,
-            newPassword: resetData.newPassword,
+            email: resetData.email.trim(),
+            code: resetData.code.trim(),
+            newPassword: resetData.newPassword.trim(),
           }),
         });
 
@@ -215,8 +269,13 @@ export default function AuthForm() {
           throw new Error(data.message || "Failed to reset password");
         }
 
-        setSuccessMessage(data.message || "Password has been reset successfully. Please sign in.");
-        setResetData({ email: "", newPassword: "", confirmPassword: "" });
+        setSuccessMessage(data.message || "Password has been reset successfully! Please sign in.");
+        setResetData({ email: "", code: "", newPassword: "", confirmPassword: "" });
+        setResetCodeSent(false);
+        setTimeout(() => {
+          setMode("login");
+          setError("");
+        }, 2000);
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -453,18 +512,63 @@ export default function AuthForm() {
           </>
         ) : (
           <>
-            <Input
-              type="email"
-              icon={Mail}
-              placeholder="Your Registered Email"
-              value={resetData.email}
-              onChange={(value) =>
-                setResetData((prev) => ({
-                  ...prev,
-                  email: value,
-                }))
-              }
-            />
+            <div className="space-y-2">
+              <div className="relative">
+                <Input
+                  type="email"
+                  icon={Mail}
+                  placeholder="Your Registered Email"
+                  value={resetData.email}
+                  onChange={(value) =>
+                    setResetData((prev) => ({
+                      ...prev,
+                      email: value,
+                    }))
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={handleSendResetCode}
+                  disabled={isSendingResetCode}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-emerald-950 text-cream-50 rounded-xl text-[11px] font-bold uppercase tracking-wider hover:bg-emerald-900 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {isSendingResetCode ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <>
+                      <Send className="w-3 h-3" />
+                      <span>{resetCodeSent ? "Resend OTP" : "Send Reset OTP"}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {resetCodeSent && (
+                <div className="p-3.5 bg-emerald-950/5 border border-emerald-950/10 rounded-2xl space-y-2 animate-in fade-in">
+                  <div className="flex items-center justify-between text-[11px] text-emerald-950/70 font-medium">
+                    <span className="flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-800" />
+                      Enter 6-digit code sent to your email:
+                    </span>
+                  </div>
+
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="e.g. 123456"
+                    value={resetData.code}
+                    onChange={(e) =>
+                      setResetData((prev) => ({
+                        ...prev,
+                        code: e.target.value.replace(/\D/g, ""),
+                      }))
+                    }
+                    className="w-full bg-white border border-emerald-950/15 rounded-xl px-4 py-2 text-center font-mono font-bold text-base tracking-widest outline-none focus:ring-2 focus:ring-emerald-950/15"
+                    required
+                  />
+                </div>
+              )}
+            </div>
 
             <Input
               type="password"

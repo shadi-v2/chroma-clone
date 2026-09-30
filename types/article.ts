@@ -36,6 +36,7 @@ export interface PublicArticle {
   viewedBy?: string[];
   reads: number;
   assignedEditor?: string | PublicUser;
+  position?: number | null;
   deletedAt?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -51,6 +52,7 @@ export interface CreateArticlePayload {
   tags?: string[];
   readTime?: string;
   authorId?: string;
+  position?: number | null;
 }
 
 export interface UpdateArticlePayload {
@@ -64,6 +66,7 @@ export interface UpdateArticlePayload {
   readTime?: string;
   status?: ArticleStatus;
   authorId?: string;
+  position?: number | null;
 }
 
 export interface ArticleQueryParams {
@@ -74,7 +77,7 @@ export interface ArticleQueryParams {
   search?: string;
   author?: string;
   tags?: string[];
-  sortBy?: "likes" | "latest";
+  sortBy?: "likes" | "latest" | "position";
 }
 
 export interface CommentPayload {
@@ -117,6 +120,7 @@ export interface PopulatedArticle {
   bookmarksCount: number;
   bookmarkedBy: string[];
   reads: number;
+  position?: number | null;
   deletedAt?: string;
   createdAt: string;
   updatedAt: string;

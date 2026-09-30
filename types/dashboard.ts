@@ -5,6 +5,7 @@ export type DashboardTab =
   | "my-studio"
   | "user-management"
   | "all-articles"
+  | "public-order"
   | "category-management"
   | "deleted-articles"
   | "notifications"

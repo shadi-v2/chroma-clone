@@ -72,10 +72,13 @@ CREATE TABLE IF NOT EXISTS articles (
   bookmarks_count INTEGER NOT NULL DEFAULT 0,
   reads INTEGER NOT NULL DEFAULT 0,
   assigned_editor_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  position INTEGER DEFAULT NULL,
   deleted_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS position INTEGER DEFAULT NULL;
 
 CREATE TABLE IF NOT EXISTS article_enrollments (
   article_id TEXT NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
@@ -188,6 +191,7 @@ CREATE INDEX IF NOT EXISTS idx_articles_author_id ON articles(author_id);
 CREATE INDEX IF NOT EXISTS idx_articles_category_id ON articles(category_id);
 CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
 CREATE INDEX IF NOT EXISTS idx_articles_deleted_at ON articles(deleted_at);
+CREATE INDEX IF NOT EXISTS idx_articles_position ON articles(position);
 CREATE INDEX IF NOT EXISTS idx_articles_created_at ON articles(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_article_views_user ON article_views(user_id);
 CREATE INDEX IF NOT EXISTS idx_comments_article_id ON comments(article_id);

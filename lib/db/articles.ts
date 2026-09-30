@@ -19,6 +19,7 @@ export interface DbArticleRow {
   bookmarks_count: number;
   reads: number;
   assigned_editor_id: string | null;
+  position?: number | null;
   deleted_at: string | Date | null;
   created_at: string | Date;
   updated_at: string | Date;
@@ -101,6 +102,10 @@ export function formatArticle(row: DbArticleRow | null): PublicArticle | null {
     bookmarksCount: Number(row.bookmarks_count || 0),
     reads: Number(row.reads || 0),
     assignedEditor,
+    position:
+      row.position !== undefined && row.position !== null
+        ? Number(row.position)
+        : null,
     enrolledBy: Array.isArray(row.enrolled_by) ? row.enrolled_by : [],
     likedBy: Array.isArray(row.liked_by) ? row.liked_by : [],
     bookmarkedBy: Array.isArray(row.bookmarked_by) ? row.bookmarked_by : [],
@@ -159,7 +164,7 @@ export async function findArticles(options: {
   category?: string | null;
   author?: string | null;
   status?: string | null;
-  sortBy?: "likes" | "latest" | null;
+  sortBy?: "likes" | "latest" | "position" | null;
   page?: number;
   limit?: number;
   includeDeleted?: boolean;
@@ -217,9 +222,11 @@ export async function findArticles(options: {
 
   const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : "";
 
-  let orderClause = `ORDER BY a.updated_at DESC`;
+  let orderClause = `ORDER BY a.position ASC NULLS LAST, a.updated_at DESC, a.created_at DESC`;
   if (options.sortBy === "likes") {
-    orderClause = `ORDER BY a.likes DESC, a.updated_at DESC`;
+    orderClause = `ORDER BY a.likes DESC, a.position ASC NULLS LAST, a.updated_at DESC`;
+  } else if (options.sortBy === "position") {
+    orderClause = `ORDER BY a.position ASC NULLS LAST, a.updated_at DESC`;
   }
 
   const countQuery = `
@@ -263,18 +270,20 @@ export async function createArticle(data: {
   readTime?: string;
   status?: ArticleStatus;
   tags?: string[];
+  position?: number | null;
 }): Promise<PublicArticle> {
   const status = data.status || "Pending";
   const thumbnail = data.thumbnail || data.featuredImage || null;
   const featuredImage = data.featuredImage || data.thumbnail || null;
   const readTime = data.readTime || "5 min read";
   const tags = data.tags || [];
+  const position = data.position !== undefined ? data.position : null;
 
   const created = await queryOne<DbArticleRow>(
     `INSERT INTO articles (
        title, excerpt, content, author_id, category_id,
-       thumbnail, featured_image, read_time, status, tags
-     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       thumbnail, featured_image, read_time, status, tags, position
+     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      RETURNING id`,
     [
       data.title,
@@ -287,6 +296,7 @@ export async function createArticle(data: {
       readTime,
       status,
       tags,
+      position,
     ],
   );
 
@@ -312,6 +322,7 @@ export async function updateArticle(id: string, data: Partial<{
   readTime: string;
   status: ArticleStatus;
   assignedEditorId: string | null;
+  position: number | null;
   deletedAt: Date | null;
   tags: string[];
   authorId: string;
@@ -356,6 +367,10 @@ export async function updateArticle(id: string, data: Partial<{
     fields.push(`assigned_editor_id = $${idx++}`);
     values.push(data.assignedEditorId);
   }
+  if (data.position !== undefined) {
+    fields.push(`position = $${idx++}`);
+    values.push(data.position);
+  }
   if (data.deletedAt !== undefined) {
     fields.push(`deleted_at = $${idx++}`);
     values.push(data.deletedAt);
@@ -380,6 +395,28 @@ export async function updateArticle(id: string, data: Partial<{
   );
 
   return findArticleById(id);
+}
+
+export async function updateArticlePosition(
+  id: string,
+  position: number | null,
+): Promise<PublicArticle | null> {
+  await query(
+    `UPDATE articles SET position = $1, updated_at = NOW() WHERE id = $2`,
+    [position, id],
+  );
+  return findArticleById(id);
+}
+
+export async function reorderArticles(
+  positions: { id: string; position: number | null }[],
+): Promise<void> {
+  for (const item of positions) {
+    await query(
+      `UPDATE articles SET position = $1, updated_at = NOW() WHERE id = $2`,
+      [item.position, item.id],
+    );
+  }
 }
 
 export async function softDeleteArticle(id: string): Promise<boolean> {

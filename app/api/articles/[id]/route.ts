@@ -115,6 +115,7 @@ export async function PUT(
       readTime,
       tags,
       authorId: requestedAuthorId,
+      position,
     } = body;
 
     const categoryId = categoryInput
@@ -124,6 +125,11 @@ export async function PUT(
     let updateAuthorId: string | undefined = undefined;
     if (requestedAuthorId && isAdminRole(auth.user.role)) {
       updateAuthorId = requestedAuthorId;
+    }
+
+    let updatePosition: number | null | undefined = undefined;
+    if (position !== undefined && isAdminRole(auth.user.role)) {
+      updatePosition = position === null || position === "" ? null : Number(position);
     }
 
     const updatedArticle = await updateArticle(id, {
@@ -136,6 +142,7 @@ export async function PUT(
       readTime,
       tags: Array.isArray(tags) ? tags : undefined,
       authorId: updateAuthorId,
+      position: updatePosition,
     });
 
     return NextResponse.json(updatedArticle);

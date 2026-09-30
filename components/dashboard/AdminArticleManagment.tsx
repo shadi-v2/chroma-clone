@@ -6,6 +6,7 @@ import type { ArticleStatus } from "@/types/article";
 import { api } from "@/services/api";
 
 import AdminArticleActions from "./AdminArticleActions";
+import AdminPublicOrderModal from "./AdminPublicOrderModal";
 import {
   Edit,
   Loader,
@@ -15,6 +16,7 @@ import {
   ArrowDown,
   RotateCcw,
   Sparkles,
+  Layers,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -56,7 +58,8 @@ type SortField =
   | "author"
   | "status"
   | "reads"
-  | "likes";
+  | "likes"
+  | "position";
 
 type SortDirection = "asc" | "desc";
 
@@ -81,11 +84,14 @@ export default function AdminArticleManagement({
     null,
   );
 
+  const [showOrderModal, setShowOrderModal] = useState(false);
+
   // Filters state
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedEditor, setSelectedEditor] = useState<string>("all");
+  const [onlyPositioned, setOnlyPositioned] = useState<boolean>(false);
 
   // Sorting state
   const [sortField, setSortField] = useState<SortField>("updatedAt");
@@ -164,6 +170,38 @@ export default function AdminArticleManagement({
     }
   };
 
+  const handlePositionChange = async (
+    articleId: string,
+    newPosition: number | null,
+  ) => {
+    setUpdatingArticleId(articleId);
+
+    try {
+      const updatedArticle = await api.articles.updatePosition(
+        articleId,
+        newPosition,
+      );
+
+      setArticles((prev) =>
+        prev.map((article) =>
+          article._id === articleId
+            ? {
+                ...article,
+                position:
+                  updatedArticle.position !== undefined
+                    ? updatedArticle.position
+                    : newPosition,
+              }
+            : article,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to update article position:", error);
+    } finally {
+      setUpdatingArticleId(null);
+    }
+  };
+
   const handleAssignEditor = async (articleId: string, editorId: string) => {
     await updateArticle(articleId, {
       assignedEditor: editorId || null,
@@ -183,7 +221,11 @@ export default function AdminArticleManagement({
       setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
       setSortField(field);
-      setSortDirection(field === "title" || field === "author" ? "asc" : "desc");
+      setSortDirection(
+        field === "title" || field === "author" || field === "position"
+          ? "asc"
+          : "desc",
+      );
     }
   };
 
@@ -192,6 +234,7 @@ export default function AdminArticleManagement({
     setSelectedStatus("all");
     setSelectedCategory("all");
     setSelectedEditor("all");
+    setOnlyPositioned(false);
     setSortField("updatedAt");
     setSortDirection("desc");
   };
@@ -200,7 +243,8 @@ export default function AdminArticleManagement({
     searchQuery.trim() !== "" ||
     selectedStatus !== "all" ||
     selectedCategory !== "all" ||
-    selectedEditor !== "all";
+    selectedEditor !== "all" ||
+    onlyPositioned;
 
   // Filter and sort articles
   const filteredAndSortedArticles = useMemo(() => {
@@ -214,6 +258,17 @@ export default function AdminArticleManagement({
         if (
           String(editorId) !== String(currentUser?._id) ||
           article.status === "Published"
+        ) {
+          return false;
+        }
+      }
+
+      // Positioned filter
+      if (onlyPositioned) {
+        if (
+          article.position === null ||
+          article.position === undefined ||
+          article.position <= 0
         ) {
           return false;
         }
@@ -269,6 +324,18 @@ export default function AdminArticleManagement({
     result.sort((a, b) => {
       let comparison = 0;
       switch (sortField) {
+        case "position": {
+          const posA =
+            a.position !== null && a.position !== undefined && a.position > 0
+              ? a.position
+              : 999999;
+          const posB =
+            b.position !== null && b.position !== undefined && b.position > 0
+              ? b.position
+              : 999999;
+          comparison = posA - posB;
+          break;
+        }
         case "title":
           comparison = (a.title || "").localeCompare(b.title || "");
           break;
@@ -309,6 +376,7 @@ export default function AdminArticleManagement({
     articles,
     isEditor,
     currentUser?._id,
+    onlyPositioned,
     searchQuery,
     selectedStatus,
     selectedCategory,
@@ -386,11 +454,23 @@ export default function AdminArticleManagement({
               {isEditor ? "My Assigned Edits" : "Article Control & Management"}
             </h2>
             <p className="text-emerald-950/40 text-sm mt-1">
-              Filter, sort, assign editors, and edit article statuses across the publication.
+              Filter, sort, assign editors, adjust public showcase order, and edit article statuses.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
+            {!isEditor && (
+              <button
+                type="button"
+                onClick={() => setShowOrderModal(true)}
+                className="px-4 py-2.5 bg-emerald-950 hover:bg-emerald-900 text-cream-50 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                title="Organize homepage showcase and public sequence"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Organize Public Order</span>
+              </button>
+            )}
+
             <span className="text-xs font-bold uppercase tracking-widest text-emerald-950/40 bg-emerald-950/5 px-4 py-2 rounded-full">
               {filteredAndSortedArticles.length} of {articles.length} pieces
             </span>
@@ -454,6 +534,9 @@ export default function AdminArticleManagement({
               }}
               className="w-full px-4 py-3 bg-cream-50 border border-emerald-950/10 rounded-2xl text-xs font-semibold text-emerald-950 focus:outline-none focus:ring-2 focus:ring-emerald-950/10 cursor-pointer"
             >
+              {!isEditor && (
+                <option value="position-asc">Sort: Public Position (1, 2, 3...)</option>
+              )}
               <option value="updatedAt-desc">Sort: Latest Updated</option>
               <option value="updatedAt-asc">Sort: Oldest Updated</option>
               <option value="createdAt-desc">Sort: Latest Created</option>
@@ -490,15 +573,45 @@ export default function AdminArticleManagement({
               onClick={() => {
                 setSelectedStatus("all");
                 setSelectedEditor("all");
+                setOnlyPositioned(false);
               }}
               className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
-                selectedStatus === "all" && selectedEditor === "all"
+                selectedStatus === "all" && selectedEditor === "all" && !onlyPositioned
                   ? "bg-emerald-950 text-cream-50 border-emerald-950 shadow-sm"
                   : "bg-emerald-950/5 text-emerald-950/60 border-emerald-950/5 hover:bg-emerald-950/10"
               }`}
             >
               All Pieces ({articles.length})
             </button>
+
+            {!isEditor && (
+              <button
+                onClick={() => setOnlyPositioned((prev) => !prev)}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+                  onlyPositioned
+                    ? "bg-emerald-950 text-cream-50 border-emerald-950 shadow-sm"
+                    : "bg-emerald-950/5 text-emerald-950/70 border-emerald-950/5 hover:bg-emerald-950/10"
+                }`}
+              >
+                <span>Publicly Positioned</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                    onlyPositioned
+                      ? "bg-cream-50/20 text-cream-50"
+                      : "bg-emerald-950/10 text-emerald-950"
+                  }`}
+                >
+                  {
+                    articles.filter(
+                      (a) =>
+                        a.position !== null &&
+                        a.position !== undefined &&
+                        a.position > 0,
+                    ).length
+                  }
+                </span>
+              </button>
+            )}
 
             {filterSuggestions.map((suggestion) => {
               const isActive =
@@ -510,6 +623,7 @@ export default function AdminArticleManagement({
                 <button
                   key={suggestion.label}
                   onClick={() => {
+                    setOnlyPositioned(false);
                     if (suggestion.type === "status") {
                       setSelectedStatus(isActive ? "all" : suggestion.value);
                     } else if (suggestion.type === "editor") {
@@ -548,7 +662,7 @@ export default function AdminArticleManagement({
             <tr className="bg-emerald-950/2 text-emerald-950/40 text-[10px] uppercase tracking-[0.2em] font-bold border-b border-emerald-950/5">
               <th
                 onClick={() => handleSortToggle("title")}
-                className="w-[32%] px-10 py-6 cursor-pointer select-none hover:text-emerald-950 transition-colors"
+                className="w-[30%] px-10 py-6 cursor-pointer select-none hover:text-emerald-950 transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <span>Piece & Title</span>
@@ -566,7 +680,7 @@ export default function AdminArticleManagement({
 
               <th
                 onClick={() => handleSortToggle("author")}
-                className="w-[18%] px-6 py-6 cursor-pointer select-none hover:text-emerald-950 transition-colors"
+                className="w-[16%] px-6 py-6 cursor-pointer select-none hover:text-emerald-950 transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <span>Author</span>
@@ -584,7 +698,7 @@ export default function AdminArticleManagement({
 
               <th
                 onClick={() => handleSortToggle("status")}
-                className="w-[18%] px-6 py-6 text-center cursor-pointer select-none hover:text-emerald-950 transition-colors"
+                className="w-[16%] px-6 py-6 text-center cursor-pointer select-none hover:text-emerald-950 transition-colors"
               >
                 <div className="flex items-center justify-center gap-2">
                   <span>Status (Editable)</span>
@@ -601,14 +715,34 @@ export default function AdminArticleManagement({
               </th>
 
               {!isEditor && (
-                <th className="w-[18%] px-6 py-6 text-center">
+                <th
+                  onClick={() => handleSortToggle("position")}
+                  className="w-[12%] px-4 py-6 text-center cursor-pointer select-none hover:text-emerald-950 transition-colors"
+                >
+                  <div className="flex items-center justify-center gap-1.5">
+                    <span>Public Pos</span>
+                    {sortField === "position" ? (
+                      sortDirection === "asc" ? (
+                        <ArrowUp className="w-3.5 h-3.5 text-emerald-950" />
+                      ) : (
+                        <ArrowDown className="w-3.5 h-3.5 text-emerald-950" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="w-3.5 h-3.5 opacity-30" />
+                    )}
+                  </div>
+                </th>
+              )}
+
+              {!isEditor && (
+                <th className="w-[14%] px-6 py-6 text-center">
                   Assigned Editor
                 </th>
               )}
 
               <th
                 onClick={() => handleSortToggle("updatedAt")}
-                className="w-[14%] px-6 py-6 text-center cursor-pointer select-none hover:text-emerald-950 transition-colors"
+                className="w-[12%] px-6 py-6 text-center cursor-pointer select-none hover:text-emerald-950 transition-colors"
               >
                 <div className="flex items-center justify-center gap-2">
                   <span>Updated</span>
@@ -624,7 +758,7 @@ export default function AdminArticleManagement({
                 </div>
               </th>
 
-              <th className="w-[12%] px-10 py-6 text-center">
+              <th className="w-[10%] px-8 py-6 text-center">
                 Actions
               </th>
             </tr>
@@ -634,7 +768,7 @@ export default function AdminArticleManagement({
             {filteredAndSortedArticles.length === 0 ? (
               <tr>
                 <td
-                  colSpan={isEditor ? 5 : 6}
+                  colSpan={isEditor ? 5 : 7}
                   className="px-10 py-16 text-center text-emerald-950/40"
                 >
                   <p className="font-serif text-lg font-medium text-emerald-950/60 mb-2">
@@ -731,6 +865,40 @@ export default function AdminArticleManagement({
                     </div>
                   </td>
 
+                  {/* PUBLIC POSITION */}
+                  {!isEditor && (
+                    <td className="px-4 py-6 text-center">
+                      <div className="inline-flex items-center justify-center gap-1 bg-cream-50 border border-emerald-950/10 rounded-xl px-2 py-1 shadow-xs">
+                        <span className="text-[10px] font-bold text-emerald-950/40">#</span>
+                        <input
+                          type="number"
+                          min="1"
+                          max="999"
+                          placeholder="-"
+                          value={article.position !== null && article.position !== undefined ? article.position : ""}
+                          onChange={(e) => {
+                            const val = e.target.value.trim();
+                            const num = val === "" ? null : parseInt(val, 10);
+                            handlePositionChange(article._id, isNaN(num as number) ? null : num);
+                          }}
+                          disabled={updatingArticleId === article._id}
+                          className="w-10 text-center text-xs font-bold text-emerald-950 bg-transparent focus:outline-none focus:ring-1 focus:ring-emerald-950/20 rounded"
+                          title="Set public showcase position (1 = frontpage hero)"
+                        />
+                        {article.position !== null && article.position !== undefined && (
+                          <button
+                            type="button"
+                            onClick={() => handlePositionChange(article._id, null)}
+                            className="text-[10px] text-emerald-950/40 hover:text-red-600 font-bold px-0.5 transition-colors cursor-pointer"
+                            title="Clear position"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
+
                   {/* ASSIGNED EDITOR */}
                   {!isEditor && (
                     <td className="px-6 py-6">
@@ -770,7 +938,7 @@ export default function AdminArticleManagement({
                   </td>
 
                   {/* ACTIONS */}
-                  <td className="px-10 py-6">
+                  <td className="px-8 py-6">
                     <div className="flex justify-center items-center gap-2">
                       <Link
                         href={`/edit-piece/${article._id}`}
@@ -824,6 +992,14 @@ export default function AdminArticleManagement({
           </button>
         )}
       </div>
+
+      {/* PUBLIC ORDER ORGANIZER MODAL */}
+      <AdminPublicOrderModal
+        isOpen={showOrderModal}
+        onClose={() => setShowOrderModal(false)}
+        articles={articles}
+        onOrderSaved={(updated) => setArticles(updated)}
+      />
     </div>
   );
 }
