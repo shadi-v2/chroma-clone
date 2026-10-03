@@ -8,6 +8,7 @@ import {
 } from "@/lib/db/articles";
 import { resolveCategoryId } from "@/lib/db/categories";
 import { isAdminRole } from "@/lib/roles";
+import { sendNewArticlePublishedBroadcast } from "@/lib/email";
 
 export async function GET(
   req: Request,
@@ -132,6 +133,9 @@ export async function PUT(
       updatePosition = position === null || position === "" ? null : Number(position);
     }
 
+    const requestedStatus = body.status;
+    const isNewPublish = requestedStatus === "Published" && article.status !== "Published";
+
     const updatedArticle = await updateArticle(id, {
       title,
       excerpt,
@@ -140,10 +144,17 @@ export async function PUT(
       thumbnail: thumbnail || featuredImage,
       featuredImage: featuredImage || thumbnail,
       readTime,
+      status: requestedStatus || undefined,
       tags: Array.isArray(tags) ? tags : undefined,
       authorId: updateAuthorId,
       position: updatePosition,
     });
+
+    if (isNewPublish && updatedArticle) {
+      sendNewArticlePublishedBroadcast(updatedArticle).catch((err) =>
+        console.error("Failed to broadcast new article publication email:", err),
+      );
+    }
 
     return NextResponse.json(updatedArticle);
   } catch (error) {

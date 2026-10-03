@@ -1,4 +1,5 @@
 import { query, queryOne } from "@/lib/db";
+import { sendNotificationEmailToRecipients } from "@/lib/email";
 
 export type NotificationType =
   | "General"
@@ -122,6 +123,17 @@ export async function createDbNotification(data: {
         }
       }
     }
+    // Trigger email delivery for the notification in the background
+    sendNotificationEmailToRecipients({
+      title: data.title,
+      message: data.message,
+      type,
+      recipients: data.recipients,
+      isGlobal,
+    }).catch((emailErr) => {
+      console.error("Failed to dispatch notification email:", emailErr);
+    });
+
     return findNotificationById(row.id);
   }
 
