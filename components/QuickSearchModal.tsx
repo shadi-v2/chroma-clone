@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, X } from "lucide-react";
@@ -16,10 +17,15 @@ export default function QuickSearchModal({
   isOpen,
   onClose,
 }: QuickSearchModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<PublicArticle[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -75,10 +81,10 @@ export default function QuickSearchModal({
     onClose();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-9999 w-screen h-screen min-h-screen bg-white overflow-hidden flex flex-col animate-in fade-in duration-200">
+  const modalContent = (
+    <div className="fixed inset-0 z-[99999] w-screen h-screen min-h-screen bg-white overflow-hidden flex flex-col animate-in fade-in duration-200">
       <div className="w-full h-full max-w-6xl mx-auto px-6 md:px-12 flex flex-col">
         {/* HEADER */}
         <div className="flex justify-between items-center py-6 md:py-8 shrink-0">
@@ -228,4 +234,6 @@ export default function QuickSearchModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

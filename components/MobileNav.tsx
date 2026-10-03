@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -16,6 +17,8 @@ import {
   HelpCircle,
   Mail,
   Search,
+  Feather,
+  Compass,
 } from "lucide-react";
 import { logout } from "@/lib/logout";
 import type { PublicUser } from "@/types/user";
@@ -27,104 +30,104 @@ interface MobileNavProps {
 
 export default function MobileNav({ user, onOpenSearch }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(true);
   const [aboutOpen, setAboutOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
     } else {
       document.body.style.overflow = "";
+      document.body.style.touchAction = "";
     }
     return () => {
       document.body.style.overflow = "";
+      document.body.style.touchAction = "";
     };
   }, [isOpen]);
 
   const categories = [
-    { name: "Feature Articles", path: "/?category=Feature" },
-    { name: "Essays", path: "/?category=Essays" },
-    { name: "Stories", path: "/?category=Story" },
-    { name: "Poems", path: "/?category=Poetry" },
-    { name: "Translations", path: "/?category=Translations" },
-    { name: "Reviews", path: "/?category=Reviews" },
-    { name: "Travelogues", path: "/?category=Travelogues" },
-    { name: "Letters", path: "/?category=Letters" },
+    { name: "Feature Articles", path: "/?category=feature" },
+    { name: "Essays", path: "/?category=essays" },
+    { name: "Stories", path: "/?category=story" },
+    { name: "Poetry", path: "/?category=poetry" },
+    { name: "Philosophy", path: "/?category=philosophy" },
+    { name: "Travelogues", path: "/?category=travelogues" },
+    { name: "Letters", path: "/?category=letters" },
+    { name: "Translations", path: "/?category=translations" },
+    { name: "Reviews", path: "/?category=reviews" },
   ];
 
   const handleClose = () => {
     setIsOpen(false);
   };
 
-  return (
-    <div className="lg:hidden flex items-center gap-2">
-      {/* Quick Search Icon on Mobile */}
-      <button
-        onClick={onOpenSearch}
-        className="p-2.5 rounded-full text-emerald-950/70 hover:text-emerald-950 hover:bg-emerald-950/5 transition-colors cursor-pointer"
-        aria-label="Open Search"
-      >
-        <Search className="w-5 h-5" />
-      </button>
+  const handleToggle = () => {
+    setIsOpen((prev) => !prev);
+  };
 
-      {/* Hamburger Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="p-2.5 rounded-full text-emerald-950/80 hover:text-emerald-950 hover:bg-emerald-950/5 transition-colors cursor-pointer"
-        aria-label="Open mobile navigation menu"
-      >
-        <Menu className="w-6 h-6" />
-      </button>
-
-      {/* Slide-over Drawer Backdrop */}
+  const drawerContent = (
+    <div className="lg:hidden">
+      {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-100 bg-emerald-950/60 backdrop-blur-sm animate-in fade-in duration-300"
+          className="fixed inset-0 z-[9998] bg-emerald-950/70 backdrop-blur-xs transition-opacity duration-300"
           onClick={handleClose}
+          aria-hidden="true"
         />
       )}
 
-      {/* Sliding Drawer Container */}
+      {/* Drawer Panel */}
       <div
-        className={`fixed top-0 right-0 bottom-0 z-101 w-full max-w-sm bg-cream-50 text-emerald-950 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 bottom-0 z-[9999] w-full max-w-[340px] sm:max-w-sm bg-cream-50 text-emerald-950 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile Navigation"
       >
         {/* Drawer Header */}
-        <div className="flex items-center justify-between p-6 border-b border-emerald-950/10 bg-white/60 backdrop-blur-md">
+        <div className="flex items-center justify-between p-5 border-b border-emerald-950/10 bg-white/80 backdrop-blur-md shrink-0">
           <Link href="/" onClick={handleClose} className="flex items-center gap-3">
             <Image
               src="/logo.png"
               alt="Chroma Diaries"
-              width={120}
-              height={40}
-              className="h-10 w-auto"
+              width={130}
+              height={45}
+              className="h-9 w-auto object-contain"
             />
           </Link>
           <button
+            type="button"
             onClick={handleClose}
-            className="p-2 rounded-full text-emerald-950/60 hover:text-emerald-950 hover:bg-emerald-950/5 transition-colors cursor-pointer"
+            className="p-2.5 rounded-full bg-emerald-950/5 hover:bg-emerald-950 hover:text-white text-emerald-950/70 transition-all cursor-pointer"
             aria-label="Close menu"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* User Card inside mobile menu */}
+        {/* User Card */}
         {user ? (
-          <div className="p-6 bg-white/80 border-b border-emerald-950/5 flex items-center justify-between gap-4">
+          <div className="p-4 bg-white border-b border-emerald-950/10 flex items-center justify-between gap-3 shrink-0">
             <div className="flex items-center gap-3 min-w-0">
               {user.avatar ? (
                 <Image
                   src={user.avatar}
                   alt={user.firstName}
-                  width={44}
-                  height={44}
-                  className="w-11 h-11 rounded-full object-cover border border-emerald-950/10"
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-full object-cover border border-emerald-950/10"
                 />
               ) : (
-                <div className="w-11 h-11 rounded-full bg-emerald-950 text-cream-50 flex items-center justify-center font-bold text-sm">
+                <div className="w-10 h-10 rounded-full bg-emerald-950 text-cream-50 flex items-center justify-center font-bold text-sm">
                   {user.firstName[0]?.toUpperCase() || "?"}
                 </div>
               )}
@@ -132,149 +135,166 @@ export default function MobileNav({ user, onOpenSearch }: MobileNavProps) {
                 <p className="font-bold text-emerald-950 text-sm truncate">
                   {user.firstName} {user.surname}
                 </p>
-                <p className="text-xs text-emerald-950/50 truncate">
+                <p className="text-[11px] text-emerald-950/50 truncate">
                   {user.email}
                 </p>
               </div>
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-950/10 text-emerald-950 shrink-0">
+            <span className="text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-950 text-cream-50 shrink-0">
               {user.role}
             </span>
           </div>
         ) : (
-          <div className="p-6 bg-white/80 border-b border-emerald-950/5">
+          <div className="p-4 bg-white border-b border-emerald-950/10 shrink-0">
             <Link
               href="/auth"
               onClick={handleClose}
-              className="w-full py-3 bg-emerald-950 text-cream-50 rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-emerald-900 transition-all shadow-md"
+              className="w-full py-2.5 bg-emerald-950 text-cream-50 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-emerald-900 transition-all shadow-sm active:scale-95"
             >
-              <UserIcon className="w-4 h-4" />
+              <UserIcon className="w-3.5 h-3.5" />
               <span>Sign In / Join</span>
             </Link>
           </div>
         )}
 
         {/* Scrollable Navigation Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Search Bar Input inside Mobile Drawer */}
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-950/40" />
-            <input
-              type="text"
-              placeholder="Search articles, authors..."
-              onFocus={() => {
-                handleClose();
-                onOpenSearch();
-              }}
-              onClick={() => {
-                handleClose();
-                onOpenSearch();
-              }}
-              readOnly
-              className="w-full bg-white border border-emerald-950/10 rounded-full py-3 pl-11 pr-4 text-xs font-semibold text-emerald-950 placeholder:text-emerald-950/40 shadow-xs cursor-pointer focus:outline-none"
-            />
-          </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Search Trigger inside Mobile Drawer */}
+          <button
+            type="button"
+            onClick={() => {
+              handleClose();
+              onOpenSearch();
+            }}
+            className="w-full flex items-center gap-3 bg-white border border-emerald-950/10 rounded-2xl py-3 px-4 text-xs font-semibold text-emerald-950/60 hover:text-emerald-950 hover:border-emerald-950/30 transition-all shadow-xs cursor-pointer text-left"
+          >
+            <Search className="w-4 h-4 text-emerald-950/40" />
+            <span>Search articles, topics, authors...</span>
+          </button>
 
-          <div className="space-y-1">
+          {/* Primary Nav Links */}
+          <div className="space-y-1 bg-white p-2 rounded-2xl border border-emerald-950/5 shadow-xs">
             <Link
               href="/"
               onClick={handleClose}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm text-emerald-950 hover:bg-emerald-950/5 transition-colors"
+              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-emerald-950 hover:bg-emerald-950/5 transition-colors"
             >
               <BookOpen className="w-4 h-4 text-emerald-800" />
               <span>Home</span>
             </Link>
 
-            {/* Categories Accordion */}
-            <div>
-              <button
-                onClick={() => setCategoriesOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm text-emerald-950 hover:bg-emerald-950/5 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <Sparkles className="w-4 h-4 text-emerald-800" />
-                  <span>Categories</span>
-                </div>
-                <ChevronDown
-                  className={`w-4 h-4 text-emerald-950/50 transition-transform duration-200 ${
-                    categoriesOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
+            <Link
+              href="/?category=essays"
+              onClick={handleClose}
+              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-emerald-950 hover:bg-emerald-950/5 transition-colors"
+            >
+              <Feather className="w-4 h-4 text-emerald-800" />
+              <span>Essays</span>
+            </Link>
 
-              {categoriesOpen && (
-                <div className="pl-11 pr-4 py-2 space-y-1">
-                  {categories.map((c) => (
-                    <Link
-                      key={c.name}
-                      href={c.path}
-                      onClick={handleClose}
-                      className="block px-3 py-2 rounded-xl text-xs font-semibold text-emerald-950/70 hover:text-emerald-950 hover:bg-emerald-950/5 transition-colors"
-                    >
-                      {c.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+            <Link
+              href="/?category=letters"
+              onClick={handleClose}
+              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-emerald-950 hover:bg-emerald-950/5 transition-colors"
+            >
+              <Mail className="w-4 h-4 text-emerald-800" />
+              <span>Letters</span>
+            </Link>
+          </div>
 
-            {/* About & Guidelines Accordion */}
-            <div>
-              <button
-                onClick={() => setAboutOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm text-emerald-950 hover:bg-emerald-950/5 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <HelpCircle className="w-4 h-4 text-sky-600" />
-                  <span>About & Guidelines</span>
-                </div>
-                <ChevronDown
-                  className={`w-4 h-4 text-emerald-950/50 transition-transform duration-200 ${
-                    aboutOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
+          {/* Categories Accordion */}
+          <div className="bg-white p-2 rounded-2xl border border-emerald-950/5 shadow-xs">
+            <button
+              type="button"
+              onClick={() => setCategoriesOpen((prev) => !prev)}
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-emerald-950 hover:bg-emerald-950/5 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-4 h-4 text-emerald-800" />
+                <span>Categories</span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-emerald-950/50 transition-transform duration-200 ${
+                  categoriesOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
 
-              {aboutOpen && (
-                <div className="pl-11 pr-4 py-2 space-y-1">
+            {categoriesOpen && (
+              <div className="grid grid-cols-2 gap-1.5 pt-2 pb-1 px-1 border-t border-emerald-950/5 mt-1">
+                {categories.map((c) => (
                   <Link
-                    href="/about"
+                    key={c.name}
+                    href={c.path}
                     onClick={handleClose}
-                    className="block px-3 py-2 rounded-xl text-xs font-semibold text-emerald-950/70 hover:text-emerald-950 hover:bg-emerald-950/5 transition-colors"
+                    className="block px-2.5 py-2 rounded-lg text-xs font-semibold text-emerald-950/70 hover:text-emerald-950 hover:bg-emerald-950/5 transition-colors truncate"
                   >
-                    Our Story & Vision
+                    {c.name}
                   </Link>
-                  <Link
-                    href="/submit"
-                    onClick={handleClose}
-                    className="block px-3 py-2 rounded-xl text-xs font-semibold text-emerald-950/70 hover:text-emerald-950 hover:bg-emerald-950/5 transition-colors"
-                  >
-                    Submission Guidelines
-                  </Link>
-                </div>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
+          </div>
 
+          {/* About & Guidelines Accordion */}
+          <div className="bg-white p-2 rounded-2xl border border-emerald-950/5 shadow-xs">
+            <button
+              type="button"
+              onClick={() => setAboutOpen((prev) => !prev)}
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-emerald-950 hover:bg-emerald-950/5 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <HelpCircle className="w-4 h-4 text-emerald-800" />
+                <span>About & Guidelines</span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-emerald-950/50 transition-transform duration-200 ${
+                  aboutOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {aboutOpen && (
+              <div className="space-y-1 pt-2 pb-1 px-1 border-t border-emerald-950/5 mt-1">
+                <Link
+                  href="/about"
+                  onClick={handleClose}
+                  className="block px-3 py-2 rounded-lg text-xs font-semibold text-emerald-950/70 hover:text-emerald-950 hover:bg-emerald-950/5 transition-colors"
+                >
+                  Our Story & Vision
+                </Link>
+                <Link
+                  href="/submit"
+                  onClick={handleClose}
+                  className="block px-3 py-2 rounded-lg text-xs font-semibold text-emerald-950/70 hover:text-emerald-950 hover:bg-emerald-950/5 transition-colors"
+                >
+                  Submission Guidelines
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white p-2 rounded-2xl border border-emerald-950/5 shadow-xs">
             <Link
               href="/contact"
               onClick={handleClose}
-              className="flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm text-emerald-950 hover:bg-emerald-950/5 transition-colors"
+              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-emerald-950 hover:bg-emerald-950/5 transition-colors"
             >
-              <Mail className="w-4 h-4 text-emerald-700" />
+              <Compass className="w-4 h-4 text-emerald-800" />
               <span>Contact Editorial</span>
             </Link>
           </div>
 
-          {/* User Logged In Actions */}
+          {/* User Workspace Actions */}
           {user && (
-            <div className="pt-4 border-t border-emerald-950/10 space-y-1">
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-emerald-950/40 px-4 block mb-2">
+            <div className="bg-white p-2 rounded-2xl border border-emerald-950/5 shadow-xs space-y-1">
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-emerald-950/40 px-3.5 pt-1.5 block">
                 Workspace
               </span>
               <Link
-                href={`/profile/${user._id}`}
+                href={`/profile/${user._id || user.id}`}
                 onClick={handleClose}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-2xl font-bold text-sm text-emerald-950 hover:bg-emerald-950/5 transition-colors"
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-emerald-950 hover:bg-emerald-950/5 transition-colors"
               >
                 <UserIcon className="w-4 h-4 text-emerald-800" />
                 <span>My Profile</span>
@@ -282,17 +302,18 @@ export default function MobileNav({ user, onOpenSearch }: MobileNavProps) {
               <Link
                 href="/dashboard"
                 onClick={handleClose}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-2xl font-bold text-sm text-emerald-950 hover:bg-emerald-950/5 transition-colors"
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-emerald-950 hover:bg-emerald-950/5 transition-colors"
               >
                 <LayoutDashboard className="w-4 h-4 text-emerald-800" />
                 <span>Dashboard</span>
               </Link>
               <button
+                type="button"
                 onClick={() => {
                   handleClose();
                   logout();
                 }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl font-bold text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-red-600 hover:bg-red-50 transition-colors cursor-pointer text-left"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Logout</span>
@@ -302,17 +323,45 @@ export default function MobileNav({ user, onOpenSearch }: MobileNavProps) {
         </div>
 
         {/* Drawer Bottom CTA */}
-        <div className="p-6 border-t border-emerald-950/10 bg-white/60 backdrop-blur-md">
+        <div className="p-4 border-t border-emerald-950/10 bg-white/80 backdrop-blur-md shrink-0">
           <Link
             href="/submit-piece"
             onClick={handleClose}
-            className="w-full py-3.5 bg-emerald-950 text-cream-50 rounded-full font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-emerald-900 transition-all shadow-lg active:scale-95"
+            className="w-full py-3 bg-emerald-950 text-cream-50 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-emerald-900 transition-all shadow-md active:scale-95"
           >
             <PenTool className="w-4 h-4" />
             <span>Submit Writing</span>
           </Link>
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="lg:hidden flex items-center gap-1.5">
+      {/* Quick Search Icon on Mobile Header */}
+      <button
+        type="button"
+        onClick={onOpenSearch}
+        className="p-2 rounded-full text-emerald-950/70 hover:text-emerald-950 hover:bg-emerald-950/5 transition-colors cursor-pointer"
+        aria-label="Open Search"
+      >
+        <Search className="w-5 h-5" />
+      </button>
+
+      {/* Hamburger 3-Line Menu Trigger */}
+      <button
+        type="button"
+        onClick={handleToggle}
+        className="p-2 rounded-xl text-emerald-950 hover:bg-emerald-950/5 transition-colors cursor-pointer flex items-center justify-center"
+        aria-label="Toggle navigation menu"
+        aria-expanded={isOpen}
+      >
+        <Menu className="w-6 h-6 stroke-[2.2]" />
+      </button>
+
+      {/* Mount Portal to Document Body */}
+      {mounted && createPortal(drawerContent, document.body)}
     </div>
   );
 }

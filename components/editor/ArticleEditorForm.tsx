@@ -64,7 +64,10 @@ export default function ArticleEditorForm({
     title: article?.title || "",
     excerpt: article?.excerpt || "",
     body: article?.content || "",
-    category: article?.category?._id || "",
+    category:
+      article?.category?._id ||
+      article?.category?.id ||
+      (categories.length > 0 ? categories[0]._id || categories[0].id || "" : ""),
     thumbnail: article?.thumbnail || "",
     thumbnailPublicId: "",
     authorId: article?.author?._id || article?.author?.id || "",
@@ -312,11 +315,14 @@ export default function ArticleEditorForm({
               >
                 <option value="">Select Category</option>
 
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
+                {categories.map((category) => {
+                  const catId = category._id || category.id || "";
+                  return (
+                    <option key={catId} value={catId}>
+                      {category.name}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 

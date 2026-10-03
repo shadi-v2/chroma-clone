@@ -71,11 +71,9 @@ export async function findCategoryByName(name: string): Promise<(Category & { _i
 }
 
 export async function findCategoryByIdOrSlug(idOrSlug: string): Promise<(Category & { _id: string; id: string }) | null> {
-  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
-  if (isUuid) {
-    const byId = await findCategoryById(idOrSlug);
-    if (byId) return byId;
-  }
+  if (!idOrSlug) return null;
+  const byId = await findCategoryById(idOrSlug);
+  if (byId) return byId;
   return findCategoryBySlug(idOrSlug);
 }
 
@@ -121,21 +119,49 @@ export async function deleteCategory(id: string): Promise<boolean> {
 export async function resolveCategoryId(categoryInput: string): Promise<string | null> {
   if (!categoryInput) return null;
 
-  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(categoryInput);
-  if (isUuid) {
-    const existing = await findCategoryById(categoryInput);
-    if (existing) return existing.id || existing._id;
+  const trimmed = categoryInput.trim();
+  if (!trimmed) return null;
+
+  // 1. Direct ID match (checks by id: UUID, ObjectId, or text ID)
+  const byId = await findCategoryById(trimmed);
+  if (byId) return byId.id || byId._id;
+
+  // 2. Direct Name match (case-insensitive)
+  let existing = await findCategoryByName(trimmed);
+  if (existing) return existing.id || existing._id;
+
+  // 3. Direct Slug match (case-insensitive)
+  existing = await findCategoryBySlug(trimmed);
+  if (existing) return existing.id || existing._id;
+
+  // 4. Fuzzy / partial match against all existing categories
+  const all = await listCategories();
+  const lower = trimmed.toLowerCase();
+  const matched = all.find(
+    (c) =>
+      c.name.toLowerCase() === lower ||
+      c.slug.toLowerCase() === lower ||
+      c.name.toLowerCase().includes(lower) ||
+      lower.includes(c.name.toLowerCase()) ||
+      c._id === trimmed ||
+      c.id === trimmed
+  );
+  if (matched) return (matched._id || matched.id) ?? null;
+
+  // 5. Fallback to existing default category - NEVER create a new category automatically
+  if (all.length > 0) {
+    const defaultCat =
+      all.find(
+        (c) =>
+          c.name.toLowerCase() === "article" ||
+          c.name.toLowerCase() === "general" ||
+          c.slug.toLowerCase() === "article" ||
+          c.slug.toLowerCase() === "general"
+      ) || all[0];
+    return (defaultCat._id || defaultCat.id) ?? null;
   }
 
-  let existing = await findCategoryByName(categoryInput);
-  if (existing) return existing.id || existing._id;
-
-  existing = await findCategoryBySlug(categoryInput);
-  if (existing) return existing.id || existing._id;
-
-  const slug = categoryInput.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
-  const created = await createCategory({ name: categoryInput, slug });
-  return created.id || created._id;
+  return null;
 }
 
 // TAGS
