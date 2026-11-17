@@ -10,7 +10,6 @@ interface JwtPayload {
 
 export async function getCurrentUser() {
   try {
-    await connectDB();
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
     if (!token) {
@@ -22,6 +21,7 @@ export async function getCurrentUser() {
       process.env.JWT_SECRET || "secret",
     ) as JwtPayload;
 
+    await connectDB();
     const user = await findUserById(decoded.id);
 
     if (!user) {

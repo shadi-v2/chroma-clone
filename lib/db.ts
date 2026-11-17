@@ -1,17 +1,20 @@
 import { neon } from "@neondatabase/serverless";
 import { SCHEMA_STATEMENTS } from "./schema";
 
-const DATABASE_URL = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL || process.env.POSTGRES_URL;
-
 let isSchemaInitialized = false;
 
 export function getDatabaseUrl(): string {
-  if (!DATABASE_URL) {
+  const url =
+    process.env.DATABASE_URL ||
+    process.env.NEON_DATABASE_URL ||
+    process.env.POSTGRES_URL;
+
+  if (!url) {
     throw new Error(
       "Please define the DATABASE_URL (or NEON_DATABASE_URL / POSTGRES_URL) environment variable inside .env",
     );
   }
-  return DATABASE_URL;
+  return url;
 }
 
 export function getSql() {
@@ -38,8 +41,15 @@ export async function queryOne<T = Record<string, unknown>>(
 
 export async function ensureSchema() {
   if (isSchemaInitialized) return;
+  const url =
+    process.env.DATABASE_URL ||
+    process.env.NEON_DATABASE_URL ||
+    process.env.POSTGRES_URL;
+  if (!url) {
+    return;
+  }
   try {
-    const sql = getSql();
+    const sql = neon(url);
     for (const stmt of SCHEMA_STATEMENTS) {
       await sql.query(stmt);
     }
@@ -50,6 +60,13 @@ export async function ensureSchema() {
 }
 
 export async function connectDB() {
+  const url =
+    process.env.DATABASE_URL ||
+    process.env.NEON_DATABASE_URL ||
+    process.env.POSTGRES_URL;
+  if (!url) {
+    return null;
+  }
   await ensureSchema();
   return getSql();
 }

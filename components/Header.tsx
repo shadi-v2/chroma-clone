@@ -16,14 +16,16 @@ interface Notification {
 }
 
 export default async function Header() {
-  await connectDB();
-
   const user = await getCurrentUser();
 
   let notifications: Notification[] = [];
 
   if (user) {
-    notifications = await findNotificationsForUser(user.id || user._id);
+    try {
+      notifications = await findNotificationsForUser(user.id || user._id);
+    } catch (error) {
+      console.error("Failed to load notifications in Header:", error);
+    }
   }
 
   const navItems = [
