@@ -18,6 +18,9 @@ export interface DbUser {
   avatar_public_id?: string | null;
   is_frozen?: boolean;
   is_email_verified?: boolean;
+  last_login_at?: string | Date | null;
+  failed_login_attempts?: number;
+  locked_until?: string | Date | null;
   google_id?: string | null;
   onboarding_completed?: boolean;
   genres?: string[] | null;
@@ -25,7 +28,13 @@ export interface DbUser {
   updated_at: string | Date;
 }
 
-export type FormattedUser = PublicUser & { _id: string; id: string; password?: string };
+export type FormattedUser = PublicUser & {
+  _id: string;
+  id: string;
+  password?: string;
+  failedLoginAttempts?: number;
+  lockedUntil?: string;
+};
 
 export function formatUser(row: DbUser | null): FormattedUser | null {
   if (!row) return null;
@@ -51,6 +60,9 @@ export function formatUser(row: DbUser | null): FormattedUser | null {
     dateOfBirth: row.date_of_birth ? new Date(row.date_of_birth).toISOString() : "",
     isFrozen,
     isEmailVerified: Boolean(row.is_email_verified),
+    lastLoginAt: row.last_login_at ? new Date(row.last_login_at).toISOString() : undefined,
+    failedLoginAttempts: Number(row.failed_login_attempts || 0),
+    lockedUntil: row.locked_until ? new Date(row.locked_until).toISOString() : undefined,
     googleId: row.google_id || undefined,
     onboardingCompleted: Boolean(row.onboarding_completed),
     genres: Array.isArray(row.genres) ? row.genres : [],
@@ -67,6 +79,8 @@ export function toPublicUser(user: DbUser | FormattedUser | null): PublicUser {
   const formatted = "first_name" in user ? formatUser(user as DbUser) : (user as FormattedUser);
   const rest: Partial<FormattedUser> = { ...formatted };
   delete rest.password;
+  delete rest.failedLoginAttempts;
+  delete rest.lockedUntil;
   return rest as PublicUser;
 }
 
@@ -156,6 +170,9 @@ export async function updateUser(id: string, data: Partial<{
   genres?: string[];
   isFrozen?: boolean;
   isEmailVerified?: boolean;
+  lastLoginAt?: string | Date | null;
+  failedLoginAttempts?: number;
+  lockedUntil?: string | Date | null;
   googleId?: string;
   onboardingCompleted?: boolean;
   password?: string;
@@ -211,6 +228,18 @@ export async function updateUser(id: string, data: Partial<{
   if (data.isEmailVerified !== undefined) {
     fields.push(`is_email_verified = $${index++}`);
     values.push(Boolean(data.isEmailVerified));
+  }
+  if (data.lastLoginAt !== undefined) {
+    fields.push(`last_login_at = $${index++}`);
+    values.push(data.lastLoginAt ? new Date(data.lastLoginAt) : null);
+  }
+  if (data.failedLoginAttempts !== undefined) {
+    fields.push(`failed_login_attempts = $${index++}`);
+    values.push(Number(data.failedLoginAttempts));
+  }
+  if (data.lockedUntil !== undefined) {
+    fields.push(`locked_until = $${index++}`);
+    values.push(data.lockedUntil ? new Date(data.lockedUntil) : null);
   }
   if (data.googleId !== undefined) {
     fields.push(`google_id = $${index++}`);

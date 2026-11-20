@@ -11,6 +11,7 @@ import {
   FileCode,
 } from "lucide-react";
 import { EMAIL_LAYOUT_STARTERS, type LayoutStarter } from "@/lib/emailWrapper";
+import { useConfirm } from "@/contexts/ConfirmationContext";
 
 interface TemplateLayoutStartersProps {
   onSelectLayout: (layoutHtml: string, layoutName: string) => void;
@@ -21,17 +22,20 @@ export default function TemplateLayoutStarters({
   onSelectLayout,
   currentHtmlLength = 0,
 }: TemplateLayoutStartersProps) {
+  const { confirm } = useConfirm();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string>("");
 
-  const handleApply = (starter: LayoutStarter) => {
-    if (
-      currentHtmlLength > 50 &&
-      !window.confirm(
-        `Apply "${starter.name}" layout starter? This will replace the current template content with this full HTML layout.`,
-      )
-    ) {
-      return;
+  const handleApply = async (starter: LayoutStarter) => {
+    if (currentHtmlLength > 50) {
+      const ok = await confirm({
+        title: "Replace Template Layout?",
+        message: `Apply "${starter.name}" layout starter? This will replace your current template HTML layout with this starter.`,
+        confirmText: "Apply Layout",
+        cancelText: "Keep Current",
+        variant: "warning",
+      });
+      if (!ok) return;
     }
 
     setSelectedId(starter.id);

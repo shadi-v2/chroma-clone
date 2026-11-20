@@ -27,6 +27,8 @@ import Image from "next/image";
 import CustomRoleDropdown from "../CustomRoleDropdown";
 import Link from "next/link";
 import AgeBadge from "@/components/AgeBadge";
+import { useConfirm } from "@/contexts/ConfirmationContext";
+import { gooeyToast } from "@/components/ui/goey-toaster";
 
 type UserSortField = "name" | "email" | "role" | "phone" | "age" | "status" | "createdAt";
 type SortDirection = "asc" | "desc";
@@ -45,6 +47,7 @@ interface AdminUserManagementProps {
 }
 
 const AdminUserManagement = ({ currentUser }: AdminUserManagementProps) => {
+  const { confirm } = useConfirm();
   const [users, setUsers] = useState<PublicUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<PublicUser | null>(null);
@@ -98,9 +101,14 @@ const AdminUserManagement = ({ currentUser }: AdminUserManagementProps) => {
   const handleToggleFreeze = async (user: PublicUser) => {
     const newStatus = !user.isFrozen;
     const actionName = newStatus ? "freeze" : "unfreeze";
-    const confirmed = window.confirm(
-      `Are you sure you want to ${actionName} the account for ${user.firstName} ${user.surname}?`,
-    );
+    const confirmed = await confirm({
+      title: `${newStatus ? "Freeze" : "Unfreeze"} Account`,
+      message: `Are you sure you want to ${actionName} the account for ${user.firstName} ${user.surname}? ${
+        newStatus ? "Frozen accounts cannot log in." : "The account will be restored to active."
+      }`,
+      confirmText: newStatus ? "Freeze Account" : "Unfreeze Account",
+      variant: newStatus ? "destructive" : "default",
+    });
 
     if (!confirmed) return;
 
@@ -127,16 +135,20 @@ const AdminUserManagement = ({ currentUser }: AdminUserManagementProps) => {
       if (selectedUser && selectedUser._id === user._id) {
         setSelectedUser((prev) => (prev ? { ...prev, isFrozen: newStatus } : null));
       }
+      gooeyToast.success(`Account successfully ${actionName}d.`);
     } catch (error) {
       console.error("Failed to toggle freeze:", error);
-      alert("Failed to update account freeze status");
+      gooeyToast.error("Failed to update account freeze status.");
     }
   };
 
   const handleDeleteUser = async (userId: string) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this user?",
-    );
+    const confirmed = await confirm({
+      title: "Delete User",
+      message: "Are you sure you want to permanently delete this user? All their associated data may be affected.",
+      confirmText: "Delete User",
+      variant: "destructive",
+    });
 
     if (!confirmed) {
       return;
@@ -145,8 +157,10 @@ const AdminUserManagement = ({ currentUser }: AdminUserManagementProps) => {
     try {
       await api.users.delete(userId);
       setUsers((prev) => prev.filter((user) => user._id !== userId));
+      gooeyToast.success("User deleted successfully.");
     } catch (error) {
       console.error(error);
+      gooeyToast.error("Failed to delete user.");
     }
   };
 

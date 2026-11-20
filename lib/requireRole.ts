@@ -32,6 +32,20 @@ export async function requireRole(req: Request, roles: string[]) {
     };
   }
 
+  if (user.isEmailVerified === false) {
+    return {
+      error: NextResponse.json(
+        {
+          message: "Email verification required. Unverified accounts cannot perform this action.",
+          requiresVerification: true,
+        },
+        {
+          status: 403,
+        },
+      ),
+    };
+  }
+
   if (!roles.includes(user.role) && !(roles.includes("Admin") && isAdminRole(user.role))) {
     return {
       error: NextResponse.json(

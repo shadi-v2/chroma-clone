@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ToastProvider } from "@/contexts/ToastContext";
+import { ConfirmationProvider } from "@/contexts/ConfirmationContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PublicNavigationWrapper from "@/components/PublicNavigationWrapper";
@@ -92,14 +93,16 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col selection:bg-emerald-950/85 selection:text-cream-50 bg-cream-50 text-charcoal">
         <AuthProvider>
-          <ToastProvider>
-            <PublicNavigationWrapper
-              headerSlot={<Header />}
-              footerSlot={<Footer />}
-            >
-              {children}
-            </PublicNavigationWrapper>
-          </ToastProvider>
+          <ConfirmationProvider>
+            <ToastProvider>
+              <PublicNavigationWrapper
+                headerSlot={<Header />}
+                footerSlot={<Footer />}
+              >
+                {children}
+              </PublicNavigationWrapper>
+            </ToastProvider>
+          </ConfirmationProvider>
         </AuthProvider>
       </body>
     </html>

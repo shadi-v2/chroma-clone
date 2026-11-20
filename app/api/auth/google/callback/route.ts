@@ -144,6 +144,9 @@ export async function GET(req: Request) {
 
       const updates: Parameters<typeof updateUser>[1] = {
         isEmailVerified: true,
+        lastLoginAt: new Date(),
+        failedLoginAttempts: 0,
+        lockedUntil: null,
       };
       if (googleId && !user.googleId) updates.googleId = googleId;
       if (avatar && !user.avatar) updates.avatar = avatar;

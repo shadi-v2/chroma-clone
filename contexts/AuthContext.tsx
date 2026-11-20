@@ -5,6 +5,7 @@ import { api } from "@/services/api";
 import type { PublicUser } from "@/types/user";
 import AuthDialog from "@/components/auth/AuthDialog";
 import BirthdayDialog from "@/components/birthday/BirthdayDialog";
+import UnverifiedAccountGuard from "@/components/auth/UnverifiedAccountGuard";
 
 interface AuthModalOptions {
   title?: string;
@@ -136,6 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         redirectTo={authModalOptions.redirectTo}
       />
       <BirthdayDialog />
+      <UnverifiedAccountGuard />
     </AuthContext.Provider>
   );
 }

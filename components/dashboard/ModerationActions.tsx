@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { api } from "@/services/api";
 import type { PublicArticle, ArticleStatus } from "@/types/article";
+import { useConfirm } from "@/contexts/ConfirmationContext";
+import { gooeyToast } from "@/components/ui/goey-toaster";
 
 interface ModerationActionsProps {
   article: PublicArticle;
@@ -11,26 +13,37 @@ interface ModerationActionsProps {
 
 export default function ModerationActions({ article }: ModerationActionsProps) {
   const router = useRouter();
+  const { confirm } = useConfirm();
+
   const handleStatusUpdate = async (status: ArticleStatus) => {
     try {
       await api.articles.updateStatus(article._id, status);
+      gooeyToast.success(`Article marked as ${status.toLowerCase()}.`);
       router.refresh();
     } catch (error) {
       console.error("Failed to update article:", error);
+      gooeyToast.error("Failed to update article status.");
     }
   };
 
   const handleArchive = async () => {
-    const confirmed = window.confirm("Archive this article?");
+    const confirmed = await confirm({
+      title: "Archive Article",
+      message: `Are you sure you want to archive "${article.title}"?`,
+      confirmText: "Archive",
+      variant: "destructive",
+    });
 
     if (!confirmed) {
       return;
     }
     try {
       await api.articles.delete(article._id);
+      gooeyToast.success("Article archived.");
       router.refresh();
     } catch (error) {
       console.error("Failed to archive:", error);
+      gooeyToast.error("Failed to archive article.");
     }
   };
 

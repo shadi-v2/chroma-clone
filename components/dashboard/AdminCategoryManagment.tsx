@@ -15,10 +15,13 @@ import {
 } from "lucide-react";
 import { api } from "@/services/api";
 import type { Category } from "@/types/category";
+import { useConfirm } from "@/contexts/ConfirmationContext";
+import { gooeyToast } from "@/components/ui/goey-toaster";
 
 type CategorySort = "name-asc" | "name-desc" | "created-desc" | "created-asc";
 
 const AdminCategoryManagement = () => {
+  const { confirm } = useConfirm();
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -70,14 +73,21 @@ const AdminCategoryManagement = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const confirmed = window.confirm("Delete this category?");
+    const confirmed = await confirm({
+      title: "Delete Category",
+      message: "Are you sure you want to delete this category? Articles assigned to it may need reassignment.",
+      confirmText: "Delete",
+      variant: "destructive",
+    });
     if (!confirmed) return;
 
     try {
       await api.categories.delete(id);
       setCategories((prev) => prev.filter((category) => category._id !== id));
+      gooeyToast.success("Category deleted.");
     } catch (err) {
       console.error(err);
+      gooeyToast.error("Failed to delete category.");
     }
   };
 

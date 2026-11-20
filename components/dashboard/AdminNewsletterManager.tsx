@@ -17,6 +17,8 @@ import {
   Loader2,
   Sparkles,
 } from "lucide-react";
+import { useConfirm } from "@/contexts/ConfirmationContext";
+import { gooeyToast } from "@/components/ui/goey-toaster";
 
 interface Subscriber {
   id: string;
@@ -28,6 +30,7 @@ interface Subscriber {
 }
 
 export default function AdminNewsletterManager() {
+  const { confirm } = useConfirm();
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [activeCount, setActiveCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -101,17 +104,24 @@ export default function AdminNewsletterManager() {
   };
 
   const handleDeleteSubscriber = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this subscriber?")) return;
+    const ok = await confirm({
+      title: "Remove Subscriber",
+      message: "Are you sure you want to delete this subscriber from the mailing list?",
+      confirmText: "Delete",
+      variant: "destructive",
+    });
+    if (!ok) return;
+
     try {
       const res = await fetch(`/api/admin/newsletter?id=${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
         fetchSubscribers();
-        setFeedback({ type: "success", text: "Subscriber removed successfully." });
+        gooeyToast.success("Subscriber removed successfully.");
       }
     } catch {
-      setFeedback({ type: "error", text: "Failed to delete subscriber." });
+      gooeyToast.error("Failed to delete subscriber.");
     }
   };
 

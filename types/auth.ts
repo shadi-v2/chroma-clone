@@ -16,7 +16,10 @@ export interface RegisterPayload {
 }
 
 export interface AuthResponse {
-  token: string;
-  user: PublicUser;
+  token?: string;
+  user?: PublicUser;
   message?: string;
+  requiresVerification?: boolean;
+  reason?: "unverified" | "three_months" | "signup";
+  email?: string;
 }

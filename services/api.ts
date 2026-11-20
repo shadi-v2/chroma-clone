@@ -61,7 +61,10 @@ export const api = {
         body: JSON.stringify(data),
       }).then(async (res) => {
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Registration failed");
+        if (!res.ok) {
+          if (data && data.requiresVerification) return data;
+          throw new Error(data.message || "Registration failed");
+        }
         return data;
       }),
 
@@ -71,7 +74,10 @@ export const api = {
         body: JSON.stringify(data),
       }).then(async (res) => {
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Login failed");
+        if (!res.ok) {
+          if (data && data.requiresVerification) return data;
+          throw new Error(data.message || "Login failed");
+        }
         return data;
       }),
 
@@ -102,7 +108,7 @@ export const api = {
         return data;
       }),
 
-    verifyCode: async (email: string, code: string): Promise<{ success: boolean; message: string }> =>
+    verifyCode: async (email: string, code: string): Promise<AuthResponse & { verified?: boolean }> =>
       apiFetch(`${BASE_URL}/auth/verify-code`, {
         method: "POST",
         body: JSON.stringify({ email, code }),

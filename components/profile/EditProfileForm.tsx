@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import ProfileAvatarUpload from "@/components/ProfileAvatarUpload";
+import { gooeyToast } from "@/components/ui/goey-toaster";
 
 interface User {
   _id: string;
@@ -112,12 +113,13 @@ export default function EditProfileForm({ user, adminMode }: Props) {
         throw new Error(errorData.message || "Failed to update profile");
       }
 
+      gooeyToast.success("Profile updated successfully!");
       router.push(`/profile/${user._id}`);
       router.refresh();
     } catch (error: unknown) {
       console.error(error);
       const msg = error instanceof Error ? error.message : "Failed to update profile";
-      alert(msg);
+      gooeyToast.error(msg);
     } finally {
       setLoading(false);
     }

@@ -25,6 +25,8 @@ import VisualEmailBuilder from "@/components/dashboard/VisualEmailBuilder";
 import ChromadiariesLogoArranger from "@/components/dashboard/ChromadiariesLogoArranger";
 import TemplateLayoutStarters from "@/components/dashboard/TemplateLayoutStarters";
 import { renderEmailTemplate } from "@/lib/emailWrapper";
+import { gooeyToast } from "@/components/ui/goey-toaster";
+import { useConfirm } from "@/contexts/ConfirmationContext";
 
 interface EmailTemplate {
   id: string;
@@ -49,6 +51,7 @@ interface SentEmailRecord {
 }
 
 export default function AdminEmailCenter() {
+  const { confirm } = useConfirm();
   const [activeSubTab, setActiveSubTab] = useState<"compose" | "templates" | "history">("compose");
 
   // Compose State
@@ -281,7 +284,7 @@ export default function AdminEmailCenter() {
   const handleSaveTemplate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!templateName || !templateSubject || !templateContent) {
-      alert("Please fill in template name, subject, and content.");
+      gooeyToast.error("Please fill in template name, subject, and content.");
       return;
     }
 
@@ -307,12 +310,12 @@ export default function AdminEmailCenter() {
         setTemplateSubject("");
         setTemplateContent("");
         fetchTemplates();
-        setFeedback({ type: "success", text: data.message || "Template saved successfully!" });
+        gooeyToast.success(data.message || "Template saved successfully!");
       } else {
-        alert(data.message || "Failed to save template.");
+        gooeyToast.error(data.message || "Failed to save template.");
       }
     } catch {
-      alert("Network error saving template.");
+      gooeyToast.error("Network error saving template.");
     } finally {
       setSavingTemplate(false);
     }
@@ -320,7 +323,14 @@ export default function AdminEmailCenter() {
 
   // Delete Template Handler
   const handleDeleteTemplate = async (id: string, name: string) => {
-    if (!window.confirm(`Are you sure you want to delete template "${name}"?`)) return;
+    const confirmed = await confirm({
+      title: "Delete Template",
+      message: `Are you sure you want to delete template "${name}"? This action cannot be undone.`,
+      confirmText: "Delete",
+      cancelText: "Keep Template",
+      variant: "destructive",
+    });
+    if (!confirmed) return;
 
     try {
       const res = await fetch(`/api/admin/email/templates?id=${id}`, {
@@ -328,10 +338,10 @@ export default function AdminEmailCenter() {
       });
       if (res.ok) {
         fetchTemplates();
-        setFeedback({ type: "success", text: `Template "${name}" deleted.` });
+        gooeyToast.success(`Template "${name}" deleted.`);
       }
     } catch {
-      setFeedback({ type: "error", text: "Failed to delete template." });
+      gooeyToast.error("Failed to delete template.");
     }
   };
 

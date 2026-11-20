@@ -15,6 +15,8 @@ import {
 import AdminArticleRecoverActions from "./AdminArticleRecoverActions";
 import { DashboardArticle } from "@/types/dashboard";
 import { useRouter } from "next/navigation";
+import { useConfirm } from "@/contexts/ConfirmationContext";
+import { gooeyToast } from "@/components/ui/goey-toaster";
 
 type RecoverSortField = "deletedAt" | "title" | "author";
 type SortDirection = "asc" | "desc";
@@ -24,6 +26,8 @@ interface Props {
 }
 
 export default function AdminArticleRecover({ search: initialSearch = "" }: Props) {
+  const router = useRouter();
+  const { confirm } = useConfirm();
   const [articles, setArticles] = useState<DashboardArticle[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,8 +36,6 @@ export default function AdminArticleRecover({ search: initialSearch = "" }: Prop
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [sortField, setSortField] = useState<RecoverSortField>("deletedAt");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-
-  const router = useRouter();
 
   const fetchArticles = async () => {
     try {
@@ -66,7 +68,12 @@ export default function AdminArticleRecover({ search: initialSearch = "" }: Prop
   };
 
   const handleDelete = async (id: string) => {
-    const confirmed = confirm("Permanently delete this article?");
+    const confirmed = await confirm({
+      title: "Permanently Delete Article",
+      message: "Are you sure you want to permanently delete this article? This action cannot be undone.",
+      confirmText: "Delete Permanently",
+      variant: "destructive",
+    });
     if (!confirmed) {
       return;
     }
@@ -77,9 +84,11 @@ export default function AdminArticleRecover({ search: initialSearch = "" }: Prop
       });
 
       setArticles((prev) => prev.filter((article) => article._id !== id));
+      gooeyToast.success("Article permanently deleted.");
       router.refresh();
     } catch (error) {
       console.error(error);
+      gooeyToast.error("Failed to delete article.");
     }
   };
 

@@ -15,6 +15,7 @@ export interface PublicUser {
   dateOfBirth?: string;
   isFrozen?: boolean;
   isEmailVerified?: boolean;
+  lastLoginAt?: string;
   googleId?: string;
   onboardingCompleted?: boolean;
   genres?: string[];

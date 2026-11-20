@@ -2,22 +2,45 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { connectDB, query } from "@/lib/db";
 import { sendVerificationEmail } from "@/lib/email";
-
+import { getClientIp, checkRateLimit } from "@/lib/security/rateLimiter";
 
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req);
     await connectDB();
     const body = await req.json();
     const { email } = body;
 
     if (!email || typeof email !== "string" || !email.includes("@")) {
       return NextResponse.json(
-        { message: "A valid email address is required" },
+        { message: "A valid email address is required." },
         { status: 400 },
       );
     }
 
     const cleanEmail = email.trim().toLowerCase();
+
+    // Security Rate Limit: max 3 requests per 5 minutes per email
+    const rateLimit = checkRateLimit(`send_code:${cleanEmail}`, 3, 300);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        {
+          message: `Please wait ${rateLimit.resetSeconds} seconds before requesting another verification code.`,
+        },
+        { status: 429 },
+      );
+    }
+
+    // IP Rate Limit: max 10 requests per 10 minutes per IP
+    const ipLimit = checkRateLimit(`send_code_ip:${ip}`, 10, 600);
+    if (!ipLimit.allowed) {
+      return NextResponse.json(
+        {
+          message: `Too many code requests from this network. Please wait ${ipLimit.resetSeconds} seconds.`,
+        },
+        { status: 429 },
+      );
+    }
 
     // Generate 6-digit numeric OTP code
     const code = crypto.randomInt(100000, 999999).toString();

@@ -58,6 +58,8 @@ export async function getUserFromToken(req: Request) {
       email: user.email || decoded.email || "",
       role: user.role,
       isFrozen: user.isFrozen,
+      isEmailVerified: user.isEmailVerified,
+      lastLoginAt: user.lastLoginAt,
       dateOfBirth: user.dateOfBirth,
       age: user.age,
     };

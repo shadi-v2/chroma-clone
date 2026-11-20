@@ -15,6 +15,7 @@ import Image from "next/image";
 
 import { api } from "@/services/api";
 import type { PublicUser } from "@/types/user";
+import { gooeyToast } from "@/components/ui/goey-toaster";
 
 interface Notification {
   _id: string;
@@ -87,7 +88,7 @@ export default function AdminNotificationManager() {
     }
 
     if (!isGlobal && selectedRecipients.length === 0) {
-      alert("Please select at least one recipient.");
+      gooeyToast.error("Please select at least one recipient.");
       return;
     }
 

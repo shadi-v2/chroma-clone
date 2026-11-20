@@ -32,6 +32,7 @@ import {
   removeLogoFromHtml,
   generateLogoHtml,
 } from "@/lib/emailWrapper";
+import { gooeyToast } from "@/components/ui/goey-toaster";
 
 interface ChromadiariesLogoArrangerProps {
   htmlContent: string;
@@ -101,6 +102,7 @@ export default function ChromadiariesLogoArranger({
     }
 
     setJustApplied(true);
+    gooeyToast.success("Chromadiaries logo arranged in template!");
     setTimeout(() => setJustApplied(false), 2400);
   };
 
@@ -108,6 +110,7 @@ export default function ChromadiariesLogoArranger({
     const updated = removeLogoFromHtml(htmlContent);
     onChangeHtml(updated);
     setHasExistingLogo(false);
+    gooeyToast.info("Chromadiaries logo removed from template.");
   };
 
   return (

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Camera, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { gooeyToast } from "@/components/ui/goey-toaster";
 
 import AvatarCropModal from "./profile/AvatarCropModal";
 
@@ -60,11 +61,11 @@ export default function ProfileAvatarUpload() {
         throw new Error(updateData.message || "Failed to update avatar");
       }
 
+      gooeyToast.success("Profile avatar updated successfully!");
       router.refresh();
     } catch (error) {
       console.error(error);
-
-      alert(error instanceof Error ? error.message : "Failed to upload avatar");
+      gooeyToast.error(error instanceof Error ? error.message : "Failed to upload avatar");
     } finally {
       setUploading(false);
       setCropImage(null);
