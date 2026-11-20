@@ -22,12 +22,9 @@ import {
 import { api } from "@/services/api";
 import type { PublicUser } from "@/types/user";
 import VisualEmailBuilder from "@/components/dashboard/VisualEmailBuilder";
-import EmailWrapperDesigner from "@/components/dashboard/EmailWrapperDesigner";
-import {
-  renderEmailWithWrapper,
-  DEFAULT_WRAPPER_CONFIG,
-  type EmailWrapperConfig,
-} from "@/lib/emailWrapper";
+import ChromadiariesLogoArranger from "@/components/dashboard/ChromadiariesLogoArranger";
+import TemplateLayoutStarters from "@/components/dashboard/TemplateLayoutStarters";
+import { renderEmailTemplate } from "@/lib/emailWrapper";
 
 interface EmailTemplate {
   id: string;
@@ -62,8 +59,10 @@ export default function AdminEmailCenter() {
   const [senderName, setSenderName] = useState("Chroma Diaries Editorial");
   const [senderEmail, setSenderEmail] = useState("editorial@chromadiaries.in");
   const [customSenderPrefix, setCustomSenderPrefix] = useState("");
-  const [wrapperConfig, setWrapperConfig] = useState<EmailWrapperConfig>(DEFAULT_WRAPPER_CONFIG);
   const [sending, setSending] = useState(false);
+  const [cursorInsertFn, setCursorInsertFn] = useState<((html: string) => void) | null>(null);
+  const [templateCursorInsertFn, setTemplateCursorInsertFn] = useState<((html: string) => void) | null>(null);
+  const [modalPreviewMode, setModalPreviewMode] = useState<"edit" | "preview">("edit");
 
   // Template Data
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
@@ -198,11 +197,10 @@ export default function AdminEmailCenter() {
       const content = event.target?.result as string;
       if (content) {
         setHtmlContent(content);
-        // If full HTML document, automatically turn off redundant outer letterhead wrapper
-        if (content.toLowerCase().includes("<html") || content.toLowerCase().includes("<!doctype")) {
-          setWrapperConfig((prev) => ({ ...prev, enabled: false }));
-        }
-        setFeedback({ type: "success", text: `Imported HTML template: ${file.name}` });
+        setFeedback({
+          type: "success",
+          text: `Imported HTML template: "${file.name}". You can now arrange the Chromadiaries logo in your template below!`,
+        });
       }
     };
     reader.readAsText(file);
@@ -222,6 +220,10 @@ export default function AdminEmailCenter() {
         if (!templateName) {
           setTemplateName(file.name.replace(/\.[^/.]+$/, ""));
         }
+        setFeedback({
+          type: "success",
+          text: `Imported HTML template: "${file.name}". You can now arrange the Chromadiaries logo in your template!`,
+        });
       }
     };
     reader.readAsText(file);
@@ -253,8 +255,7 @@ export default function AdminEmailCenter() {
           htmlContent: htmlContent.trim(),
           senderName: senderName.trim(),
           fromEmail: resolvedFromEmail,
-          wrapTemplate: wrapperConfig.enabled,
-          wrapperConfig,
+          wrapTemplate: false,
         }),
       });
 
@@ -626,11 +627,23 @@ export default function AdminEmailCenter() {
                 />
               </div>
 
+              {/* 1-CLICK HTML LAYOUT STARTERS */}
+              <TemplateLayoutStarters
+                onSelectLayout={(layoutHtml, layoutName) => {
+                  setHtmlContent(layoutHtml);
+                  setFeedback({
+                    type: "success",
+                    text: `Applied "${layoutName}" layout starter. The layout is 100% editable HTML!`,
+                  });
+                }}
+                currentHtmlLength={htmlContent.length}
+              />
+
               {/* MESSAGE CONTENT & TOOLBAR */}
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-xs font-bold uppercase tracking-wider text-emerald-950">
-                    Email Message Content <span className="text-red-500">*</span>
+                    Email Message Content & Layout HTML <span className="text-red-500">*</span>
                   </label>
 
                   <div className="flex items-center gap-2">
@@ -649,20 +662,27 @@ export default function AdminEmailCenter() {
                 <VisualEmailBuilder
                   value={htmlContent}
                   onChange={setHtmlContent}
+                  onRegisterInsertHtml={setCursorInsertFn}
                   placeholder="Click here to type your email message visually. Use the toolbar above to style text, or click 'Insert Shape / Design' to add buttons, badges, and cards with single clicks..."
                   minHeight="320px"
                 />
 
                 <div className="flex items-center justify-between mt-2 text-[11px] text-emerald-950/50">
                   <span>
-                    Supported variables: <code className="bg-emerald-950/5 px-1 rounded font-bold">{"{{name}}"}</code>, <code className="bg-emerald-950/5 px-1 rounded font-bold">{"{{title}}"}</code>
+                    Supported variables: <code className="bg-emerald-950/5 px-1 rounded font-bold">{"{{name}}"}</code>, <code className="bg-emerald-950/5 px-1 rounded font-bold">{"{{title}}"}</code>, <code className="bg-emerald-950/5 px-1 rounded font-bold">{"{{subject}}"}</code>
                   </span>
                   <span>{htmlContent.length} chars</span>
                 </div>
               </div>
 
-              {/* LETTERHEAD & WRAPPER DESIGNER */}
-              <EmailWrapperDesigner config={wrapperConfig} onChange={setWrapperConfig} />
+              {/* CHROMADIARIES LOGO ARRANGER */}
+              <ChromadiariesLogoArranger
+                htmlContent={htmlContent}
+                onChangeHtml={setHtmlContent}
+                onInsertAtCursor={cursorInsertFn || undefined}
+                label="Arrange Chromadiaries Logo in Template"
+                defaultExpanded={true}
+              />
 
               {/* ACTION BUTTONS */}
               <div className="flex gap-4 pt-2">
@@ -708,7 +728,7 @@ export default function AdminEmailCenter() {
                 <span>Live Client Email Preview</span>
               </div>
               <span className="text-[10px] text-emerald-950/60 uppercase font-bold bg-emerald-950/5 px-2.5 py-0.5 rounded-full border border-emerald-950/10">
-                {wrapperConfig.enabled ? wrapperConfig.theme : "Raw HTML Mode"}
+                Pure HTML Template Layout
               </span>
             </div>
 
@@ -716,13 +736,12 @@ export default function AdminEmailCenter() {
             <div className="rounded-[2.5rem] border border-emerald-950/15 p-3 shadow-xl overflow-hidden bg-white">
               <iframe
                 title="Live Email Preview"
-                srcDoc={renderEmailWithWrapper(
+                srcDoc={renderEmailTemplate(
                   subject || "Subject line will appear here...",
                   htmlContent ||
-                    "<p style='color: #9ca3af; font-style: italic;'>Your visual message, shapes, badges, and buttons will appear here in real-time...</p>",
-                  wrapperConfig,
+                    "<div style='text-align: center; padding: 60px 20px; color: #9ca3af; font-family: sans-serif;'><p style='font-size: 16px; margin-bottom: 8px;'>✨ Your email template layout will render here in real-time...</p><p style='font-size: 13px; color: #94a3b8;'>Select a template, apply an HTML layout starter, import an HTML file, or arrange the Chromadiaries logo.</p></div>",
                 )}
-                className="w-full h-[620px] rounded-2xl border-none"
+                className="w-full h-[660px] rounded-2xl border-none"
               />
             </div>
           </div>
@@ -964,12 +983,40 @@ export default function AdminEmailCenter() {
                   {editingTemplate ? "Edit Email Template" : "Create New Email Template"}
                 </h3>
               </div>
-              <button
-                onClick={() => setShowTemplateModal(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-full cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
+
+              <div className="flex items-center gap-2">
+                <div className="flex items-center bg-emerald-950/5 p-1 rounded-xl border border-emerald-950/10 text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setModalPreviewMode("edit")}
+                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      modalPreviewMode === "edit"
+                        ? "bg-emerald-950 text-cream-50 shadow-xs"
+                        : "text-emerald-950/60 hover:text-emerald-950"
+                    }`}
+                  >
+                    Editor
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setModalPreviewMode("preview")}
+                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      modalPreviewMode === "preview"
+                        ? "bg-emerald-950 text-cream-50 shadow-xs"
+                        : "text-emerald-950/60 hover:text-emerald-950"
+                    }`}
+                  >
+                    Live Preview
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => setShowTemplateModal(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600 rounded-full cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             <form onSubmit={handleSaveTemplate} className="space-y-5">
@@ -1000,6 +1047,7 @@ export default function AdminEmailCenter() {
                     <option value="Editorial">Editorial</option>
                     <option value="Spotlight">Spotlight</option>
                     <option value="Official">Official</option>
+                    <option value="Dispatch">Dispatch</option>
                     <option value="Custom">Custom</option>
                   </select>
                 </div>
@@ -1019,27 +1067,61 @@ export default function AdminEmailCenter() {
                 />
               </div>
 
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-emerald-950">
-                    Visual Template Design & Content
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => templateFileInputRef.current?.click()}
-                    className="text-xs text-emerald-700 font-bold underline cursor-pointer"
-                  >
-                    Import .html file
-                  </button>
+              {modalPreviewMode === "preview" ? (
+                <div className="rounded-2xl border border-emerald-950/15 p-2 bg-emerald-950/2">
+                  <iframe
+                    title="Template Live Preview"
+                    srcDoc={renderEmailTemplate(
+                      templateSubject || "Subject Preview",
+                      templateContent || "<p style='text-align:center;color:#9ca3af;padding:40px;'>Template is empty. Switch back to Editor to design your layout.</p>",
+                    )}
+                    className="w-full h-[450px] rounded-xl border-none bg-white"
+                  />
                 </div>
+              ) : (
+                <>
+                  {/* HTML LAYOUT STARTERS */}
+                  <TemplateLayoutStarters
+                    onSelectLayout={(layoutHtml, layoutName) => {
+                      setTemplateContent(layoutHtml);
+                      if (!templateName) setTemplateName(layoutName);
+                    }}
+                    currentHtmlLength={templateContent.length}
+                  />
 
-                <VisualEmailBuilder
-                  value={templateContent}
-                  onChange={setTemplateContent}
-                  placeholder="Design your reusable template visually. Click 'Insert Shape / Design' to place badges, buttons, ribbons, or quote boxes with zero HTML typing..."
-                  minHeight="280px"
-                />
-              </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-emerald-950">
+                        Template HTML & Visual Layout
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => templateFileInputRef.current?.click()}
+                        className="text-xs text-emerald-700 font-bold underline cursor-pointer"
+                      >
+                        Import .html file
+                      </button>
+                    </div>
+
+                    <VisualEmailBuilder
+                      value={templateContent}
+                      onChange={setTemplateContent}
+                      onRegisterInsertHtml={setTemplateCursorInsertFn}
+                      placeholder="Design your reusable template visually. Click 'Insert Shape / Design' to place badges, buttons, ribbons, or quote boxes with zero HTML typing..."
+                      minHeight="280px"
+                    />
+                  </div>
+
+                  {/* LOGO ARRANGER IN TEMPLATE STUDIO */}
+                  <ChromadiariesLogoArranger
+                    htmlContent={templateContent}
+                    onChangeHtml={setTemplateContent}
+                    onInsertAtCursor={templateCursorInsertFn || undefined}
+                    label="Arrange Chromadiaries Logo in Template"
+                    defaultExpanded={false}
+                  />
+                </>
+              )}
 
               <div className="flex gap-3 pt-4 border-t border-emerald-950/10">
                 <button
@@ -1061,7 +1143,6 @@ export default function AdminEmailCenter() {
           </div>
         </div>
       )}
-
       {/* VIEW SENT EMAIL MODAL */}
       {viewingHistoryEmail && (
         <div className="fixed inset-0 z-50 bg-emerald-950/40 backdrop-blur-sm flex items-center justify-center p-4">

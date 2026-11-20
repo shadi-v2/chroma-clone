@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       htmlContent: htmlContent.trim(),
       senderName: cleanSenderName,
       fromEmail: (fromEmail && typeof fromEmail === "string") ? fromEmail.trim() : undefined,
-      wrapInOfficialTemplate: wrapTemplate !== false,
+      wrapInOfficialTemplate: wrapTemplate === true,
       wrapperConfig: wrapperConfig || undefined,
     });
 

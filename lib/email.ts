@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { query } from "@/lib/db";
-import { renderEmailWithWrapper, type EmailWrapperConfig } from "./emailWrapper";
+import { renderEmailWithWrapper, renderEmailTemplate, type EmailWrapperConfig } from "./emailWrapper";
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
@@ -410,7 +410,7 @@ export async function sendOfficialEmail({
   htmlContent,
   senderName = "Chroma Diaries Editorial",
   fromEmail,
-  wrapInOfficialTemplate = true,
+  wrapInOfficialTemplate = false,
   wrapperConfig,
 }: {
   to: string;
@@ -424,10 +424,13 @@ export async function sendOfficialEmail({
   try {
     const resolvedFromEmail = resolveFromEmail(fromEmail || process.env.RESEND_FROM_EMAIL, "editorial");
 
-    const finalHtml = renderEmailWithWrapper(subject, htmlContent, {
-      ...wrapperConfig,
-      enabled: wrapInOfficialTemplate !== false && (wrapperConfig?.enabled !== false),
-    });
+    // The layout comes directly from the HTML template. Never force any constant layout across templates.
+    let finalHtml: string;
+    if (wrapInOfficialTemplate && wrapperConfig?.enabled) {
+      finalHtml = renderEmailWithWrapper(subject, htmlContent, wrapperConfig);
+    } else {
+      finalHtml = renderEmailTemplate(subject, htmlContent);
+    }
 
     if (!resend) {
       console.log(`\n=======================================================`);

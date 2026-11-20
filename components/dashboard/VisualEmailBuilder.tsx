@@ -33,6 +33,7 @@ import {
   Award,
   PenTool,
   Grid,
+  Image as ImageIcon,
 } from "lucide-react";
 
 interface VisualEmailBuilderProps {
@@ -40,6 +41,7 @@ interface VisualEmailBuilderProps {
   onChange: (html: string) => void;
   placeholder?: string;
   minHeight?: string;
+  onRegisterInsertHtml?: (insertFn: (html: string) => void) => void;
 }
 
 export default function VisualEmailBuilder({
@@ -47,6 +49,7 @@ export default function VisualEmailBuilder({
   onChange,
   placeholder = "Click here to write your email visually or insert shapes and buttons...",
   minHeight = "360px",
+  onRegisterInsertHtml,
 }: VisualEmailBuilderProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<"visual" | "html">("visual");
@@ -73,18 +76,8 @@ export default function VisualEmailBuilder({
     }
   }, [onChange]);
 
-  // Execute standard rich text command
-  const execCmd = (command: string, value: string | undefined = undefined) => {
-    if (activeTab !== "visual") return;
-    if (editorRef.current) {
-      editorRef.current.focus();
-    }
-    document.execCommand(command, false, value);
-    handleInput();
-  };
-
   // Insert custom HTML fragment at cursor position
-  const insertHtmlAtCursor = (htmlString: string) => {
+  const insertHtmlAtCursor = useCallback((htmlString: string) => {
     if (activeTab === "html") {
       onChange(value + "\n" + htmlString);
       return;
@@ -117,10 +110,56 @@ export default function VisualEmailBuilder({
 
     handleInput();
     setShowShapeMenu(false);
+  }, [activeTab, handleInput, onChange, value]);
+
+  // Register insertion handler with parent if requested
+  useEffect(() => {
+    if (onRegisterInsertHtml) {
+      onRegisterInsertHtml(insertHtmlAtCursor);
+    }
+  }, [onRegisterInsertHtml, insertHtmlAtCursor]);
+
+  // Execute standard rich text command
+  const execCmd = (command: string, value: string | undefined = undefined) => {
+    if (activeTab !== "visual") return;
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+    document.execCommand(command, false, value);
+    handleInput();
   };
 
   // Preset Design Elements & Shapes
   const designElements = [
+    {
+      category: "Chromadiaries Brand Logos",
+      items: [
+        {
+          name: "Centered Primary Brand Logo",
+          icon: ImageIcon,
+          description: "Official dark emerald brand logo with responsive email container",
+          html: `<!-- CD_LOGO_START --><div data-chromadiaries-logo="true" style="text-align: center; margin: 24px 0; padding: 0;"><a href="https://chromadiaries.in" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;"><img src="https://chromadiaries.in/logo.png" alt="Chroma Diaries" width="165" style="display: block; width: 165px; max-width: 100%; height: auto; border: 0; outline: none; margin: 0 auto;" /></a></div><!-- CD_LOGO_END -->`,
+        },
+        {
+          name: "Left-Aligned Editorial Logo",
+          icon: AlignLeft,
+          description: "Left-aligned logo for clean, modern dispatch letters",
+          html: `<!-- CD_LOGO_START --><div data-chromadiaries-logo="true" style="text-align: left; margin: 20px 0; padding: 0;"><a href="https://chromadiaries.in" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;"><img src="https://chromadiaries.in/logo.png" alt="Chroma Diaries" width="145" style="display: block; width: 145px; max-width: 100%; height: auto; border: 0; outline: none; margin: 0;" /></a></div><!-- CD_LOGO_END -->`,
+        },
+        {
+          name: "White Logo on Emerald Plaque",
+          icon: Award,
+          description: "White brand logo framed in a deep emerald banner container",
+          html: `<div style="background-color: #022c22; padding: 24px; border-radius: 16px; text-align: center; margin: 20px 0;"><!-- CD_LOGO_START --><div data-chromadiaries-logo="true" style="margin: 0; padding: 0;"><a href="https://chromadiaries.in" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;"><img src="https://chromadiaries.in/logo-white.png" alt="Chroma Diaries" width="165" style="display: block; width: 165px; max-width: 100%; height: auto; border: 0; outline: none; margin: 0 auto;" /></a></div><!-- CD_LOGO_END --></div>`,
+        },
+        {
+          name: "Monogram Emblem Seal",
+          icon: Circle,
+          description: "Chroma emblem icon mark for vintage, literary, or compact layouts",
+          html: `<!-- CD_LOGO_START --><div data-chromadiaries-logo="true" style="text-align: center; margin: 18px 0; padding: 0;"><a href="https://chromadiaries.in" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: inline-block;"><img src="https://chromadiaries.in/icon.png" alt="Chroma Diaries" width="70" style="display: block; width: 70px; max-width: 100%; height: auto; border: 0; outline: none; margin: 0 auto;" /></a></div><!-- CD_LOGO_END -->`,
+        },
+      ],
+    },
     {
       category: "Shapes & Badges",
       items: [
